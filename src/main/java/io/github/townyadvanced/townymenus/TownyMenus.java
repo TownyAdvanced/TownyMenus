@@ -5,9 +5,11 @@ import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
 import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
+import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.settings.MenuSettings;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
@@ -37,6 +39,16 @@ public class TownyMenus extends JavaPlugin {
 		TranslationLoader loader = new TranslationLoader(getDataFolder().toPath().resolve("lang"), this, TownyMenus.class);
 		loader.load();
 		TownyAPI.getInstance().addTranslations(this, loader.getTranslations());
+	}
+
+	@Override
+	public void onDisable() {
+		// Close any open inventories if the server isn't stopping, can happen if the /reload command is used.
+		if (!Bukkit.getServer().isStopping()) {
+			for (Player player : Bukkit.getOnlinePlayers())
+				if (player.getOpenInventory().getTopInventory().getHolder() instanceof MenuInventory)
+					player.closeInventory();
+		}
 	}
 
 	public static TownyMenus getPlugin() {

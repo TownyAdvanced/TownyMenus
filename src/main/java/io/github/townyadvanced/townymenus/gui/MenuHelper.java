@@ -6,10 +6,17 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 public class MenuHelper {
+    /**
+     * @return A new back button item builder, without a specific slot.
+     */
     public static MenuItem.Builder backButton() {
         return MenuItem.builder(Material.BARRIER)
                 .name(Component.text("Back", NamedTextColor.GREEN))
                 .lore(Component.text("Click to go back to the previous screen.", NamedTextColor.GRAY))
                 .action(ClickAction.back());
+    }
+
+    public static int normalizeSize(int size) {
+        return (int) Math.min(Math.ceil(size / 9d) * 9, 54);
     }
 }

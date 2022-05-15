@@ -1,11 +1,14 @@
 package io.github.townyadvanced.townymenus.gui.action;
 
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
+import io.github.townyadvanced.townymenus.gui.MenuItem;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public interface ClickAction {
@@ -39,5 +42,9 @@ public interface ClickAction {
 
     static BackAction back() {
         return BACK;
+    }
+
+    static PaginatorAction paginate(Component title, Supplier<List<MenuItem>> supplier) {
+        return new PaginatorAction(title, supplier);
     }
 }

@@ -1,6 +1,7 @@
 package io.github.townyadvanced.townymenus.gui;
 
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
+import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -18,21 +19,25 @@ import java.util.List;
 import java.util.UUID;
 
 public class MenuItem {
-    private int slot;
+    private SlotAnchor slot;
     private final ItemStack itemStack;
     private String permission;
     private final List<ClickAction> actions = new ArrayList<>(0);
 
-    public MenuItem(ItemStack itemStack, int slot) {
+    public MenuItem(ItemStack itemStack, SlotAnchor slot) {
         this.itemStack = itemStack;
         this.slot = slot;
     }
 
-    public int slot() {
-        return this.slot;
+    public int resolveSlot(int size) {
+        return this.slot.resolveSlot(size);
     }
 
     public void slot(int slot) {
+        this.slot = SlotAnchor.ofExact(slot);
+    }
+
+    public void slot(SlotAnchor slot) {
         this.slot = slot;
     }
 
@@ -70,7 +75,7 @@ public class MenuItem {
         private Component name = Component.empty();
         private final List<Component> lore = new ArrayList<>(0);
         private int size = 1;
-        private int slot = 0;
+        private SlotAnchor slot = SlotAnchor.ofExact(0);
         private final List<ClickAction> actions = new ArrayList<>(0);
         private boolean glint;
         private UUID ownerUUID;
@@ -94,7 +99,17 @@ public class MenuItem {
             return this;
         }
 
+        public Builder clearActions() {
+            this.actions.clear();
+            return this;
+        }
+
         public Builder slot(int slot) {
+            this.slot = SlotAnchor.ofExact(slot);
+            return this;
+        }
+
+        public Builder slot(SlotAnchor slot) {
             this.slot = slot;
             return this;
         }

@@ -21,11 +21,13 @@ import java.util.function.Supplier;
 
 public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supplier<MenuInventory> {
     private final Inventory inventory;
+    private final int size;
     private final Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
 
     public MenuInventory(@NotNull Inventory inventory, @NotNull Component title) {
         this.inventory = Bukkit.createInventory(this, inventory.getSize(), title);
         this.inventory.setContents(inventory.getContents());
+        this.size = this.inventory.getSize();
     }
 
     @Override
@@ -54,16 +56,17 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     public void addItem(@NotNull MenuItem item) {
-        if (item.slot() > this.inventory.getSize() - 1)
+        if (item.resolveSlot(this.size) > this.inventory.getSize() - 1)
             return;
 
-        this.inventory.setItem(item.slot(), item.itemStack());
+        this.inventory.setItem(item.resolveSlot(this.size), item.itemStack());
 
         if (!item.actions().isEmpty())
-            clickActions.put(item.slot(), item.actions());
+            clickActions.put(item.resolveSlot(this.size), item.actions());
     }
 
     public void open(@NotNull HumanEntity player) {
+        // If a player already has a MenuInventory open, replace any back actions with openInventory ones.
         if (player.getOpenInventory().getTopInventory().getHolder() instanceof MenuInventory inventory) {
             for (List<ClickAction> actions : clickActions.values()) {
                 for (int i = 0; i < actions.size(); i++) {
@@ -84,7 +87,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     public int size() {
-        return this.inventory.getSize();
+        return this.size;
     }
 
     public static Builder builder() {
@@ -105,19 +108,19 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         private Builder() {}
 
         public Builder addItem(@NotNull MenuItem item) {
-            if (item.slot() > size - 1)
+            if (item.resolveSlot(this.size) > size - 1)
                 return this;
 
-            items.put(item.slot(), item.itemStack());
+            items.put(item.resolveSlot(this.size), item.itemStack());
 
             if (!item.actions().isEmpty())
-                actions.put(item.slot(), item.actions());
+                actions.put(item.resolveSlot(this.size), item.actions());
 
             return this;
         }
 
         public Builder size(int size) {
-            this.size = (int) Math.min(Math.ceil(size / 9d) * 9, 54);
+            this.size = MenuHelper.normalizeSize(size);
             return this;
         }
 
