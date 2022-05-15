@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -29,7 +30,12 @@ public class ResidentMenu {
         return () -> MenuInventory.builder()
                 .rows(3)
                 .title(Component.text("Resident Menu"))
-                // TODO: add resident friend menu, with options to add, view and remove friends
+                .addItem(MenuItem.builder(Material.PLAYER_HEAD)
+                        .name(Component.text("View Friends", NamedTextColor.GREEN))
+                        .lore(Component.text("Click to see your friends list.", NamedTextColor.GRAY))
+                        .slot(11)
+                        .action(ClickAction.paginate(Component.text("Resident Friends"), () -> formatFriendsView(player)))
+                        .build())
                 .addItem(formatResidentInfo(player.getUniqueId(), 13))
                 .addItem(MenuItem.builder(Material.RED_BED)
                         .name(Component.text("Spawn", NamedTextColor.GREEN))
@@ -77,10 +83,10 @@ public class ResidentMenu {
         lore.add(Component.text("Status: ", NamedTextColor.DARK_GREEN).append(resident.isOnline() ? Component.text("● Online", NamedTextColor.GREEN) : Component.text("● Offline", NamedTextColor.RED)));
 
         if (resident.hasTown()) {
-            lore.add(Component.text(resident.isMayor() ? "Mayor" : "Resident" + " of ", NamedTextColor.DARK_GREEN).append(Component.text(resident.getTownOrNull().getName(), NamedTextColor.GREEN)));
+            lore.add(Component.text((resident.isMayor() ? "Mayor" : "Resident") + " of ", NamedTextColor.DARK_GREEN).append(Component.text(resident.getTownOrNull().getName(), NamedTextColor.GREEN)));
 
             if (resident.hasNation())
-                lore.add(Component.text(resident.isKing() ? "Leader" : "Member" + " of ", NamedTextColor.DARK_GREEN).append(Component.text(resident.getNationOrNull().getName(), NamedTextColor.GREEN)));
+                lore.add(Component.text((resident.isKing() ? "Leader" : "Member") + " of ", NamedTextColor.DARK_GREEN).append(Component.text(resident.getNationOrNull().getName(), NamedTextColor.GREEN)));
         }
 
         lore.add(Component.text("Registered ", NamedTextColor.DARK_GREEN).append(Component.text(Time.formatRegistered(resident.getRegistered()), NamedTextColor.GREEN)));
@@ -94,5 +100,21 @@ public class ResidentMenu {
                 .lore(lore)
                 .slot(slot)
                 .build();
+    }
+
+    public static List<MenuItem> formatFriendsView(@NotNull Player player) {
+        Resident resident = TownyAPI.getInstance().getResident(player);
+
+        if (resident == null || resident.getFriends().size() == 0)
+            return Collections.singletonList(MenuItem.builder(Material.BARRIER)
+                    .name(Component.text("Error", NamedTextColor.RED))
+                    .lore(Component.text("You do not have any friends to list.", NamedTextColor.GRAY))
+                    .build());
+
+        List<MenuItem> friends = new ArrayList<>();
+        for (Resident friend : resident.getFriends())
+            friends.add(formatResidentInfo(friend.getUUID(), 0));
+
+        return friends;
     }
 }
