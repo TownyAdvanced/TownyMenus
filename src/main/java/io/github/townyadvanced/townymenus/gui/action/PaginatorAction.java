@@ -7,6 +7,7 @@ import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.utils.MenuScheduler;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -16,11 +17,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class PaginatorAction implements ClickAction {
     private final Supplier<List<MenuItem>> supplier;
+    private final List<MenuItem> extraItems = new ArrayList<>(0);
     private final Component title;
 
     public PaginatorAction(Component title, List<MenuItem> items) {
@@ -33,9 +36,14 @@ public class PaginatorAction implements ClickAction {
         this.title = title;
     }
 
+    public PaginatorAction addExtraItem(MenuItem item) {
+        this.extraItems.add(item);
+        return this;
+    }
+
     @Override
     public void onClick(MenuInventory inventory, InventoryClickEvent event) {
-        Bukkit.getScheduler().runTaskAsynchronously(TownyMenus.getPlugin(), () -> {
+        MenuScheduler.scheduleAsync(event.getWhoClicked(), () -> {
             List<MenuItem> items = supplier.get();
             // Each page can hold 45 items (5 rows), the bottom row is reserved for forward/back buttons.
             int pageCount = (int) Math.ceil(items.size() / 45d);
@@ -53,6 +61,9 @@ public class PaginatorAction implements ClickAction {
                     item.slot(j);
                     builder.addItem(item);
                 }
+
+                for (MenuItem extraItem : this.extraItems)
+                    builder.addItem(extraItem);
 
                 // Add a back button if we're not on the first page
                 if (i != 0)
