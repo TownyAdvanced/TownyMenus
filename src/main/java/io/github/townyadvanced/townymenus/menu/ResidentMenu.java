@@ -59,6 +59,7 @@ public class ResidentMenu {
                                                 return AnvilGUI.Response.text(friend.getName() + " is already your friend!");
 
                                             ResidentCommand.residentFriendAdd(player, resident, Collections.singletonList(friend));
+                                            TownyMenus.logger().info(player.getName() + " has added " + friend.getName() + " as a friend.");
 
                                             // Re-open resident menu
                                             MenuScheduler.scheduleAsync(player, () -> createResidentMenu(player).get().open(player));
@@ -156,7 +157,7 @@ public class ResidentMenu {
                         // TODO: Reopen root menu in order to prevent back button loop
                         MenuScheduler.scheduleAsync(player, () -> createResidentMenu(player).get().open(player));
 
-                        TownyMenus.getPlugin().getLogger().info(player.getName() + " has removed " + friend.getName() + " as a friend.");
+                        TownyMenus.logger().info(player.getName() + " has removed " + friend.getName() + " as a friend.");
                     }))))
                     .build());
 
