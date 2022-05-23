@@ -7,7 +7,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,7 +20,6 @@ import java.util.UUID;
 public class MenuItem {
     private SlotAnchor slot;
     private final ItemStack itemStack;
-    private String permission;
     private final List<ClickAction> actions = new ArrayList<>(0);
 
     public MenuItem(ItemStack itemStack, SlotAnchor slot) {
@@ -45,14 +43,6 @@ public class MenuItem {
         return this.itemStack;
     }
 
-    public boolean hasPermission(@NotNull Player player) {
-        return this.permission == null || player.hasPermission(this.permission);
-    }
-
-    public void permission(@NotNull String permission) {
-        this.permission = permission;
-    }
-
     @NotNull
     public List<ClickAction> actions() {
         return this.actions;
@@ -68,6 +58,30 @@ public class MenuItem {
 
     public static Builder builder(@NotNull Material type) {
         return new Builder(type);
+    }
+
+    public Builder builder() {
+        Builder builder = builder(itemStack.getType())
+                .name(itemStack.displayName())
+                .slot(slot)
+                .size(itemStack.getAmount());
+
+        final ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+            if (meta.hasEnchants())
+                builder.withGlint();
+
+            if (meta.hasLore())
+                builder.lore(meta.lore());
+
+            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.hasOwner() && skullMeta.getPlayerProfile().isComplete())
+                builder.skullOwner(skullMeta.getPlayerProfile().getId());
+        }
+
+        for (ClickAction clickAction : this.actions)
+            builder.action(clickAction);
+
+        return builder;
     }
 
     public static class Builder {
