@@ -7,6 +7,7 @@ import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
+import io.github.townyadvanced.townymenus.listeners.PlayerListener;
 import io.github.townyadvanced.townymenus.settings.MenuSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ import org.slf4j.Logger;
 
 public class TownyMenus extends JavaPlugin {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.98.1.0");
+	private static final Version requiredTownyVersion = Version.fromString("0.98.2.0");
 	private static TownyMenus plugin;
 
 	@Override
@@ -33,6 +34,7 @@ public class TownyMenus extends JavaPlugin {
 		MenuSettings.loadConfig();
 
 		Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 		Bukkit.getPluginCommand("townymenu").setExecutor(new TownyMenuCommand(this));
 
 		logger().info("Loading translations...");

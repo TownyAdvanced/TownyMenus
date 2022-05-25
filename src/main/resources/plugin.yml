@@ -12,3 +12,13 @@ commands:
       - tmenu
       - townygui
       - tgui
+    permission: townymenus.command.townymenu
+
+permissions:
+  townymenus.command.*:
+    default: op
+    children:
+      townymenus.command.townymenu: true
+
+  townymenus.command.townymenu:
+    default: true

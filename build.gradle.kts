@@ -1,6 +1,7 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "7.1.2" apply true
+    id("xyz.jpenilla.run-paper") version "1.0.6"
 }
 
 repositories {
@@ -23,7 +24,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
-    compileOnly("com.palmergames.bukkit.towny:towny:0.98.1.0")
+    compileOnly("com.palmergames.bukkit.towny:towny:0.98.2.0")
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
 }
 group = "io.github.townyadvanced"
@@ -54,6 +55,10 @@ tasks {
         filteringCharset = Charsets.UTF_8.name()
 
         expand("version" to project.version)
+    }
+
+    runServer {
+        minecraftVersion("1.18.2")
     }
 }
 

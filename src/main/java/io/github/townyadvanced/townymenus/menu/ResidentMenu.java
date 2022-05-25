@@ -11,6 +11,7 @@ import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.utils.SpawnUtil;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
+import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
@@ -41,31 +42,7 @@ public class ResidentMenu {
                         .name(Component.text("View Friends", NamedTextColor.GREEN))
                         .lore(Component.text("Click to see your friends list.", NamedTextColor.GRAY))
                         .slot(11)
-                        .action(ClickAction.paginate(Component.text("Resident Friends"), () -> formatFriendsView(player))
-                                .addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                                        .name(Component.text("Add Friend", NamedTextColor.GREEN))
-                                        .lore(Component.text("Click here to add a player as a friend.", NamedTextColor.GRAY))
-                                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                                        .action(ClickAction.userInput("Enter player name.", name -> {
-                                            Resident friend = TownyAPI.getInstance().getResident(name);
-                                            if (friend == null)
-                                                return AnvilGUI.Response.text("Not a valid resident.");
-
-                                            Resident resident = TownyAPI.getInstance().getResident(player);
-                                            if (resident == null)
-                                                return AnvilGUI.Response.text("You are not registered.");
-
-                                            if (resident.hasFriend(friend))
-                                                return AnvilGUI.Response.text(friend.getName() + " is already your friend!");
-
-                                            ResidentCommand.residentFriendAdd(player, resident, Collections.singletonList(friend));
-                                            TownyMenus.logger().info(player.getName() + " has added " + friend.getName() + " as a friend.");
-
-                                            // Re-open resident menu
-                                            MenuScheduler.scheduleAsync(player, () -> createResidentMenu(player).get().open(player));
-                                            return AnvilGUI.Response.close();
-                                        }))
-                                        .build()))
+                        .action(ClickAction.openInventory(formatResidentFriends(player)))
                         .build())
                 .addItem(formatResidentInfo(player.getUniqueId()).slot(13).build())
                 .addItem(MenuItem.builder(Material.RED_BED)
@@ -153,14 +130,54 @@ public class ResidentMenu {
 
                         ResidentCommand.residentFriendRemove(player, resident, Collections.singletonList(friend));
 
-                        // Re-open resident menu
-                        // TODO: Reopen root menu in order to prevent back button loop
-                        MenuScheduler.scheduleAsync(player, () -> createResidentMenu(player).get().open(player));
+                        // Re-open resident friends menu
+                        MenuScheduler.scheduleAsync(player, () -> {
+                            MenuHistory.pop(player.getUniqueId());
+                            formatResidentFriends(player).open(player);
+                        });
 
                         TownyMenus.logger().info(player.getName() + " has removed " + friend.getName() + " as a friend.");
                     }))))
                     .build());
 
         return friends;
+    }
+
+    private static MenuInventory formatResidentFriends(Player player) {
+        return MenuInventory.paginator()
+                .title(Component.text("Resident Friends"))
+                .addItems(formatFriendsView(player))
+                .addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
+                        .name(Component.text("Add Friend", NamedTextColor.GREEN))
+                        .lore(Component.text("Click here to add a player as a friend.", NamedTextColor.GRAY))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                        .action(ClickAction.userInput("Enter player name.", name -> {
+                            Resident resident = TownyAPI.getInstance().getResident(player);
+                            if (resident == null)
+                                return AnvilGUI.Response.text("You are not registered.");
+
+                            Resident friend = TownyAPI.getInstance().getResident(name);
+                            if (friend == null || friend.getUUID().equals(resident.getUUID()))
+                                return AnvilGUI.Response.text("Not a valid resident.");
+
+                            if (resident.hasFriend(friend))
+                                return AnvilGUI.Response.text(friend.getName() + " is already your friend!");
+
+                            List<Resident> friends = new ArrayList<>();
+                            friends.add(friend);
+
+                            ResidentCommand.residentFriendAdd(player, resident, friends);
+                            TownyMenus.logger().info(player.getName() + " has added " + friend.getName() + " as a friend.");
+
+                            // Re-open resident friends menu
+                            MenuScheduler.scheduleAsync(player, () -> {
+                                MenuHistory.pop(player.getUniqueId());
+                                formatResidentFriends(player).open(player);
+                            });
+
+                            return AnvilGUI.Response.close();
+                        }))
+                        .build())
+                .build();
     }
 }

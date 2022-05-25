@@ -23,7 +23,7 @@ public class UserInputAction implements ClickAction {
     public void onClick(MenuInventory inventory, InventoryClickEvent event) {
         new AnvilGUI.Builder()
                 .title(title)
-                .onClose(inventory::open) // Re-open previous inventory if closed
+                .onClose(inventory::openSilent) // Re-open previous inventory if closed
                 .onComplete((player, input) -> inputFunction.apply(input))
                 .itemLeft(new ItemStack(Material.PAPER))
                 .plugin(TownyMenus.getPlugin())

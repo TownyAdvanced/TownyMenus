@@ -3,6 +3,7 @@
 /.settings/
 /.project
 /*.iml
+/run
 
 # Ignore Gradle project-specific cache directory
 .gradle

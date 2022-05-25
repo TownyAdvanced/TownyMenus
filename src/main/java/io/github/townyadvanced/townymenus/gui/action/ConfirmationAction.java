@@ -40,9 +40,9 @@ public class ConfirmationAction implements ClickAction {
                 .addItem(MenuItem.builder(Material.RED_STAINED_GLASS)
                         .name(Component.text("Cancel", NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD))
                         .slot(15)
-                        .action(ClickAction.openInventory(inventory))
+                        .action(ClickAction.openSilent(inventory))
                         .build())
                 .build()
-                .open(event.getWhoClicked());
+                .openSilent(event.getWhoClicked());
     }
 }
