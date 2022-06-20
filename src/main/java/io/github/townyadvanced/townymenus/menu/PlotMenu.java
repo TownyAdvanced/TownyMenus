@@ -131,6 +131,7 @@ public class PlotMenu {
                     .name(Component.text(type.getFormattedName(), NamedTextColor.GREEN))
                     .lore(alreadySelected ? Component.text("Currently selected!", NamedTextColor.GRAY) : Component.text("Click to change the plot type to " + type.getFormattedName() + ".", NamedTextColor.GRAY))
                     .lore(!alreadySelected && type.getCost() > 0 && TownyEconomyHandler.isActive() ? Component.text("Setting this type will cost " + TownyEconomyHandler.getFormattedBalance(type.getCost()) + ".", NamedTextColor.GRAY) : Component.empty())
+                    .lore(!alreadySelected && TownyEconomyHandler.isActive() && townBlock.getTownOrNull() != null && type.getTax(townBlock.getTownOrNull()) > 0 ? Component.text("Tax for this type is " + TownyEconomyHandler.getFormattedBalance(type.getTax(townBlock.getTownOrNull())) + ".", NamedTextColor.GRAY) : Component.empty())
                     .withGlint(alreadySelected)
                     .action(alreadySelected ? ClickAction.NONE : type.getCost() > 0 && TownyEconomyHandler.isActive() // Add confirmation if cost > 0 and economy is active
                             ? ClickAction.confirmation(() -> Component.text("Changing the plot type will cost " + TownyEconomyHandler.getFormattedBalance(type.getCost()) + ", are you sure you want to continue?", NamedTextColor.RED), ClickAction.run(onClick))
