@@ -68,8 +68,7 @@ public class MenuItem {
 
         final ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
-            if (meta.hasEnchants())
-                builder.withGlint();
+            builder.withGlint(meta.hasEnchants());
 
             if (meta.hasLore())
                 builder.lore(meta.lore());
@@ -130,6 +129,11 @@ public class MenuItem {
 
         public Builder withGlint() {
             this.glint = true;
+            return this;
+        }
+
+        public Builder withGlint(boolean glint) {
+            this.glint = glint;
             return this;
         }
 

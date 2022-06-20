@@ -117,13 +117,16 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         private Builder() {}
 
         public Builder addItem(@NotNull MenuItem item) {
-            if (item.resolveSlot(this.size) > size - 1)
+            // TODO: resolve slots in the build method, the size can change later on
+            int slot = item.resolveSlot(this.size);
+
+            if (slot > this.size - 1)
                 return this;
 
-            items.put(item.resolveSlot(this.size), item.itemStack());
+            items.put(slot, item.itemStack());
 
             if (!item.actions().isEmpty())
-                actions.put(item.resolveSlot(this.size), item.actions());
+                actions.put(slot, item.actions());
 
             return this;
         }
