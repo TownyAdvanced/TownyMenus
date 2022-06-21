@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supplier<MenuInventory> {
+    private static final ItemStack backgroundGlass = MenuItem.builder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build().itemStack();
     private final Inventory inventory;
     private final int size;
     private final Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
@@ -152,6 +153,9 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
 
         public MenuInventory build() {
             Inventory inventory = Bukkit.createInventory(null, size, title);
+
+            for (int i = 0; i < size; i++)
+                inventory.setItem(i, backgroundGlass);
 
             for (Map.Entry<Integer, ItemStack> entry : items.entrySet())
                 inventory.setItem(entry.getKey(), entry.getValue());
