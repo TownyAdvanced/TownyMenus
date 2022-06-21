@@ -2,9 +2,14 @@ package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
+import com.palmergames.bukkit.towny.TownySettings;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
-import com.palmergames.bukkit.towny.object.Transaction;
+import com.palmergames.bukkit.towny.object.TownBlockType;
+import com.palmergames.bukkit.towny.object.TownBlockTypeCache;
+import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
+import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
 import com.palmergames.bukkit.towny.object.TransactionType;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
@@ -36,24 +41,79 @@ public class TownMenu {
                 .title(Component.text("Town Menu - " + (town != null ? town.getName() : "No Town")))
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
                         .name(Component.text("Transaction History", NamedTextColor.GREEN))
+                        .slot(0)
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
-                            else if (!TownyEconomyHandler.isActive())
-                                return Component.text("Economy has not been turned on.", NamedTextColor.GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode()))
                                 return Component.text("You do not have permission to view the town's transaction history.", NamedTextColor.GRAY);
                             else
                                 return Component.text("Click to view the town's transaction history.", NamedTextColor.GRAY);
                         })
                         .action(town != null && TownyEconomyHandler.isActive() && player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode())
-                            ? ClickAction.openInventory(() -> createBankHistoryMenu(player, town)) : ClickAction.NONE)
+                            ? ClickAction.openInventory(() -> createBankHistoryMenu(town)) : ClickAction.NONE)
+                        .build())
+                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                        .name(Component.text("Town Plots", NamedTextColor.GREEN))
+                        .slot(1)
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_PLOTS.getNode()))
+                                return Component.text("You do not have permission to view the town's plots.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view the town's plots.", NamedTextColor.GRAY);
+                        })
+                        .action(ClickAction.openInventory(() -> {
+                            if (town == null || !TownyUniverse.getInstance().hasTown(town.getUUID()))
+                                return MenuInventory.paginator().title(Component.text("Town Plots")).build();
+
+                            List<MenuItem> plotItems = new ArrayList<>();
+                            TownBlockTypeCache cache = town.getTownBlockTypeCache();
+
+                            for (TownBlockType type : TownBlockTypeHandler.getTypes().values()) {
+                                int residentOwned = cache.getNumTownBlocks(type, CacheType.RESIDENTOWNED);
+
+                                plotItems.add(MenuItem.builder(Material.GRASS_BLOCK)
+                                        .name(Component.text(type.getFormattedName(), NamedTextColor.GREEN))
+                                        .lore(Component.text("Resident Owned: ", NamedTextColor.DARK_GREEN).append(Component.text(residentOwned, NamedTextColor.GREEN)))
+                                        .lore(Component.text("For Sale: ", NamedTextColor.DARK_GREEN).append(Component.text(cache.getNumTownBlocks(type, CacheType.FORSALE), NamedTextColor.GREEN)))
+                                        .lore(Component.text("Total: ", NamedTextColor.DARK_GREEN).append(Component.text(cache.getNumTownBlocks(type, CacheType.ALL), NamedTextColor.GREEN)))
+                                        .lore(!TownyEconomyHandler.isActive() ? Component.empty() : Component.text("Daily Revenue: ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(residentOwned * type.getTax(town)), NamedTextColor.GREEN)))
+                                        .build());
+                            }
+
+                            return MenuInventory.paginator()
+                                    .addItems(plotItems)
+                                    .addExtraItem(MenuItem.builder(Material.OAK_SIGN)
+                                            .name(Component.text("Town Plots", NamedTextColor.DARK_GREEN))
+                                            .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                                            .lore(Component.text("Town Size: ", NamedTextColor.DARK_GREEN).append(Component.text(town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString(), NamedTextColor.GREEN))
+                                                    .append(town.hasUnlimitedClaims()
+                                                            ? Component.empty()
+                                                            : TownySettings.isSellingBonusBlocks(town) ?
+                                                            Component.text(" [Bought: " + town.getPurchasedBlocks() + "/" + TownySettings.getMaxPurchasedBlocks(town) + "]", NamedTextColor.AQUA) :
+                                                            Component.empty()
+                                                                    .append(town.getBonusBlocks() > 0 ?
+                                                                            Component.text(" [Bonus: " + town.getBonusBlocks() + "]", NamedTextColor.AQUA) :
+                                                                            Component.empty())
+                                                                    .append(TownySettings.getNationBonusBlocks(town) > 0 ?
+                                                                            Component.text(" [NationBonus: " + TownySettings.getNationBonusBlocks(town) + "]", NamedTextColor.AQUA) :
+                                                                            Component.empty())))
+                                            .lore(Component.text("Town Owned Land: ", NamedTextColor.DARK_GREEN).append(Component.text(town.getTownBlocks().size() - cache.getNumberOfResidentOwnedTownBlocks(), NamedTextColor.GREEN)))
+                                            .build())
+                                    .title(Component.text("Town Plots"))
+                                    .build();
+                        }))
                         .build())
                 .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
                 .build();
     }
 
-    private static MenuInventory createBankHistoryMenu(Player player, Town town) {
+    private static MenuInventory createBankHistoryMenu(Town town) {
+        if (town == null || !TownyEconomyHandler.isActive() || !TownyUniverse.getInstance().hasTown(town.getUUID()))
+            return MenuInventory.paginator().title(Component.text("Transaction History")).build();
+
         List<MenuItem> transactionItems = new ArrayList<>();
         List<BankTransaction> transactions = new ArrayList<>(town.getAccount().getAuditor().getTransactions());
 
@@ -71,9 +131,6 @@ public class TownMenu {
 
         Collections.reverse(transactionItems);
 
-        return MenuInventory.paginator()
-                .addItems(transactionItems)
-                .title(Component.text("Transaction History"))
-                .build();
+        return MenuInventory.paginator().addItems(transactionItems).title(Component.text("Transaction History")).build();
     }
 }
