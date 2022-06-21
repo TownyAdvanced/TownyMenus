@@ -193,6 +193,11 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         }
 
         public MenuInventory build() {
+            if (this.items.isEmpty())
+                this.items.add(MenuItem.builder(Material.BARRIER)
+                        .name(Component.text("No entries to list.", NamedTextColor.RED))
+                        .build());
+
             // Each page can hold 45 items (5 rows), the bottom row is reserved for forward/back buttons.
             int pageCount = (int) Math.ceil(items.size() / 45d);
             MenuInventory[] inventories = new MenuInventory[pageCount];

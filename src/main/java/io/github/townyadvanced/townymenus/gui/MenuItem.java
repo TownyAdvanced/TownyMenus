@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class MenuItem {
     private SlotAnchor slot;
@@ -142,6 +143,10 @@ public class MenuItem {
                 this.lore.add(lore.decoration(TextDecoration.ITALIC, false));
 
             return this;
+        }
+
+        public Builder lore(@NotNull Supplier<Component> supplier) {
+            return this.lore(supplier.get());
         }
 
         public Builder lore(@NotNull List<Component> lore) {

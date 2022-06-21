@@ -9,6 +9,7 @@ import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
+import io.github.townyadvanced.townymenus.menu.TownMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -59,7 +60,7 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
                                 ? Component.text("Click to view the town menu!", NamedTextColor.GRAY)
                                 : Component.text("✖ You are not a member of a town.", NamedTextColor.RED))
                         .slot(10)
-                        .action(hasTown ? ClickAction.close() : ClickAction.NONE)
+                        .action(hasTown ? ClickAction.openInventory(TownMenu.createTownMenu(player)) : ClickAction.NONE)
                         .build())
                 .addItem(MenuItem.builder(Material.DIAMOND)
                         .name(Component.text("Nation Settings", NamedTextColor.AQUA))
