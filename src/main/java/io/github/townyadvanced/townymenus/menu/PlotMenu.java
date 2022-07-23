@@ -116,6 +116,8 @@ public class PlotMenu {
                                 return AnvilGUI.Response.close();
                             }
 
+                            newName = newName.replaceAll(" ", "_");
+
                             if (NameValidation.isBlacklistName(newName)) {
                                 TownyMessaging.sendErrorMsg(player, Translatable.of("msg_invalid_name"));
                                 MenuHistory.last(player);
@@ -337,7 +339,7 @@ public class PlotMenu {
                                 TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                                 if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, worldCoord)) {
-                                    MenuHistory.back(player);
+                                    MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
                                     return AnvilGUI.Response.close();
                                 }
 
@@ -353,7 +355,7 @@ public class PlotMenu {
 
                                 putTownBlockForSale(player, townBlock, plotPrice);
 
-                                MenuHistory.back(player);
+                                MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
                                 return AnvilGUI.Response.close();
                             }))
                             .build())
