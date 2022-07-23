@@ -1,7 +1,6 @@
 package io.github.townyadvanced.townymenus.gui;
 
 import io.github.townyadvanced.townymenus.TownyMenus;
-import io.github.townyadvanced.townymenus.gui.action.BackAction;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;

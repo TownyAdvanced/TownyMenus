@@ -4,13 +4,12 @@ import io.github.townyadvanced.townymenus.TownyMenus;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MenuScheduler {
-    private static final Set<UUID> hasRunningTask = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<UUID> hasRunningTask = ConcurrentHashMap.newKeySet();
 
     public static void scheduleAsync(HumanEntity entity, Runnable runnable) {
         scheduleAsync(entity.getUniqueId(), runnable);

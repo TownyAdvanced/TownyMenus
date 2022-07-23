@@ -1,5 +1,6 @@
 package io.github.townyadvanced.townymenus.gui;
 
+import io.github.townyadvanced.townymenus.utils.MenuScheduler;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * Used for tracking what menus a player has opened in their current 'session'.
@@ -66,5 +68,12 @@ public class MenuHistory {
             return;
 
         history.remove(history.size() - 1);
+    }
+
+    public static void reOpen(Player player, Supplier<MenuInventory> supplier) {
+        MenuScheduler.scheduleAsync(player.getUniqueId(), () -> {
+            pop(player.getUniqueId());
+            supplier.get().open(player);
+        });
     }
 }

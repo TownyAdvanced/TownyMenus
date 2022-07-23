@@ -29,14 +29,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class TownMenu {
-    public static Supplier<MenuInventory> createTownMenu(@NotNull Player player) {
+    public static MenuInventory createTownMenu(@NotNull Player player) {
         Resident resident = TownyAPI.getInstance().getResident(player);
         Town town = resident != null ? resident.getTownOrNull() : null;
 
-        return () -> MenuInventory.builder()
+        return MenuInventory.builder()
                 .rows(6)
                 .title(Component.text("Town Menu - " + (town != null ? town.getName() : "No Town")))
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)

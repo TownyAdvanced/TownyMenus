@@ -1,7 +1,5 @@
 package io.github.townyadvanced.townymenus.commands;
 
-import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.object.Resident;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -43,12 +41,6 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        Resident resident = TownyAPI.getInstance().getResident(player);
-        boolean hasTown = resident != null && resident.hasTown();
-        boolean hasNation = resident != null && resident.hasNation();
-
-        boolean inWilderness = TownyAPI.getInstance().isWilderness(player.getLocation());
-
         MenuHistory.clearHistory(player.getUniqueId());
 
         MenuInventory.builder()
@@ -56,31 +48,26 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
                 .title(Component.text("Towny Menu"))
                 .addItem(MenuItem.builder(Material.EMERALD)
                         .name(Component.text("Town Settings", NamedTextColor.GREEN))
-                        .lore(hasTown
-                                ? Component.text("Click to view the town menu!", NamedTextColor.GRAY)
-                                : Component.text("✖ You are not a member of a town.", NamedTextColor.RED))
+                        .lore(Component.text("Click to view the town menu!", NamedTextColor.GRAY))
                         .slot(10)
-                        .action(hasTown ? ClickAction.openInventory(TownMenu.createTownMenu(player)) : ClickAction.NONE)
+                        .action(ClickAction.openInventory(TownMenu.createTownMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.DIAMOND)
                         .name(Component.text("Nation Settings", NamedTextColor.AQUA))
-                        .lore(hasNation
-                                ? Component.text("Click to view the nation menu!", NamedTextColor.GRAY)
-                                : Component.text("✖ You are not a member of a nation.", NamedTextColor.RED))
+                        .lore(Component.text("Click to view the nation menu!", NamedTextColor.GRAY))
                         .slot(12)
-                        .action(hasNation ? ClickAction.close() : ClickAction.NONE)
+                        .action(ClickAction.close())
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Plot Settings", NamedTextColor.DARK_GREEN))
-                        .lore(inWilderness
-                                ? Component.text("✖ You cannot view the plot menu while standing outside of a town.", NamedTextColor.RED)
-                                : Component.text("Click to view the plot menu!", NamedTextColor.GRAY))
+                        .lore(Component.text("Click to view the plot menu!", NamedTextColor.GRAY))
                         .slot(14)
-                        .action(inWilderness ? ClickAction.NONE : ClickAction.openInventory(PlotMenu.createPlotMenu(player)))
+                        .action(ClickAction.openInventory(() -> PlotMenu.createPlotMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
                         .skullOwner(player.getUniqueId())
                         .name(Component.text("Resident Settings", NamedTextColor.YELLOW))
+                        .lore(Component.text("Click to view the resident menu!", NamedTextColor.GRAY))
                         .slot(16)
                         .action(ClickAction.openInventory(ResidentMenu.createResidentMenu(player)))
                         .build())
