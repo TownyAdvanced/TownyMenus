@@ -19,4 +19,8 @@ public class MenuHelper {
     public static int normalizeSize(int size) {
         return (int) Math.min(Math.ceil(size / 9d) * 9, 54);
     }
+
+    public static Component errorMessage(String message) {
+        return Component.text("✖ " + message, NamedTextColor.RED);
+    }
 }

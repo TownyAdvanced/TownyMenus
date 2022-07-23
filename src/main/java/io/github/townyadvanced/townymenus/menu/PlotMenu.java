@@ -14,6 +14,7 @@ import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.WorldCoord;
+import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.util.NameValidation;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
@@ -33,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class PlotMenu {
     public static MenuInventory createPlotMenu(@NotNull Player player) {
@@ -40,6 +42,7 @@ public class PlotMenu {
         TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
         boolean isOwner = testPlotOwner(player, worldCoord);
+        boolean isWilderness = townBlock == null;
 
         return MenuInventory.builder()
             .title(Component.text("Plot Menu"))
@@ -48,12 +51,13 @@ public class PlotMenu {
             .addItem(MenuItem.builder(Material.NAME_TAG)
                     .name(Component.text("Plot Set", NamedTextColor.GREEN))
                     .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
-                    .action(isOwner ? ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord)) : ClickAction.NONE)
+                    .lore(isWilderness ? MenuHelper.errorMessage("This menu cannot be opened while in the wilderness.") : Component.empty())
+                    .action(isWilderness ? ClickAction.NONE : ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord, isOwner)))
                     .build())
                 .build();
     }
 
-    private static MenuInventory createPlotSetMenu(Player player, WorldCoord worldCoord) {
+    private static MenuInventory createPlotSetMenu(Player player, WorldCoord worldCoord, boolean isOwner) {
         return MenuInventory.builder()
                 .rows(4)
                 .title(Component.text("Plot Set Menu"))
@@ -62,10 +66,18 @@ public class PlotMenu {
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Set plot name", NamedTextColor.GREEN))
                         .lore(Component.text("Changes the name of the current plot.", NamedTextColor.GRAY))
-                        .action(ClickAction.userInput("Input new plot name", newName -> {
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
+                                return Component.text("You do not have permission to change this plot's name.", NamedTextColor.GRAY);
+                            else if (!isOwner)
+                                return Component.text("Only the owner of the plot can change it's name.", NamedTextColor.GRAY);
+                            else
+                                return Component.empty();
+                        })
+                        .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Input new plot name", newName -> {
                             TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
-                            if (!testPlotOwner(player, worldCoord)) {
+                            if (townBlock == null || !testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode())) {
                                 MenuHistory.last(player);
                                 return AnvilGUI.Response.close();
                             }
@@ -88,7 +100,8 @@ public class PlotMenu {
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Set plot type", NamedTextColor.GREEN))
                         .lore(Component.text("Changes the type of the current plot.", NamedTextColor.GRAY))
-                        .action(ClickAction.openInventory(() -> formatPlotSetType(player, worldCoord)))
+                        .lore(!isOwner ? Component.text("Only the owner of the plot can change it's type.", NamedTextColor.GRAY) : Component.empty())
+                        .action(!isOwner ? ClickAction.NONE : ClickAction.openInventory(() -> formatPlotSetType(player, worldCoord)))
                         .build())
                 .build();
     }
@@ -102,12 +115,15 @@ public class PlotMenu {
         PlotGroup group = townBlock == null ? null : townBlock.getPlotObjectGroup();
 
         for (TownBlockType type : TownBlockTypeHandler.getTypes().values()) {
+            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET.getNode(type.getName().toLowerCase(Locale.ROOT))))
+                continue;
+
             boolean alreadySelected = type == currentType;
             double changeCost = group == null ? type.getCost() : type.getCost() * group.getTownBlocks().size();
 
             Runnable onClick = () -> {
                 // Check if the player still has permissions to change the plot type.
-                if (!testPlotOwner(player, worldCoord)) {
+                if (!testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET.getNode(type.getName().toLowerCase(Locale.ROOT)))) {
                     player.sendMessage(Component.text("You do not have enough permissions to change the type for this plot.", NamedTextColor.RED));
                     MenuHistory.back(player);
                     return;

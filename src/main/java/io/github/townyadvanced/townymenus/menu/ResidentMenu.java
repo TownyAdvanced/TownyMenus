@@ -66,9 +66,7 @@ public class ResidentMenu {
                         })))
                         .slot(15)
                         .build())
-                .addItem(MenuHelper.backButton()
-                        .slot(26)
-                        .build())
+                .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
                 .build();
     }
 
