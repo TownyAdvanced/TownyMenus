@@ -38,22 +38,57 @@ import java.util.Locale;
 
 public class PlotMenu {
     public static MenuInventory createPlotMenu(@NotNull Player player) {
-        WorldCoord worldCoord = WorldCoord.parseWorldCoord(player);
+        return createPlotMenu(player, WorldCoord.parseWorldCoord(player));
+    }
+
+    public static MenuInventory createPlotMenu(@NotNull Player player, WorldCoord worldCoord) {
         TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
         boolean isOwner = testPlotOwner(player, worldCoord);
         boolean isWilderness = townBlock == null;
 
         return MenuInventory.builder()
-            .title(Component.text("Plot Menu"))
-            .size(27)
-            .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
-            .addItem(MenuItem.builder(Material.NAME_TAG)
-                    .name(Component.text("Plot Set", NamedTextColor.GREEN))
-                    .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
-                    .lore(isWilderness ? MenuHelper.errorMessage("This menu cannot be opened while in the wilderness.") : Component.empty())
-                    .action(isWilderness ? ClickAction.NONE : ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord, isOwner)))
-                    .build())
+                .title(Component.text("Plot Menu"))
+                .rows(4)
+                .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                .addItem(MenuItem.builder(Material.NAME_TAG)
+                        .name(Component.text("Plot Set", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .lore(isWilderness ? MenuHelper.errorMessage("This menu cannot be opened while in the wilderness.") : Component.empty())
+                        .action(isWilderness ? ClickAction.NONE : ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord, isOwner)))
+                        .build())
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                        .name(Component.text("Set Plot For Sale", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .lore(() -> {
+                            if (isWilderness)
+                                return Component.text("Wilderness plots cannot be put for sale.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()))
+                                return Component.text("You do not have permission to put this plot for sale.", NamedTextColor.GRAY);
+                            else if (!isOwner)
+                                return Component.text("Only the owner of the plot can put it for sale.");
+                            else return Component.empty();
+                        })
+                        .action(isOwner && player.hasPermission(townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_FORSALE.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode())
+                                ? putForSaleOrOpenForSaleMenu(player, worldCoord)
+                                : ClickAction.NONE)
+                        .build())
+                .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
+                        .name(Component.text("Set Plot Not For Sale", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .lore(() -> {
+                            if (isWilderness)
+                                return Component.text("Wilderness plots cannot be put not for sale.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()))
+                                return Component.text("You do not have permission to put this plot not for sale.", NamedTextColor.GRAY);
+                            else if (!isOwner)
+                                return Component.text("Only the owner of the plot can put it not for sale.");
+                            else return Component.empty();
+                        })
+                        .action(isOwner && player.hasPermission(townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_NOTFORSALE.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_NOTFORSALE.getNode())
+                                ? ClickAction.run(() -> putNotForSale(player, worldCoord))
+                                : ClickAction.NONE)
+                        .build())
                 .build();
     }
 
@@ -71,8 +106,7 @@ public class PlotMenu {
                                 return Component.text("You do not have permission to change this plot's name.", NamedTextColor.GRAY);
                             else if (!isOwner)
                                 return Component.text("Only the owner of the plot can change it's name.", NamedTextColor.GRAY);
-                            else
-                                return Component.empty();
+                            else return Component.empty();
                         })
                         .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Input new plot name", newName -> {
                             TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
@@ -82,7 +116,7 @@ public class PlotMenu {
                                 return AnvilGUI.Response.close();
                             }
 
-                            if (!NameValidation.isBlacklistName(newName)) {
+                            if (NameValidation.isBlacklistName(newName)) {
                                 TownyMessaging.sendErrorMsg(player, Translatable.of("msg_invalid_name"));
                                 MenuHistory.last(player);
                                 return AnvilGUI.Response.close();
@@ -105,10 +139,9 @@ public class PlotMenu {
                                 return Component.text("You do not have permission to clear this plot's name.", NamedTextColor.GRAY);
                             else if (!isOwner)
                                 return Component.text("Only the owner of the plot can clear it's name.", NamedTextColor.GRAY);
-                            else
-                                return Component.empty();
+                            else return Component.empty();
                         })
-                        .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.confirmation(ClickAction.run(() -> {
+                        .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.confirmation(() -> Component.text("Click to confirm removing the plot's name.", NamedTextColor.GRAY), ClickAction.run(() -> {
                             TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                             if (townBlock == null || !testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode())) {
@@ -173,7 +206,6 @@ public class PlotMenu {
                 }
 
                 if (plotGroup == null) {
-
                     if (TownBlockType.ARENA.equals(type) && TownySettings.getOutsidersPreventPVPToggle()) {
                         for (Player target : Bukkit.getOnlinePlayers()) {
                             if (!townBlock1.getTownOrNull().hasResident(target) && !player.getName().equals(target.getName()) && worldCoord.equals(WorldCoord.parseWorldCoord(target))) {
@@ -247,6 +279,7 @@ public class PlotMenu {
                     // We've already checked whether the player can pay above, so this should never fail.
                     // If we withdrew at the top of the method we'd need to refund the cost back if the type couldn't be set.
                     resident.getAccount().withdraw(cost, String.format("Plot set to %s", type.getFormattedName()));
+                    TownyMessaging.sendMsg(player, Translatable.of("msg_plot_set_cost", cost, type.getFormattedName()));
                 }
 
                 TownyMessaging.sendMsg(player, Translatable.of(plotGroup == null ? "msg_plot_set_type" : "msg_set_group_type_to_x", type.getFormattedName()));
@@ -267,6 +300,128 @@ public class PlotMenu {
         }
 
         return MenuInventory.paginator().addItems(plotTypeItems).title(Component.text("Select plot type")).build();
+    }
+
+    private static ClickAction putForSaleOrOpenForSaleMenu(Player player, WorldCoord worldCoord) {
+        ClickAction putForSale = ClickAction.run(() -> {
+            TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+
+            PermissionNodes node = townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_FORSALE : PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE;
+
+            if (townBlock == null || !player.hasPermission(node.getNode()) || !testPlotOwner(player, worldCoord)) {
+                if (TownyEconomyHandler.isActive())
+                    MenuHistory.back(player);
+
+                return;
+            }
+
+            putTownBlockForSale(player, townBlock, 0);
+
+            if (TownyEconomyHandler.isActive())
+                MenuHistory.back(player);
+        });
+
+        // If the economy handler isn't active, put the plot for sale straight away.
+        // If it's active, allow the player to either pick between their own price or for free.
+        if (!TownyEconomyHandler.isActive())
+            return putForSale;
+        else
+            return ClickAction.openInventory(() -> MenuInventory.builder()
+                    .rows(3)
+                    .title(Component.text("Select plot sell price"))
+                    .addItem(MenuItem.builder(Material.PAPER)
+                            .name(Component.text("Custom Amount", NamedTextColor.GREEN))
+                            .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                            .lore(Component.text("Click to enter a custom amount as the new plot price.", NamedTextColor.GRAY))
+                            .action(ClickAction.userInput("Enter plot price", price -> {
+                                TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+
+                                if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, worldCoord)) {
+                                    MenuHistory.back(player);
+                                    return AnvilGUI.Response.close();
+                                }
+
+                                double plotPrice;
+                                try {
+                                    plotPrice = Double.parseDouble(price);
+                                } catch (NumberFormatException e) {
+                                    return AnvilGUI.Response.text(price + " is not a valid price.");
+                                }
+
+                                if (plotPrice < 0)
+                                    return AnvilGUI.Response.text(price + " is not a valid price.");
+
+                                putTownBlockForSale(player, townBlock, plotPrice);
+
+                                MenuHistory.back(player);
+                                return AnvilGUI.Response.close();
+                            }))
+                            .build())
+                    .addItem(MenuItem.builder(Material.EMERALD)
+                            .name(Component.text("Free", NamedTextColor.GREEN))
+                            .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                            .lore(Component.text("Click to put this plot for sale for free.", NamedTextColor.GRAY))
+                            .action(putForSale)
+                            .build())
+                    .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                    .build());
+    }
+
+    private static void putTownBlockForSale(Player player, TownBlock townBlock, double price) {
+        PlotGroup group = townBlock.getPlotObjectGroup();
+        Resident resident = TownyAPI.getInstance().getResident(player);
+
+        if (group == null) {
+            townBlock.setPlotPrice(Math.min(price, TownySettings.getMaxPlotPrice()));
+            townBlock.save();
+
+            TownyMessaging.sendPrefixedTownMessage(townBlock.getTownOrNull(), Translatable.of("msg_plot_for_sale", player.getName(), townBlock.getWorldCoord().toString()));
+
+            if (resident == null || !resident.hasTown() || townBlock.getTownOrNull() != resident.getTownOrNull())
+                TownyMessaging.sendMsg(player, Translatable.of("msg_plot_for_sale", player.getName(), townBlock.getWorldCoord().toString()));
+        } else {
+            group.setPrice(Math.min(price, TownySettings.getMaxPlotPrice()));
+            group.save();
+
+            Translatable message = Translatable.of("msg_player_put_group_up_for_sale", player.getName(), group.getName(), TownyEconomyHandler.getFormattedBalance(group.getPrice()));
+            TownyMessaging.sendPrefixedTownMessage(townBlock.getTownOrNull(), message);
+
+            if (resident == null || !resident.hasTown() || resident.getTownOrNull() != townBlock.getTownOrNull())
+                TownyMessaging.sendMsg(player, message);
+        }
+    }
+
+    private static void putNotForSale(Player player, WorldCoord worldCoord) {
+        TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+
+        PermissionNodes node = townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_NOTFORSALE : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_FORSALE;
+
+        if (townBlock == null || !player.hasPermission(node.getNode()) || !testPlotOwner(player, worldCoord))
+            return;
+
+        PlotGroup group = townBlock.getPlotObjectGroup();
+
+        if (group == null) {
+            if (townBlock.getPlotPrice() == -1)
+                return;
+
+            townBlock.setPlotPrice(-1);
+            townBlock.save();
+
+            TownyMessaging.sendMsg(player, Translatable.of("msg_plot_set_to_nfs"));
+        } else {
+            if (group.getPrice() == -1)
+                return;
+
+            group.setPrice(-1);
+            group.save();
+
+            TownyMessaging.sendPrefixedTownMessage(townBlock.getTownOrNull(), Translatable.of("msg_player_made_group_not_for_sale", player.getName(), group.getName()));
+
+            Resident resident = TownyAPI.getInstance().getResident(player);
+            if (resident == null || !resident.hasTown() || resident.getTownOrNull() != townBlock.getTownOrNull())
+                TownyMessaging.sendMsg(player, Translatable.of("msg_player_made_group_not_for_sale", player.getName(), group.getName()));
+        }
     }
 
     private static boolean testPlotOwner(Player player, WorldCoord worldCoord) {

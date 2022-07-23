@@ -49,7 +49,7 @@ public class TownMenu {
                             else
                                 return Component.text("Click to view the town's transaction history.", NamedTextColor.GRAY);
                         })
-                        .action(town != null && TownyEconomyHandler.isActive() && player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode())
+                        .action(town != null && player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode())
                             ? ClickAction.openInventory(() -> createBankHistoryMenu(town)) : ClickAction.NONE)
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
