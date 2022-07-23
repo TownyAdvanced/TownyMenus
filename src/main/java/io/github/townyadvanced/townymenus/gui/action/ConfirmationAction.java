@@ -35,7 +35,6 @@ public class ConfirmationAction implements ClickAction {
                         .lore(warning.get())
                         .slot(11)
                         .action(confirmAction)
-                        .action(ClickAction.close())
                         .build())
                 .addItem(MenuItem.builder(Material.RED_STAINED_GLASS)
                         .name(Component.text("Cancel", NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD))

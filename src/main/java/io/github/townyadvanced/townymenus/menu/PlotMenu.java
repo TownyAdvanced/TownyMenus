@@ -82,7 +82,7 @@ public class PlotMenu {
                                 return AnvilGUI.Response.close();
                             }
 
-                            if (!NameValidation.isValidName(newName)) {
+                            if (!NameValidation.isBlacklistName(newName)) {
                                 TownyMessaging.sendErrorMsg(player, Translatable.of("msg_invalid_name"));
                                 MenuHistory.last(player);
                                 return AnvilGUI.Response.close();
@@ -95,6 +95,32 @@ public class PlotMenu {
                             MenuHistory.last(player);
                             return AnvilGUI.Response.close();
                         }))
+                        .build())
+                .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
+                        .name(Component.text("Clear plot name", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .lore(Component.text("Clears the name of the current plot.", NamedTextColor.GRAY))
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
+                                return Component.text("You do not have permission to clear this plot's name.", NamedTextColor.GRAY);
+                            else if (!isOwner)
+                                return Component.text("Only the owner of the plot can clear it's name.", NamedTextColor.GRAY);
+                            else
+                                return Component.empty();
+                        })
+                        .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.confirmation(ClickAction.run(() -> {
+                            TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+
+                            if (townBlock == null || !testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode())) {
+                                MenuHistory.last(player);
+                                return;
+                            }
+
+                            townBlock.setName("");
+                            townBlock.save();
+                            TownyMessaging.sendMsg(player, Translatable.of("msg_plot_name_removed"));
+                            MenuHistory.reOpen(player, () -> createPlotSetMenu(player, worldCoord, true));
+                        })))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
@@ -141,7 +167,7 @@ public class PlotMenu {
                 if (cost > 0 && TownyEconomyHandler.isActive()) {
                     if (!resident.getAccount().canPayFromHoldings(cost)) {
                         TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_cannot_afford_plot_set_type_cost", type.getFormattedName(), TownyEconomyHandler.getFormattedBalance(cost)));
-                        MenuHistory.reOpen(player, formatPlotSetType(player, worldCoord));
+                        MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                         return;
                     }
                 }
@@ -152,7 +178,7 @@ public class PlotMenu {
                         for (Player target : Bukkit.getOnlinePlayers()) {
                             if (!townBlock1.getTownOrNull().hasResident(target) && !player.getName().equals(target.getName()) && worldCoord.equals(WorldCoord.parseWorldCoord(target))) {
                                 TownyMessaging.sendErrorMsg(player, Translatable.of("msg_cant_toggle_pvp_outsider_in_plot"));
-                                MenuHistory.reOpen(player, formatPlotSetType(player, worldCoord));
+                                MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                                 return;
                             }
                         }
@@ -170,7 +196,7 @@ public class PlotMenu {
                         townBlock1.setType(type, resident);
                     } catch (TownyException e) {
                         TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                        MenuHistory.reOpen(player, formatPlotSetType(player, worldCoord));
+                        MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                         return;
                     }
                 } else {
@@ -180,7 +206,7 @@ public class PlotMenu {
                             for (Player target : Bukkit.getOnlinePlayers()) {
                                 if (!townBlock1.getTownOrNull().hasResident(target) && !player.getName().equals(target.getName()) && groupBlock.getWorldCoord().equals(WorldCoord.parseWorldCoord(target))) {
                                     TownyMessaging.sendErrorMsg(player, Translatable.of("msg_cant_toggle_pvp_outsider_in_plot"));
-                                    MenuHistory.reOpen(player, formatPlotSetType(player, worldCoord));
+                                    MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                                     return;
                                 }
                             }
@@ -211,7 +237,7 @@ public class PlotMenu {
                                 alteredBlock.save();
                             }
 
-                            MenuHistory.reOpen(player, formatPlotSetType(player, worldCoord));
+                            MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                             return;
                         }
                     }
@@ -225,7 +251,7 @@ public class PlotMenu {
 
                 TownyMessaging.sendMsg(player, Translatable.of(plotGroup == null ? "msg_plot_set_type" : "msg_set_group_type_to_x", type.getFormattedName()));
 
-                MenuHistory.reOpen(player, formatPlotSetType(player, worldCoord));
+                MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
             };
 
             plotTypeItems.add(MenuItem.builder(Material.GRASS_BLOCK)

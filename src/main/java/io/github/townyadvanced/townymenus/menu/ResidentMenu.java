@@ -64,6 +64,7 @@ public class ResidentMenu {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
                         })))
+                        .action(ClickAction.close())
                         .slot(15)
                         .build())
                 .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
@@ -129,10 +130,7 @@ public class ResidentMenu {
                         ResidentCommand.residentFriendRemove(player, resident, Collections.singletonList(friend));
 
                         // Re-open resident friends menu
-                        MenuScheduler.scheduleAsync(player, () -> {
-                            MenuHistory.pop(player.getUniqueId());
-                            formatResidentFriends(player).open(player);
-                        });
+                        MenuHistory.reOpen(player, () -> formatResidentFriends(player));
 
                         TownyMenus.logger().info(player.getName() + " has removed " + friend.getName() + " as a friend.");
                     }))))
