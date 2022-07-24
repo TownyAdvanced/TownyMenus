@@ -2,9 +2,12 @@ package io.github.townyadvanced.townymenus.listeners;
 
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
+import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+
+import java.util.List;
 
 public class InventoryListener implements Listener {
     private final TownyMenus plugin;
@@ -20,7 +23,8 @@ public class InventoryListener implements Listener {
 
         event.setCancelled(true);
 
-        if (menu.hasActions(event.getSlot()))
-            menu.actions(event.getSlot()).forEach(action -> action.onClick(menu, event));
+        List<ClickAction> actions = menu.actions(event.getSlot());
+        if (actions != null)
+            actions.forEach(action -> action.onClick(menu, event));
     }
 }

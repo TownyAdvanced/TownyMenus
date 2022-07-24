@@ -54,7 +54,7 @@ public class PlotMenu {
         return MenuInventory.builder()
                 .title(Component.text("Plot Menu"))
                 .rows(4)
-                .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Plot Set", NamedTextColor.GREEN))
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
@@ -106,7 +106,7 @@ public class PlotMenu {
         return MenuInventory.builder()
                 .rows(4)
                 .title(Component.text("Plot Set Menu"))
-                .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Set plot name", NamedTextColor.GREEN))
@@ -202,7 +202,7 @@ public class PlotMenu {
 
                 // Should never be null, testPlotOwner returns false if it is not claimed anymore.
                 TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
-                if (townBlock1 == null)
+                if (townBlock1 == null || !townBlock1.getTypeName().equalsIgnoreCase(type.getName()))
                     return;
 
                 PlotGroup plotGroup = townBlock1.getPlotObjectGroup();
@@ -375,7 +375,7 @@ public class PlotMenu {
                             .lore(Component.text("Click to put this plot for sale for free.", NamedTextColor.GRAY))
                             .action(putForSale)
                             .build())
-                    .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                    .addItem(MenuHelper.backButton().build())
                     .build());
     }
 

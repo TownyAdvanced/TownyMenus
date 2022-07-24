@@ -35,7 +35,7 @@ public class TownyMenus extends JavaPlugin {
 
 		Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-		Bukkit.getPluginCommand("townymenu").setExecutor(new TownyMenuCommand(this));
+		getCommand("townymenu").setExecutor(new TownyMenuCommand(this));
 
 		logger().info("Loading translations...");
 		TranslationLoader loader = new TranslationLoader(getDataFolder().toPath().resolve("lang"), this, TownyMenus.class);

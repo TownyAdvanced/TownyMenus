@@ -226,11 +226,11 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
                             .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(0)))
                             .build());
 
-                // Since we already have the inventory to go back to, clear the actions and add an openInventory one instead.
                 builder.addItem(MenuHelper.backButton()
                         .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(4)))
                         .build());
 
+                // Add a forward button if we're not on the last page
                 if (i + 1 != pageCount)
                     builder.addItem(MenuItem.builder(Material.ARROW)
                             .name(Component.text("Next", NamedTextColor.GREEN).decorate(TextDecoration.BOLD))

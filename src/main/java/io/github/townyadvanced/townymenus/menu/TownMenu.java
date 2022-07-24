@@ -2,8 +2,12 @@ package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
+import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.TownyUniverse;
+import com.palmergames.bukkit.towny.command.TownCommand;
+import com.palmergames.bukkit.towny.exceptions.TownyException;
+import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlockType;
@@ -24,6 +28,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -63,8 +68,8 @@ public class TownMenu {
                             else
                                 return Component.text("Click to view the town's plots.", NamedTextColor.GRAY);
                         })
-                        .action(ClickAction.openInventory(() -> {
-                            if (town == null || !TownyUniverse.getInstance().hasTown(town.getUUID()))
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_PLOTS.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
+                            if (!TownyUniverse.getInstance().hasTown(town.getUUID()))
                                 return MenuInventory.paginator().title(Component.text("Town Plots")).build();
 
                             List<MenuItem> plotItems = new ArrayList<>();
@@ -105,7 +110,31 @@ public class TownMenu {
                                     .build();
                         }))
                         .build())
-                .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                .addItem(MenuItem.builder(Material.RED_BED)
+                        .slot(2)
+                        .name(Component.text("Town Spawn", NamedTextColor.GREEN))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission("towny.town.spawn.town"))
+                                return Component.text("You do not have permission to use this.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to teleport to your town's spawn.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null || !player.hasPermission("towny.town.spawn.town") ? ClickAction.NONE : ClickAction.confirmation(() -> Component.text("Click to confirm using /town spawn.", NamedTextColor.GRAY), ClickAction.run(() -> {
+                            if (!player.hasPermission("towny.town.spawn.town"))
+                                return;
+
+                            try {
+                                TownCommand.townSpawn(player, new String[]{}, false, true);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
+
+                            player.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+                        })))
+                        .build())
+                .addItem(MenuHelper.backButton().build())
                 .build();
     }
 

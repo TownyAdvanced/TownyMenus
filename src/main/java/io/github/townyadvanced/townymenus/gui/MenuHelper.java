@@ -1,6 +1,7 @@
 package io.github.townyadvanced.townymenus.gui;
 
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
+import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ public class MenuHelper {
         return MenuItem.builder(Material.BARRIER)
                 .name(Component.text("Back", NamedTextColor.GREEN))
                 .lore(Component.text("Click to go back to the previous screen.", NamedTextColor.GRAY))
+                .slot(SlotAnchor.bottomRight())
                 .action(ClickAction.back());
     }
 

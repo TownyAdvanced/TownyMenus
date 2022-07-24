@@ -25,6 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +52,7 @@ public class ResidentMenu {
                         .lore(player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_SPAWN.getNode())
                                 ? Component.text("Click to teleport to your spawn!", NamedTextColor.GRAY)
                                 : Component.text("✖ You do not have enough permissions to use this!", NamedTextColor.RED))
-                        .action(ClickAction.confirmation(() -> Component.text("Click to confirm using /resident spawn.", NamedTextColor.GRAY), ClickAction.run(() -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_SPAWN.getNode()) ? ClickAction.NONE : ClickAction.confirmation(() -> Component.text("Click to confirm using /resident spawn.", NamedTextColor.GRAY), ClickAction.run(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_SPAWN.getNode()))
                                 return;
 
@@ -64,11 +65,12 @@ public class ResidentMenu {
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
+
+                            player.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
                         })))
-                        .action(ClickAction.close())
                         .slot(15)
                         .build())
-                .addItem(MenuHelper.backButton().slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0))).build())
+                .addItem(MenuHelper.backButton().build())
                 .build();
     }
 
@@ -156,7 +158,7 @@ public class ResidentMenu {
                                 return AnvilGUI.Response.text("You are not registered.");
 
                             Resident friend = TownyAPI.getInstance().getResident(name);
-                            if (friend == null || friend.getUUID().equals(resident.getUUID()))
+                            if (friend == null || friend.isNPC() || friend.getUUID().equals(resident.getUUID()))
                                 return AnvilGUI.Response.text("Not a valid resident.");
 
                             if (resident.hasFriend(friend))
