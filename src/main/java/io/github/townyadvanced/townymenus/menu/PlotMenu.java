@@ -1,11 +1,14 @@
 package io.github.townyadvanced.townymenus.menu;
 
+import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.command.PlotCommand;
 import com.palmergames.bukkit.towny.event.PlotPreChangeTypeEvent;
+import com.palmergames.bukkit.towny.event.plot.PlotTrustAddEvent;
+import com.palmergames.bukkit.towny.event.plot.PlotTrustRemoveEvent;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.PlotGroup;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -35,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class PlotMenu {
     public static MenuInventory createPlotMenu(@NotNull Player player) {
@@ -88,6 +92,12 @@ public class PlotMenu {
                         .action(isOwner && player.hasPermission(townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_NOTFORSALE.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_NOTFORSALE.getNode())
                                 ? ClickAction.run(() -> putNotForSale(player, worldCoord))
                                 : ClickAction.NONE)
+                        .build())
+                .addItem(MenuItem.builder(Material.OAK_SIGN)
+                        .name(Component.text("Trusted Players", NamedTextColor.GREEN))
+                        .lore(Component.text("Click to view the current plot's trusted player list.", NamedTextColor.GRAY))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
+                        .action(ClickAction.openInventory(() -> formatPlotTrustMenu(player, worldCoord)))
                         .build())
                 .build();
     }
@@ -338,7 +348,7 @@ public class PlotMenu {
                             .action(ClickAction.userInput("Enter plot price", price -> {
                                 TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
-                                if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, worldCoord)) {
+                                if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, townBlock)) {
                                     MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
                                     return AnvilGUI.Response.close();
                                 }
@@ -398,7 +408,7 @@ public class PlotMenu {
 
         PermissionNodes node = townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_NOTFORSALE : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_FORSALE;
 
-        if (townBlock == null || !player.hasPermission(node.getNode()) || !testPlotOwner(player, worldCoord))
+        if (townBlock == null || !player.hasPermission(node.getNode()) || !testPlotOwner(player, townBlock))
             return;
 
         PlotGroup group = townBlock.getPlotObjectGroup();
@@ -426,9 +436,153 @@ public class PlotMenu {
         }
     }
 
-    private static boolean testPlotOwner(Player player, WorldCoord worldCoord) {
-        Resident resident = TownyAPI.getInstance().getResident(player);
+    private static MenuInventory formatPlotTrustMenu(Player player, WorldCoord worldCoord) {
         TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+
+        if (townBlock == null)
+            return MenuInventory.paginator().title(Component.text("Trusted Players")).build();
+
+        PlotGroup plotGroup = townBlock.getPlotObjectGroup();
+        boolean canAddRemove = player.hasPermission(plotGroup == null ? PermissionNodes.TOWNY_COMMAND_PLOT_TRUST.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_TRUST.getNode()) && testPlotOwner(player, townBlock);
+
+        Set<Resident> trusted = plotGroup == null ? townBlock.getTrustedResidents() : plotGroup.getTrustedResidents();
+        List<MenuItem> trustedPlayers = new ArrayList<>(trusted.size());
+
+        for (Resident trustedResident : trusted) {
+            MenuItem.Builder builder = ResidentMenu.formatResidentInfo(trustedResident);
+
+            if (canAddRemove)
+                builder.lore(Component.text("Right click to remove this player as trusted.", NamedTextColor.GRAY))
+                        .action(ClickAction.rightClick(ClickAction.confirmation(() -> Component.text("Are you sure you want to remove " + trustedResident.getName() + " as trusted?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                            TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
+                            if (townBlock1 == null)
+                                return;
+
+                            PlotGroup group = townBlock1.getPlotObjectGroup();
+
+                            if (!player.hasPermission(group == null ? PermissionNodes.TOWNY_COMMAND_PLOT_TRUST.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_TRUST.getNode()) || !testPlotOwner(player, townBlock1)) {
+                                TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_command_disable"));
+                                MenuHistory.back(player);
+                                return;
+                            }
+
+                            PlotTrustRemoveEvent event;
+                            if (group == null) {
+                                event = new PlotTrustRemoveEvent(townBlock, trustedResident, player);
+                                Bukkit.getPluginManager().callEvent(event);
+
+                                if (event.isCancelled()) {
+                                    TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                                    return;
+                                }
+
+                                townBlock.removeTrustedResident(trustedResident);
+                                Towny.getPlugin().deleteCache(trustedResident);
+
+                                TownyMessaging.sendMsg(player, Translatable.of("msg_trusted_removed", trustedResident.getName(), Translatable.of("townblock")));
+                                if (trustedResident.isOnline() && !trustedResident.getName().equals(player.getName()))
+                                    TownyMessaging.sendMsg(trustedResident, Translatable.of("msg_trusted_removed_2", player.getName(), Translatable.of("townblock"), townBlock.getWorldCoord().getCoord().toString()));
+                            } else {
+                                event = new PlotTrustRemoveEvent(new ArrayList<>(group.getTownBlocks()), trustedResident, player);
+                                Bukkit.getPluginManager().callEvent(event);
+
+                                if (event.isCancelled()) {
+                                    TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                                    MenuHistory.back(player);
+                                    return;
+                                }
+
+                                group.removeTrustedResident(trustedResident);
+                                Towny.getPlugin().deleteCache(trustedResident);
+
+                                TownyMessaging.sendMsg(player, Translatable.of("msg_trusted_removed", trustedResident.getName(), Translatable.of("plotgroup_sing")));
+
+                                if (trustedResident.isOnline() && !trustedResident.getName().equals(player.getName()))
+                                    TownyMessaging.sendMsg(trustedResident, Translatable.of("msg_trusted_removed_2", player.getName(), Translatable.of("plotgroup_sing"), group.getName()));
+                            }
+
+                            MenuHistory.reOpen(player, () -> formatPlotTrustMenu(player, worldCoord));
+                        }))));
+            trustedPlayers.add(builder.build());
+        }
+
+        MenuInventory.PaginatorBuilder builder = MenuInventory.paginator()
+                .addItems(trustedPlayers)
+                .title(Component.text("Trusted Players"));
+
+        if (canAddRemove)
+            builder.addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
+                    .name(Component.text("Add player as trusted", NamedTextColor.GREEN))
+                    .lore(Component.text("Click here to add a player as trusted", NamedTextColor.GRAY))
+                    .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                    .action(ClickAction.userInput("Enter player name", name -> {
+                        Resident resident = TownyAPI.getInstance().getResident(name);
+                        if (resident == null)
+                            return AnvilGUI.Response.text("Not a valid resident.");
+
+                        TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
+                        if (townBlock1 == null)
+                            return AnvilGUI.Response.close();
+
+                        PlotGroup group = townBlock1.getPlotObjectGroup();
+
+                        // Check if the player can still add players as trusted
+                        if (!player.hasPermission(group == null ? PermissionNodes.TOWNY_COMMAND_PLOT_TRUST.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_TRUST.getNode()) || !testPlotOwner(player, townBlock1))
+                            return AnvilGUI.Response.close();
+
+                        if (group == null) {
+                            if (townBlock1.hasTrustedResident(resident))
+                                return AnvilGUI.Response.text(resident.getName() + " is already trusted.");
+
+                            PlotTrustAddEvent event = new PlotTrustAddEvent(townBlock, resident, player);
+                            Bukkit.getPluginManager().callEvent(event);
+
+                            if (event.isCancelled()) {
+                                TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                                return AnvilGUI.Response.close();
+                            }
+
+                            townBlock.addTrustedResident(resident);
+                            Towny.getPlugin().deleteCache(resident);
+
+                            TownyMessaging.sendMsg(player, Translatable.of("msg_trusted_added", resident.getName(), Translatable.of("townblock")));
+                            if (resident.isOnline() && !resident.getName().equals(player.getName()))
+                                TownyMessaging.sendMsg(resident, Translatable.of("msg_trusted_added_2", player.getName(), Translatable.of("townblock"), townBlock.getWorldCoord().getCoord().toString()));
+                        } else {
+                            if (group.hasTrustedResident(resident))
+                                return AnvilGUI.Response.text(resident.getName() + " is already trusted.");
+
+                            PlotTrustAddEvent event = new PlotTrustAddEvent(new ArrayList<>(group.getTownBlocks()), resident, player);
+                            Bukkit.getPluginManager().callEvent(event);
+
+                            if (event.isCancelled()) {
+                                TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                                return AnvilGUI.Response.close();
+                            }
+
+                            group.addTrustedResident(resident);
+                            Towny.getPlugin().deleteCache(resident);
+
+                            TownyMessaging.sendMsg(player, Translatable.of("msg_trusted_added", resident.getName(), Translatable.of("plotgroup_sing")));
+
+                            if (resident.isOnline() && !resident.getName().equals(player.getName()))
+                                TownyMessaging.sendMsg(resident, Translatable.of("msg_trusted_added_2", player.getName(), Translatable.of("plotgroup_sing"), group.getName()));
+                        }
+
+                        MenuHistory.reOpen(player, () -> formatPlotTrustMenu(player, worldCoord));
+                        return AnvilGUI.Response.close();
+                    }))
+                    .build());
+
+        return builder.build();
+    }
+
+    private static boolean testPlotOwner(Player player, WorldCoord worldCoord) {
+        return testPlotOwner(player, TownyAPI.getInstance().getTownBlock(worldCoord));
+    }
+
+    private static boolean testPlotOwner(Player player, TownBlock townBlock) {
+        Resident resident = TownyAPI.getInstance().getResident(player);
 
         if (resident == null || townBlock == null)
             return false;

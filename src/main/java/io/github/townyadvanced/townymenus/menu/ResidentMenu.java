@@ -26,6 +26,7 @@ import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,16 +72,18 @@ public class ResidentMenu {
                 .build();
     }
 
+    public static MenuItem.Builder formatResidentInfo(@NotNull UUID uuid) {
+        return formatResidentInfo(TownyAPI.getInstance().getResident(uuid));
+    }
+
     /**
-     * @param uuid The uuid of the resident
+     * @param resident The resident to format
      * @return A formatted menu item, or an 'error' item if the resident isn't registered.
      */
-    public static MenuItem.Builder formatResidentInfo(@NotNull UUID uuid) {
-        Resident resident = TownyAPI.getInstance().getResident(uuid);
-
+    public static MenuItem.Builder formatResidentInfo(@Nullable Resident resident) {
         if (resident == null)
             return MenuItem.builder(Material.PLAYER_HEAD)
-                    .skullOwner(uuid)
+                    .skullOwner(resident.getUUID())
                     .name(Component.text("Error", NamedTextColor.DARK_RED))
                     .lore(Component.text("Unknown or invalid resident.", NamedTextColor.RED));
 
@@ -100,7 +103,7 @@ public class ResidentMenu {
             lore.add(Component.text("Last online ", NamedTextColor.DARK_GREEN).append(Component.text(Time.formatLastOnline(resident.getLastOnline()), NamedTextColor.GREEN)));
 
         return MenuItem.builder(Material.PLAYER_HEAD)
-                .skullOwner(uuid)
+                .skullOwner(resident.getUUID())
                 .name(Component.text(resident.getName(), NamedTextColor.GREEN))
                 .lore(lore);
     }
