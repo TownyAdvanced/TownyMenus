@@ -134,16 +134,43 @@ public class TownMenu {
                             player.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
                         })))
                         .build())
+                .addItem(MenuItem.builder(Material.STONE)
+                        .name(Component.text("Online in Town", NamedTextColor.GREEN))
+                        .slot(3)
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_ONLINE.getNode()))
+                                return Component.text("You do not have permission to view the town's offline player list.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view online players in the town.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_ONLINE.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
+                            if (!TownyUniverse.getInstance().hasTown(town.getUUID()))
+                                return MenuInventory.paginator().title(Component.text("Online in Town")).build();
+
+                            List<MenuItem> online = new ArrayList<>();
+
+                            for (Player onlinePlayer : TownyAPI.getInstance().getOnlinePlayers(town)) {
+                                if (!player.canSee(onlinePlayer))
+                                    continue;
+
+                                online.add(ResidentMenu.formatResidentInfo(onlinePlayer.getUniqueId()).build());
+                            }
+
+                            return MenuInventory.paginator().addItems(online).title(Component.text("Online in Town")).build();
+                        }))
+                        .build())
                 .addItem(MenuHelper.backButton().build())
                 .build();
     }
 
-    private static MenuInventory createBankHistoryMenu(Town town) {
-        if (town == null || !TownyEconomyHandler.isActive() || !TownyUniverse.getInstance().hasTown(town.getUUID()))
+    public static MenuInventory createBankHistoryMenu(Government government) {
+        if (government == null || !TownyEconomyHandler.isActive())
             return MenuInventory.paginator().title(Component.text("Transaction History")).build();
 
         List<MenuItem> transactionItems = new ArrayList<>();
-        List<BankTransaction> transactions = new ArrayList<>(town.getAccount().getAuditor().getTransactions());
+        List<BankTransaction> transactions = new ArrayList<>(government.getAccount().getAuditor().getTransactions());
 
         for (int i = 0; i < transactions.size(); i++) {
             BankTransaction transaction = transactions.get(i);
