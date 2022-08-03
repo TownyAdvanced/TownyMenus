@@ -33,11 +33,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class ResidentMenu {
-    public static Supplier<MenuInventory> createResidentMenu(@NotNull Player player) {
-        return () -> MenuInventory.builder()
+    public static MenuInventory createResidentMenu(@NotNull Player player) {
+        return MenuInventory.builder()
                 .rows(3)
                 .title(Component.text("Resident Menu"))
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)

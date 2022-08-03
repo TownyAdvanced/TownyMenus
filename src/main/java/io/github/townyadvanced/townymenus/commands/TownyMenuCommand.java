@@ -8,6 +8,7 @@ import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
+import io.github.townyadvanced.townymenus.utils.MenuScheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -42,15 +43,20 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
         }
 
         MenuHistory.clearHistory(player.getUniqueId());
+        MenuScheduler.scheduleAsync(player.getUniqueId(), () -> createRootMenu(player).open(player));
 
-        MenuInventory.builder()
+        return true;
+    }
+
+    public static MenuInventory createRootMenu(Player player) {
+        return MenuInventory.builder()
                 .rows(3)
                 .title(Component.text("Towny Menu"))
                 .addItem(MenuItem.builder(Material.EMERALD)
                         .name(Component.text("Town Settings", NamedTextColor.GREEN))
                         .lore(Component.text("Click to view the town menu!", NamedTextColor.GRAY))
                         .slot(10)
-                        .action(ClickAction.openInventory(TownMenu.createTownMenu(player)))
+                        .action(ClickAction.openInventory(() -> TownMenu.createTownMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.DIAMOND)
                         .name(Component.text("Nation Settings", NamedTextColor.AQUA))
@@ -69,11 +75,8 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
                         .name(Component.text("Resident Settings", NamedTextColor.YELLOW))
                         .lore(Component.text("Click to view the resident menu!", NamedTextColor.GRAY))
                         .slot(16)
-                        .action(ClickAction.openInventory(ResidentMenu.createResidentMenu(player)))
+                        .action(ClickAction.openInventory(() -> ResidentMenu.createResidentMenu(player)))
                         .build())
-                .build()
-                .open(player);
-
-        return true;
+                .build();
     }
 }
