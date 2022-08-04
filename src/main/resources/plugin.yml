@@ -12,6 +12,7 @@ commands:
       - tmenu
       - townygui
       - tgui
+      - tm
     permission: townymenus.command.townymenu
 
 permissions:
