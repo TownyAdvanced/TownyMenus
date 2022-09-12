@@ -10,13 +10,13 @@ public class Time {
     private static final long HOUR_SECONDS = TimeUnit.HOURS.toSeconds(1);
     private static final long DAY_SECONDS = TimeUnit.DAYS.toSeconds(1);
 
-    public static String formatLastOnline(long lastOnline) {
+    public static String ago(long time) {
         final long now = System.currentTimeMillis();
 
-        if (lastOnline > now)
+        if (time > now)
             return "in the future";
 
-        final long diff = TimeUnit.MILLISECONDS.toSeconds(now - lastOnline);
+        final long diff = TimeUnit.MILLISECONDS.toSeconds(now - time);
 
         if (diff < MINUTE_SECONDS)
             return "just now";
@@ -36,5 +36,17 @@ public class Time {
 
     public static String formatRegistered(long registered) {
         return registeredFormat.format(new Date(registered));
+    }
+
+    /**
+     * Formats the specified timestamp using the ago format if it's less than one month ago, otherwise uses the full registered format.
+     * @param time The time
+     * @return The formatted registered time.
+     */
+    public static String registeredOrAgo(long time) {
+        if (time + TimeUnit.DAYS.toMillis(30) < System.currentTimeMillis())
+            return formatRegistered(time);
+        else
+            return ago(time);
     }
 }

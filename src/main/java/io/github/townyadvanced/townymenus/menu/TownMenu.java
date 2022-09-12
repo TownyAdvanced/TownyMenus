@@ -6,6 +6,8 @@ import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.command.TownCommand;
+import com.palmergames.bukkit.towny.event.town.TownKickEvent;
+import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -15,6 +17,7 @@ import com.palmergames.bukkit.towny.object.TownBlockTypeCache;
 import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
 import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
 import com.palmergames.bukkit.towny.object.TransactionType;
+import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
@@ -24,6 +27,7 @@ import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -161,6 +165,12 @@ public class TownMenu {
                             return MenuInventory.paginator().addItems(online).title(Component.text("Online in Town")).build();
                         }))
                         .build())
+                .addItem(MenuItem.builder(Material.PLAYER_HEAD)
+                        .name(Component.text("Resident Overview", NamedTextColor.GREEN))
+                        .lore(Component.text("Click to view residents in this town.", NamedTextColor.GRAY))
+                        .action(ClickAction.openInventory(() -> createResidentOverview(player)))
+                        .slot(4)
+                        .build())
                 .addItem(MenuHelper.backButton().build())
                 .build();
     }
@@ -187,5 +197,67 @@ public class TownMenu {
         Collections.reverse(transactionItems);
 
         return MenuInventory.paginator().addItems(transactionItems).title(Component.text("Transaction History")).build();
+    }
+
+    public static MenuInventory createResidentOverview(Player player) {
+        Resident res = TownyAPI.getInstance().getResident(player);
+        Town town = res != null ? res.getTownOrNull() : null;
+
+        if (town == null)
+            return MenuInventory.paginator().title(Component.text("Resident Overview")).build();
+
+        MenuInventory.PaginatorBuilder builder = MenuInventory.paginator()
+                .title(Component.text("Resident Overview - " + town.getName()));
+
+        for (Resident resident : town.getResidents()) {
+            builder.addItem(ResidentMenu.formatResidentInfo(resident)
+                    .lore(Component.text("Joined town ", NamedTextColor.DARK_GREEN).append(Component.text(Time.registeredOrAgo(res.getJoinedTownAt()), NamedTextColor.GREEN)))
+                    .lore(Component.text("Right click to view additional options.", NamedTextColor.GRAY))
+                    .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, town, resident))))
+                    .build());
+        }
+
+        return builder.build();
+    }
+
+    public static MenuInventory createResidentManagementScreen(Player player, Town town, Resident resident) {
+        return MenuInventory.builder()
+                .rows(6)
+                .title(Component.text("Resident Management"))
+                .addItem(MenuItem.builder(Material.WOODEN_AXE)
+                        .name(Component.text("Kick Resident", NamedTextColor.GREEN))
+                        .slot(0)
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()))
+                                return Component.text("You do not have permission to kick this resident.", NamedTextColor.GRAY);
+                            else if (player.getUniqueId().equals(resident.getUUID()))
+                                return Component.text("You cannot kick yourself!", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to kick this player from the town.", NamedTextColor.GRAY);
+                        })
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()) || player.getUniqueId().equals(resident.getUUID()) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to kick " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                            if (town == null || !TownyUniverse.getInstance().hasTown(town.getUUID()) || !town.hasResident(resident))
+                                return;
+
+                            TownCommand.townKickResidents(player, TownyAPI.getInstance().getResident(player), town, Collections.singletonList(resident));
+                        })))
+                        .build())
+                .build();
+    }
+
+    public static MenuItem.Builder formatTownInfo(Town town) {
+        List<Component> lore = new ArrayList<>();
+
+        lore.add(Component.text("Founded ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(town.getRegistered()), NamedTextColor.GREEN)));
+
+        if (town.getMayor() != null)
+            lore.add(Component.text("Owned by ", NamedTextColor.DARK_GREEN).append(Component.text(town.getMayor().getName(), NamedTextColor.GREEN)));
+
+        if (town.hasNation())
+            lore.add(Component.text("Member of ", NamedTextColor.DARK_GREEN).append(Component.text(town.getNationOrNull().getName(), NamedTextColor.GREEN)));
+
+        return MenuItem.builder(Material.GRASS_BLOCK) // TODO: placeholder item
+                .name(Component.text(town.getFormattedName(), NamedTextColor.GREEN))
+                .lore(lore);
     }
 }

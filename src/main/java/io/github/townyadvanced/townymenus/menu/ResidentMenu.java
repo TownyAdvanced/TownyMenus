@@ -101,7 +101,7 @@ public class ResidentMenu {
         lore.add(Component.text("Registered ", NamedTextColor.DARK_GREEN).append(Component.text(Time.formatRegistered(resident.getRegistered()), NamedTextColor.GREEN)));
 
         if (!resident.isOnline())
-            lore.add(Component.text("Last online ", NamedTextColor.DARK_GREEN).append(Component.text(Time.formatLastOnline(resident.getLastOnline()), NamedTextColor.GREEN)));
+            lore.add(Component.text("Last online ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(resident.getLastOnline()), NamedTextColor.GREEN)));
 
         return MenuItem.builder(Material.PLAYER_HEAD)
                 .skullOwner(resident.getUUID())
@@ -170,10 +170,7 @@ public class ResidentMenu {
                             TownyMenus.logger().info(player.getName() + " has added " + friend.getName() + " as a friend.");
 
                             // Re-open resident friends menu
-                            MenuScheduler.scheduleAsync(player, () -> {
-                                MenuHistory.pop(player.getUniqueId());
-                                formatResidentFriends(player).open(player);
-                            });
+                            MenuHistory.reOpen(player, () -> formatResidentFriends(player));
 
                             return AnvilGUI.Response.close();
                         }))

@@ -25,6 +25,11 @@ public class ConfirmationAction implements ClickAction {
         this.warning = warning;
     }
 
+    public ConfirmationAction(@NotNull Component warning, @NotNull ClickAction confirmAction) {
+        this.confirmAction = confirmAction;
+        this.warning = () -> warning;
+    }
+
     @Override
     public void onClick(MenuInventory inventory, InventoryClickEvent event) {
         MenuInventory.builder()

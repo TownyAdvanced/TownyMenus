@@ -44,6 +44,10 @@ public interface ClickAction {
         return new ConfirmationAction(supplier, confirmAction);
     }
 
+    static ConfirmationAction confirmation(@NotNull Component component, @NotNull ClickAction confirmAction) {
+        return new ConfirmationAction(component, confirmAction);
+    }
+
     static SoundAction sound(@NotNull Sound sound) {
         return new SoundAction(sound);
     }
