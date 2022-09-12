@@ -109,25 +109,14 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     public static class Builder {
-        private final Map<Integer, ItemStack> items = new HashMap<>();
-        private final Map<Integer, List<ClickAction>> actions = new HashMap<>();
+        private final List<MenuItem> items = new ArrayList<>();
         private int size = 54;
         private Component title = Component.empty();
 
         private Builder() {}
 
         public Builder addItem(@NotNull MenuItem item) {
-            // TODO: resolve slots in the build method, the size can change later on
-            int slot = item.resolveSlot(this.size);
-
-            if (slot > this.size - 1)
-                return this;
-
-            items.put(slot, item.itemStack());
-
-            if (!item.actions().isEmpty())
-                actions.put(slot, item.actions());
-
+            this.items.add(item);
             return this;
         }
 
@@ -156,8 +145,19 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
             for (int i = 0; i < size; i++)
                 inventory.setItem(i, backgroundGlass);
 
-            for (Map.Entry<Integer, ItemStack> entry : items.entrySet())
-                inventory.setItem(entry.getKey(), entry.getValue());
+            Map<Integer, List<ClickAction>> actions = new HashMap<>();
+
+            for (MenuItem item : this.items) {
+                int slot = item.resolveSlot(this.size);
+
+                if (slot > this.size - 1 || inventory.getItem(slot) != null)
+                    continue;
+
+                inventory.setItem(slot, item.itemStack());
+
+                if (!item.actions().isEmpty())
+                    actions.put(slot, item.actions());
+            }
 
             MenuInventory menuInventory = new MenuInventory(inventory, title);
             menuInventory.addActions(actions);
