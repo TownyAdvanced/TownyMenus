@@ -33,7 +33,7 @@ public class MenuItem {
     }
 
     public void slot(int slot) {
-        this.slot = SlotAnchor.ofExact(slot);
+        this.slot = SlotAnchor.ofSlot(slot);
     }
 
     public void slot(SlotAnchor slot) {
@@ -89,7 +89,7 @@ public class MenuItem {
         private Component name = Component.empty();
         private final List<Component> lore = new ArrayList<>(0);
         private int size = 1;
-        private SlotAnchor slot = SlotAnchor.ofExact(0);
+        private SlotAnchor slot = SlotAnchor.ofSlot(0);
         private final List<ClickAction> actions = new ArrayList<>(0);
         private boolean glint;
         private UUID ownerUUID;
@@ -119,7 +119,7 @@ public class MenuItem {
         }
 
         public Builder slot(int slot) {
-            this.slot = SlotAnchor.ofExact(slot);
+            this.slot = SlotAnchor.ofSlot(slot);
             return this;
         }
 

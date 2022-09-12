@@ -195,7 +195,7 @@ public class PlotMenu {
             Runnable onClick = () -> {
                 // Check if the player still has permissions to change the plot type.
                 if (!testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET.getNode(type.getName().toLowerCase(Locale.ROOT)))) {
-                    player.sendMessage(Component.text("You do not have enough permissions to change the type for this plot.", NamedTextColor.RED));
+                    player.sendMessage(Component.text("You do not have permission to change the type for this plot.", NamedTextColor.RED));
                     MenuHistory.back(player);
                     return;
                 }

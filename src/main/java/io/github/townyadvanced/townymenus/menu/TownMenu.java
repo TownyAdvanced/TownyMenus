@@ -1,13 +1,14 @@
 package io.github.townyadvanced.townymenus.menu;
 
+import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.command.TownCommand;
-import com.palmergames.bukkit.towny.event.town.TownKickEvent;
-import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
+import com.palmergames.bukkit.towny.event.TownAddResidentRankEvent;
+import com.palmergames.bukkit.towny.event.TownRemoveResidentRankEvent;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -20,7 +21,9 @@ import com.palmergames.bukkit.towny.object.TransactionType;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
+import com.palmergames.bukkit.towny.permissions.TownyPerms;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
+import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
@@ -38,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class TownMenu {
     public static MenuInventory createTownMenu(@NotNull Player player) {
@@ -224,6 +228,7 @@ public class TownMenu {
         return MenuInventory.builder()
                 .rows(6)
                 .title(Component.text("Resident Management"))
+                .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.WOODEN_AXE)
                         .name(Component.text("Kick Resident", NamedTextColor.GREEN))
                         .slot(0)
@@ -242,7 +247,93 @@ public class TownMenu {
                             TownCommand.townKickResidents(player, TownyAPI.getInstance().getResident(player), town, Collections.singletonList(resident));
                         })))
                         .build())
+                .addItem(MenuItem.builder(Material.GRASS)  // TODO placeholder item
+                        .name(Component.text("Manage Ranks", NamedTextColor.GREEN))
+                        .slot(1)
+                        .lore(Component.text("Click to manage ranks for this player.", NamedTextColor.GRAY))
+                        .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, town, resident)))
+                        .build())
                 .build();
+    }
+
+    public static MenuInventory formatRankManagementMenu(Player player, Town town, Resident resident) {
+        MenuInventory.PaginatorBuilder paginator = MenuInventory.paginator().title(Component.text("Rank Management"));
+
+        for (String townRank : TownyPerms.getTownRanks()) {
+            MenuItem.Builder item = MenuItem.builder(Material.KNOWLEDGE_BOOK)
+                    .name(Component.text(townRank.substring(0, 1).toUpperCase(Locale.ROOT) + townRank.substring(1), NamedTextColor.GREEN));
+
+            final boolean hasPermission = player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_RANK.getNode(townRank.toLowerCase(Locale.ROOT)));
+
+            if (resident.hasTownRank(townRank)) {
+                item.withGlint();
+
+                if (hasPermission) {
+                    item.lore(Component.text("Click to remove the " + townRank + " rank from " + resident.getName() + ".", NamedTextColor.GRAY));
+                    item.action(ClickAction.confirmation(Component.text("Are you sure you want to remove the rank of " + townRank + " from " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                        if (!resident.hasTownRank(townRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_RANK.getNode(townRank.toLowerCase(Locale.ROOT)))) {
+                            MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
+                            return;
+                        }
+
+                        Resident playerResident = TownyAPI.getInstance().getResident(player);
+                        if (town == null || resident.getTownOrNull() != town || playerResident == null || playerResident.getTownOrNull() != town)
+                            return;
+
+                        TownRemoveResidentRankEvent event = new TownRemoveResidentRankEvent(resident, townRank, town);
+
+                        if (!event.callEvent()) {
+                            TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                            MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
+                            return;
+                        }
+
+                        resident.removeTownRank(townRank);
+
+                        if (resident.isOnline()) {
+                            TownyMessaging.sendMsg(resident, Translatable.of("msg_you_have_had_rank_taken", Translatable.of("town_sing"), townRank));
+                            Towny.getPlugin().deleteCache(resident);
+                        }
+
+                        TownyMessaging.sendMsg(player, Translatable.of("msg_you_have_taken_rank_from", Translatable.of("town_sing"), townRank, resident.getName()));
+                        MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
+                    })));
+                }
+            } else if (hasPermission) {
+                item.lore(Component.text("Click to grant the " + townRank + " rank to " + resident.getName() + ".", NamedTextColor.GRAY));
+                item.action(ClickAction.confirmation(Component.text("Are you sure you want to give the rank of " + townRank + " to " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                    if (resident.hasTownRank(townRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_RANK.getNode(townRank.toLowerCase(Locale.ROOT)))) {
+                        MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
+                        return;
+                    }
+
+                    Resident playerResident = TownyAPI.getInstance().getResident(player);
+                    if (town == null || resident.getTownOrNull() != town || playerResident == null || playerResident.getTownOrNull() != town)
+                        return;
+
+                    TownAddResidentRankEvent event = new TownAddResidentRankEvent(resident, townRank, town);
+
+                    if (!event.callEvent()) {
+                        TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                        MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
+                        return;
+                    }
+
+                    resident.addTownRank(townRank);
+                    if (resident.isOnline()) {
+                        TownyMessaging.sendMsg(resident, Translatable.of("msg_you_have_been_given_rank", Translatable.of("town_sing"), townRank));
+                        Towny.getPlugin().deleteCache(resident);
+                    }
+
+                    TownyMessaging.sendMsg(player, Translatable.of("msg_you_have_given_rank", Translatable.of("town_sing"), townRank, resident.getName()));
+                    MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
+                })));
+            }
+
+            paginator.addItem(item.build());
+        }
+
+        return paginator.build();
     }
 
     public static MenuItem.Builder formatTownInfo(Town town) {
