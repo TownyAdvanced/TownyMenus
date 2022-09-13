@@ -142,9 +142,6 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         public MenuInventory build() {
             Inventory inventory = Bukkit.createInventory(null, size, title);
 
-            for (int i = 0; i < size; i++)
-                inventory.setItem(i, backgroundGlass);
-
             Map<Integer, List<ClickAction>> actions = new HashMap<>();
 
             for (MenuItem item : this.items) {
@@ -158,6 +155,10 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
                 if (!item.actions().isEmpty())
                     actions.put(slot, item.actions());
             }
+
+            for (int i = 0; i < size; i++)
+                if (inventory.getItem(i) == null)
+                    inventory.setItem(i, backgroundGlass);
 
             MenuInventory menuInventory = new MenuInventory(inventory, title);
             menuInventory.addActions(actions);
