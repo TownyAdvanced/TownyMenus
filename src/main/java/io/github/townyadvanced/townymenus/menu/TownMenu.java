@@ -22,6 +22,7 @@ import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.permissions.TownyPerms;
+import com.palmergames.bukkit.towny.utils.CombatUtil;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -33,6 +34,7 @@ import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -171,7 +173,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
                         .name(Component.text("Resident Overview", NamedTextColor.GREEN))
-                        .lore(Component.text("Click to view residents in this town.", NamedTextColor.GRAY))
+                        .lore(Component.text("Click to view and manage residents in this town.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> createResidentOverview(player)))
                         .slot(4)
                         .build())
@@ -226,12 +228,12 @@ public class TownMenu {
 
     public static MenuInventory createResidentManagementScreen(Player player, Town town, Resident resident) {
         return MenuInventory.builder()
-                .rows(6)
+                .rows(5)
                 .title(Component.text("Resident Management"))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.WOODEN_AXE)
                         .name(Component.text("Kick Resident", NamedTextColor.GREEN))
-                        .slot(0)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()))
                                 return Component.text("You do not have permission to kick this resident.", NamedTextColor.GRAY);
@@ -247,11 +249,62 @@ public class TownMenu {
                             TownCommand.townKickResidents(player, TownyAPI.getInstance().getResident(player), town, Collections.singletonList(resident));
                         })))
                         .build())
-                .addItem(MenuItem.builder(Material.GRASS)  // TODO placeholder item
+                .addItem(ResidentMenu.formatResidentInfo(resident)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .build())
+                .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
                         .name(Component.text("Manage Ranks", NamedTextColor.GREEN))
-                        .slot(1)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
                         .lore(Component.text("Click to manage ranks for this player.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, town, resident)))
+                        .build())
+                .addItem(MenuItem.builder(Material.NAME_TAG)
+                        .name(Component.text("Town Title", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
+                        .lore(Component.text("Click to change this resident's title.", NamedTextColor.GRAY))
+                        .lore(Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY))
+                        .action(ClickAction.leftClick(ClickAction.userInput("Enter new title", (title) -> {
+                            try {
+                                TownCommand.townSetTitle(player, (" " + resident.getName() + " " + title).split(" "), false, town, resident, player);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                return AnvilGUI.Response.text(e.getMessage(player));
+                            }
+
+                            MenuHistory.last(player);
+                            return AnvilGUI.Response.close();
+                        })))
+                        .action(ClickAction.rightClick(ClickAction.run(() -> {
+                            try {
+                                TownCommand.townSetTitle(player, new String[]{"", resident.getName(), ""}, false, town, resident, player);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
+                        })))
+                        .build())
+                .addItem(MenuItem.builder(Material.NAME_TAG)
+                        .name(Component.text("Town Surname", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(2)))
+                        .lore(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY))
+                        .lore(Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY))
+                        .action(ClickAction.leftClick(ClickAction.userInput("Enter new surname", (surname) -> {
+                            try {
+                                TownCommand.townSetSurname(player, (" " + resident.getName() + " " + surname).split(" "), false, town, resident, player);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                return AnvilGUI.Response.text(e.getMessage(player));
+                            }
+
+                            MenuHistory.last(player);
+                            return AnvilGUI.Response.close();
+                        })))
+                        .action(ClickAction.rightClick(ClickAction.run(() -> {
+                            try {
+                                TownCommand.townSetSurname(player, new String[]{"", resident.getName(), ""}, false, town, resident, player);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
+                        })))
                         .build())
                 .build();
     }

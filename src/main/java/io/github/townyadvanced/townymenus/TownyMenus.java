@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 
 public class TownyMenus extends JavaPlugin {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.98.2.0");
+	private static final Version requiredTownyVersion = Version.fromString("0.98.3.8");
 	private static TownyMenus plugin;
 
 	@Override

@@ -4,6 +4,7 @@ import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
@@ -56,8 +57,16 @@ public interface ClickAction {
         return BACK;
     }
 
-    static RightClickAction rightClick(@NotNull ClickAction rightClickAction) {
-        return new RightClickAction(rightClickAction);
+    static ClickTypeAction rightClick(@NotNull ClickAction rightClickAction) {
+        return new ClickTypeAction(ClickType.RIGHT, rightClickAction);
+    }
+
+    static ClickTypeAction leftClick(@NotNull ClickAction rightClickAction) {
+        return new ClickTypeAction(ClickType.LEFT, rightClickAction);
+    }
+
+    static ClickTypeAction clickType(@NotNull ClickType type, @NotNull ClickAction rightClickAction) {
+        return new ClickTypeAction(type, rightClickAction);
     }
 
     static UserInputAction userInput(String title, Function<String, AnvilGUI.Response> inputFunction) {
