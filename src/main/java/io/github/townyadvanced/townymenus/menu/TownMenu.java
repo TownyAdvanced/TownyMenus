@@ -264,6 +264,7 @@ public class TownMenu {
                         .lore(Component.text("Click to change this resident's title.", NamedTextColor.GRAY))
                         .lore(Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY))
                         .action(ClickAction.leftClick(ClickAction.userInput("Enter new title", (title) -> {
+                            // TODO: wait for pr to be merged, this has no permission check currently
                             try {
                                 TownCommand.townSetTitle(player, (" " + resident.getName() + " " + title).split(" "), false, town, resident, player);
                             } catch (TownyException e) {
