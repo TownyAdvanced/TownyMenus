@@ -171,6 +171,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         private final List<MenuItem> items = new ArrayList<>();
         private final List<MenuItem> extraItems = new ArrayList<>(0);
         private Component title = Component.empty();
+        private boolean showPageCount = true;
 
         public PaginatorBuilder addItem(MenuItem item) {
             this.items.add(item);
@@ -192,6 +193,21 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
             return this;
         }
 
+        public PaginatorBuilder showPageCount() {
+            this.showPageCount = true;
+            return this;
+        }
+
+        public PaginatorBuilder showPageCount(boolean showPageCount) {
+            this.showPageCount = showPageCount;
+            return this;
+        }
+
+        public PaginatorBuilder hidePageCount() {
+            this.showPageCount = false;
+            return this;
+        }
+
         public MenuInventory build() {
             if (this.items.isEmpty())
                 this.items.add(MenuItem.builder(Material.BARRIER)
@@ -207,7 +223,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
 
                 MenuInventory.Builder builder = MenuInventory.builder()
                         .size(pageItems.size() + 9)
-                        .title(title.append(Component.text(" (Page " + (i + 1) + "/" + pageCount + ")")));
+                        .title(title.append(this.showPageCount ? Component.text(" (Page " + (i + 1) + "/" + pageCount + ")") : Component.empty()));
 
                 for (int j = 0; j < pageItems.size(); j++) {
                     MenuItem item = pageItems.get(j);
