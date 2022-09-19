@@ -1,11 +1,10 @@
 package io.github.townyadvanced.townymenus.commands.addon;
 
+import com.palmergames.bukkit.towny.TownyMessaging;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.utils.MenuScheduler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +15,7 @@ public class ResidentAddonCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("This command cannot be used by console!", NamedTextColor.RED));
+            TownyMessaging.sendErrorMsg(sender, "This command cannot be used by console!");
             return true;
         }
 

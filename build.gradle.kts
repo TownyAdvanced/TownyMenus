@@ -6,16 +6,20 @@ plugins {
 
 repositories {
     mavenCentral()
+
+    // Spigot API
     maven {
-        name = "paper-repo"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
+        name = "spigot-repo"
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
 
+    // Towny
     maven {
         name = "glare-repo"
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
 
+    // AnvilGUI
     maven {
         name = "codemc"
         url = uri("https://repo.codemc.io/repository/maven-snapshots/")
@@ -23,8 +27,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
     compileOnly("com.palmergames.bukkit.towny:towny:0.98.3.8")
+    compileOnly("org.jetbrains:annotations:23.0.0")
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
 }
 group = "io.github.townyadvanced"

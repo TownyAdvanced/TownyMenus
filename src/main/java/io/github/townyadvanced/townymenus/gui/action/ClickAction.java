@@ -1,12 +1,11 @@
 package io.github.townyadvanced.townymenus.gui.action;
 
+import com.palmergames.adventure.sound.Sound;
+import com.palmergames.adventure.text.Component;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -17,7 +16,7 @@ public interface ClickAction {
 
     ClickAction NONE = (inventory, event) -> {};
 
-    ClickAction CLOSE = (inventory, event) -> event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+    ClickAction CLOSE = (inventory, event) -> event.getWhoClicked().closeInventory();
 
     BackAction BACK = new BackAction();
 

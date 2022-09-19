@@ -1,5 +1,7 @@
 package io.github.townyadvanced.townymenus.menu;
 
+import com.palmergames.adventure.text.Component;
+import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -27,8 +29,6 @@ import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -195,7 +195,7 @@ public class PlotMenu {
             Runnable onClick = () -> {
                 // Check if the player still has permissions to change the plot type.
                 if (!testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET.getNode(type.getName().toLowerCase(Locale.ROOT)))) {
-                    player.sendMessage(Component.text("You do not have permission to change the type for this plot.", NamedTextColor.RED));
+                    TownyMessaging.sendErrorMsg(player, "You do not have permission to change the type for this plot.");
                     MenuHistory.back(player);
                     return;
                 }

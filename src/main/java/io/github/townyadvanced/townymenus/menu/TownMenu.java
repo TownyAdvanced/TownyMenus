@@ -1,5 +1,7 @@
 package io.github.townyadvanced.townymenus.menu;
 
+import com.palmergames.adventure.text.Component;
+import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -22,7 +24,6 @@ import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.permissions.TownyPerms;
-import com.palmergames.bukkit.towny.utils.CombatUtil;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -32,12 +33,10 @@ import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.utils.Time;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -141,7 +140,7 @@ public class TownMenu {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
 
-                            player.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+                            player.closeInventory();
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.STONE)
@@ -335,8 +334,9 @@ public class TownMenu {
                             return;
 
                         TownRemoveResidentRankEvent event = new TownRemoveResidentRankEvent(resident, townRank, town);
+                        Bukkit.getPluginManager().callEvent(event);
 
-                        if (!event.callEvent()) {
+                        if (event.isCancelled()) {
                             TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
                             MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
                             return;
@@ -366,8 +366,9 @@ public class TownMenu {
                         return;
 
                     TownAddResidentRankEvent event = new TownAddResidentRankEvent(resident, townRank, town);
+                    Bukkit.getPluginManager().callEvent(event);
 
-                    if (!event.callEvent()) {
+                    if (event.isCancelled()) {
                         TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
                         MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
                         return;

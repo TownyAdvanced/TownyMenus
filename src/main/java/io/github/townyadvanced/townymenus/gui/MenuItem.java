@@ -1,9 +1,10 @@
 package io.github.townyadvanced.townymenus.gui;
 
+import com.palmergames.adventure.text.Component;
+import com.palmergames.adventure.text.format.TextDecoration;
+import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -63,7 +64,6 @@ public class MenuItem {
 
     public Builder builder() {
         Builder builder = builder(itemStack.getType())
-                .name(itemStack.displayName())
                 .slot(slot)
                 .size(itemStack.getAmount());
 
@@ -71,11 +71,14 @@ public class MenuItem {
         if (meta != null) {
             builder.withGlint(meta.hasEnchants());
 
-            if (meta.hasLore())
-                builder.lore(meta.lore());
+            if (meta.hasDisplayName())
+                builder.name(LegacyComponentSerializer.legacySection().deserialize(meta.getDisplayName()));
 
-            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.hasOwner() && skullMeta.getPlayerProfile().isComplete())
-                builder.skullOwner(skullMeta.getPlayerProfile().getId());
+            if (meta.hasLore())
+                meta.getLore().forEach(lore -> builder.lore(LegacyComponentSerializer.legacySection().deserialize(lore)));
+
+            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.hasOwner() && skullMeta.getOwnerProfile().isComplete())
+                builder.skullOwner(skullMeta.getOwnerProfile().getUniqueId());
         }
 
         for (ClickAction clickAction : this.actions)
@@ -150,7 +153,7 @@ public class MenuItem {
         }
 
         public Builder lore(@NotNull List<Component> lore) {
-            this.lore.addAll(lore.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList());
+            lore.forEach(this::lore);
             return this;
         }
 
@@ -166,20 +169,21 @@ public class MenuItem {
             if (meta != null) {
 
                 if (!name.equals(Component.empty()))
-                    meta.displayName(name);
+                    meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(name));
 
                 if (!lore.isEmpty())
-                    meta.lore(lore);
+                    meta.setLore(lore.stream().map(component -> LegacyComponentSerializer.legacySection().serialize(component)).toList());
 
                 if (meta instanceof SkullMeta skullMeta && this.ownerUUID != null)
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(this.ownerUUID));
 
-                itemStack.setItemMeta(meta);
-            }
 
-            if (glint) {
-                itemStack.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                itemStack.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                if (glint) {
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    itemStack.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                }
+
+                itemStack.setItemMeta(meta);
             }
 
             MenuItem item = new MenuItem(itemStack, slot);

@@ -18,14 +18,15 @@ public class MenuSettings {
 				Files.createDirectories(path.getParent());
 				Files.createFile(path);
 			} catch (IOException e) {
-				TownyMenus.logger().error("Failed to create config.yml!", e);
+				TownyMenus.logger().warning("Failed to create config.yml!");
+				e.printStackTrace();
 			}
 		}
 
 		// read the config.yml into memory
 		config = new CommentedConfiguration(path);
 		if (!config.load())
-			TownyMenus.logger().error("Failed to load config.yml!");
+			TownyMenus.logger().warning("Failed to load config.yml!");
 
 		setDefaults(path);
 		config.save();
@@ -72,7 +73,7 @@ public class MenuSettings {
 		String data = config.getString(root.toLowerCase(), def);
 
 		if (data == null) {
-			TownyMenus.logger().error("Failed to read " + root.toLowerCase() + " from config.yml");
+			TownyMenus.logger().warning("Failed to read " + root.toLowerCase() + " from config.yml");
 			return "";
 		}
 
@@ -87,7 +88,7 @@ public class MenuSettings {
 		try {
 			return Double.parseDouble(config.getString(node.getRoot().toLowerCase(), node.getDefault()).trim());
 		} catch (NumberFormatException e) {
-			TownyMenus.logger().error("Failed to read " + node.getRoot().toLowerCase() + " from config.yml");
+			TownyMenus.logger().warning("Failed to read " + node.getRoot().toLowerCase() + " from config.yml");
 			return 0.0;
 		}
 	}
@@ -96,7 +97,7 @@ public class MenuSettings {
 		try {
 			return Integer.parseInt(config.getString(node.getRoot().toLowerCase(), node.getDefault()).trim());
 		} catch (NumberFormatException e) {
-			TownyMenus.logger().error("Failed to read " + node.getRoot().toLowerCase() + " from config.yml");
+			TownyMenus.logger().warning("Failed to read " + node.getRoot().toLowerCase() + " from config.yml");
 			return 0;
 		}
 	}

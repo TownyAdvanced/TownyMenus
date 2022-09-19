@@ -1,5 +1,7 @@
 package io.github.townyadvanced.townymenus.menu;
 
+import com.palmergames.adventure.text.Component;
+import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.command.ResidentCommand;
@@ -19,12 +21,9 @@ import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.utils.Time;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +63,7 @@ public class ResidentMenu {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
 
-                            player.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+                            player.closeInventory();
                         })))
                         .slot(15)
                         .build())

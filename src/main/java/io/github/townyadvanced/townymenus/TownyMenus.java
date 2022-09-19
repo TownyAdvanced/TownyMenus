@@ -16,9 +16,10 @@ import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.listeners.PlayerListener;
 import io.github.townyadvanced.townymenus.settings.MenuSettings;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin {
 
@@ -60,12 +61,10 @@ public class TownyMenus extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		// Close any open inventories if the server isn't stopping, can happen if the /reload command is used.
-		if (!Bukkit.getServer().isStopping()) {
-			for (Player player : Bukkit.getOnlinePlayers())
-				if (player.getOpenInventory().getTopInventory().getHolder() instanceof MenuInventory)
-					player.closeInventory();
-		}
+		// Close any open menu inventories
+		for (Player player : Bukkit.getOnlinePlayers())
+			if (player.getOpenInventory().getTopInventory().getHolder() instanceof MenuInventory)
+				player.closeInventory();
 
 		TownyCommandAddonAPI.removeSubCommand(CommandType.NATION, "menu");
 		TownyCommandAddonAPI.removeSubCommand(CommandType.PLOT, "menu");
@@ -78,7 +77,7 @@ public class TownyMenus extends JavaPlugin {
 	}
 
 	public static Logger logger() {
-		return plugin.getSLF4JLogger();
+		return plugin.getLogger();
 	}
 
 	public String getVersion() {

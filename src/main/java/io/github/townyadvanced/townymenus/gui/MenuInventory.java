@@ -1,15 +1,16 @@
 package io.github.townyadvanced.townymenus.gui;
 
+import com.palmergames.adventure.key.Key;
+import com.palmergames.adventure.sound.Sound;
+import com.palmergames.adventure.text.Component;
+import com.palmergames.adventure.text.format.NamedTextColor;
+import com.palmergames.adventure.text.format.TextDecoration;
+import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -34,7 +35,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     private final Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
 
     public MenuInventory(@NotNull Inventory inventory, @NotNull Component title) {
-        this.inventory = Bukkit.createInventory(this, inventory.getSize(), title);
+        this.inventory = Bukkit.createInventory(this, inventory.getSize(), LegacyComponentSerializer.legacyAmpersand().serialize(title));
         this.inventory.setContents(inventory.getContents());
         this.size = this.inventory.getSize();
     }
@@ -140,7 +141,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         }
 
         public MenuInventory build() {
-            Inventory inventory = Bukkit.createInventory(null, size, title);
+            Inventory inventory = Bukkit.createInventory(null, size, LegacyComponentSerializer.legacyAmpersand().serialize(title));
 
             Map<Integer, List<ClickAction>> actions = new HashMap<>();
 
@@ -237,7 +238,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
                 // Add a back button if we're not on the first page
                 if (i != 0)
                     builder.addItem(MenuItem.builder(Material.ARROW)
-                            .name(Component.text("Back", NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                            .name(Component.text("Back", NamedTextColor.GREEN, TextDecoration.BOLD))
                             .lore(Component.text("Click to go back to the previous page.", NamedTextColor.GOLD))
                             .action(ClickAction.sound(Sound.sound(Key.key(Key.MINECRAFT_NAMESPACE, "block.stone_button.click_on"), Sound.Source.PLAYER, 1.0f, 1.0f)))
                             .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(0)))

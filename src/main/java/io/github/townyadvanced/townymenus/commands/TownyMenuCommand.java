@@ -1,5 +1,8 @@
 package io.github.townyadvanced.townymenus.commands;
 
+import com.palmergames.adventure.text.Component;
+import com.palmergames.adventure.text.format.NamedTextColor;
+import com.palmergames.bukkit.towny.TownyMessaging;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -9,8 +12,6 @@ import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
 import io.github.townyadvanced.townymenus.utils.MenuScheduler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -38,7 +39,7 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("This command cannot be used by console!", NamedTextColor.RED));
+            TownyMessaging.sendErrorMsg(sender, "This command cannot be used by console!");
             return true;
         }
 
