@@ -26,14 +26,15 @@ repositories {
     }
 }
 
+val townyVersion: String by project
+
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
-    compileOnly("com.palmergames.bukkit.towny:towny:0.98.3.8")
+    compileOnly("com.palmergames.bukkit.towny:towny:${townyVersion}")
     compileOnly("org.jetbrains:annotations:23.0.0")
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
 }
-group = "io.github.townyadvanced"
-version = "0.0.1"
+
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 tasks {

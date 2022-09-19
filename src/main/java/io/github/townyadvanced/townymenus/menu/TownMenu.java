@@ -176,6 +176,9 @@ public class TownMenu {
                         .action(ClickAction.openInventory(() -> createResidentOverview(player)))
                         .slot(4)
                         .build())
+                .addItem(formatTownInfo(town)
+                        .slot(5)
+                        .build())
                 .addItem(MenuHelper.backButton().build())
                 .build();
     }
@@ -392,14 +395,19 @@ public class TownMenu {
     }
 
     public static MenuItem.Builder formatTownInfo(Town town) {
+        if (town == null)
+            return MenuItem.builder(Material.GRASS_BLOCK)
+                    .name(Component.text("No Town", NamedTextColor.GREEN));
+
         List<Component> lore = new ArrayList<>();
 
         lore.add(Component.text("Founded ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(town.getRegistered()), NamedTextColor.GREEN)));
+        lore.add(Component.text(town.getNumResidents(), NamedTextColor.DARK_GREEN).append(Component.text(" Resident" + (town.getNumResidents() == 1 ? "" : "s"), NamedTextColor.GREEN)));
 
         if (town.getMayor() != null)
             lore.add(Component.text("Owned by ", NamedTextColor.DARK_GREEN).append(Component.text(town.getMayor().getName(), NamedTextColor.GREEN)));
 
-        if (town.hasNation())
+        if (town.getNationOrNull() != null)
             lore.add(Component.text("Member of ", NamedTextColor.DARK_GREEN).append(Component.text(town.getNationOrNull().getName(), NamedTextColor.GREEN)));
 
         return MenuItem.builder(Material.GRASS_BLOCK) // TODO: placeholder item
