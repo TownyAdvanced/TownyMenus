@@ -177,10 +177,9 @@ public class MenuItem {
                 if (meta instanceof SkullMeta skullMeta && this.ownerUUID != null)
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(this.ownerUUID));
 
-
                 if (glint) {
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    itemStack.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                    meta.addEnchant(Enchantment.DURABILITY, 1, true);
                 }
 
                 itemStack.setItemMeta(meta);
