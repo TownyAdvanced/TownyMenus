@@ -8,6 +8,7 @@ import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.TownyUniverse;
+import com.palmergames.bukkit.towny.command.BaseCommand;
 import com.palmergames.bukkit.towny.command.TownCommand;
 import com.palmergames.bukkit.towny.event.TownAddResidentRankEvent;
 import com.palmergames.bukkit.towny.event.TownRemoveResidentRankEvent;
@@ -40,9 +41,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class TownMenu {
     public static MenuInventory createTownMenu(@NotNull Player player) {
@@ -148,7 +151,7 @@ public class TownMenu {
                         .slot(3)
                         .lore(() -> {
                             if (town == null)
-                                return Component.text("You are not part of a town", NamedTextColor.GRAY);
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_ONLINE.getNode()))
                                 return Component.text("You do not have permission to view the town's offline player list.", NamedTextColor.GRAY);
                             else
@@ -178,6 +181,17 @@ public class TownMenu {
                         .build())
                 .addItem(formatTownInfo(town)
                         .slot(5)
+                        .build())
+                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                        .name(Component.text("Town Toggle", NamedTextColor.GREEN))
+                        .slot(6)
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to open the toggle menu.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownToggleMenu(player)))
                         .build())
                 .addItem(MenuHelper.backButton().build())
                 .build();
@@ -263,12 +277,17 @@ public class TownMenu {
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Town Title", NamedTextColor.GREEN))
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
-                        .lore(Component.text("Click to change this resident's title.", NamedTextColor.GRAY))
-                        .lore(Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY))
-                        .action(ClickAction.leftClick(ClickAction.userInput("Enter new title", (title) -> {
-                            // TODO: wait for pr to be merged, this has no permission check currently
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()))
+                                return Collections.singletonList(Component.text("You do not have permission to change this resident's title."));
+                            else
+                                return Arrays.asList(Component.text("Click to change this resident's title.", NamedTextColor.GRAY),
+                                        Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY));
+                        })
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new title", (title) -> {
                             try {
-                                TownCommand.townSetTitle(player, (" " + resident.getName() + " " + title).split(" "), false, town, resident, player);
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
+                                TownCommand.townSetTitle(player, resident, title, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilGUI.Response.text(e.getMessage(player));
@@ -277,9 +296,10 @@ public class TownMenu {
                             MenuHistory.last(player);
                             return AnvilGUI.Response.close();
                         })))
-                        .action(ClickAction.rightClick(ClickAction.run(() -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
-                                TownCommand.townSetTitle(player, new String[]{"", resident.getName(), ""}, false, town, resident, player);
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
+                                TownCommand.townSetTitle(player, resident, "", false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
@@ -288,11 +308,17 @@ public class TownMenu {
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Town Surname", NamedTextColor.GREEN))
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(2)))
-                        .lore(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY))
-                        .lore(Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY))
-                        .action(ClickAction.leftClick(ClickAction.userInput("Enter new surname", (surname) -> {
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()))
+                                return Collections.singletonList(Component.text("You do not have permission to change this resident's surname."));
+                            else
+                                return Arrays.asList(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY),
+                                        Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY));
+                        })
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new surname", (surname) -> {
                             try {
-                                TownCommand.townSetSurname(player, (" " + resident.getName() + " " + surname).split(" "), false, town, resident, player);
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
+                                TownCommand.townSetSurname(player, resident, surname, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilGUI.Response.text(e.getMessage(player));
@@ -301,9 +327,10 @@ public class TownMenu {
                             MenuHistory.last(player);
                             return AnvilGUI.Response.close();
                         })))
-                        .action(ClickAction.rightClick(ClickAction.run(() -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
-                                TownCommand.townSetSurname(player, new String[]{"", resident.getName(), ""}, false, town, resident, player);
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
+                                TownCommand.townSetSurname(player, resident, "", false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
@@ -392,6 +419,98 @@ public class TownMenu {
         }
 
         return paginator.build();
+    }
+
+    public static MenuInventory formatTownToggleMenu(Player player) {
+        Town town = TownyAPI.getInstance().getTown(player);
+
+        final boolean fireEnabled = town != null && town.isFire();
+        final boolean explosionEnabled = town != null && town.isExplosion();
+        final boolean mobsEnabled = town != null && town.hasMobs();
+        final boolean pvpEnabled = town != null && town.isPVP();
+
+        final boolean isOpen = town != null && town.isOpen();
+        final boolean isPublic = town != null && town.isPublic();
+
+        return MenuInventory.builder()
+                .title(Component.text("Town Toggle"))
+                .rows(4)
+                .addItem(MenuHelper.backButton().build())
+                // Fire
+                .addItem(createTogglePropertyItem(player, town != null, Material.FLINT_AND_STEEL, fireEnabled, "fire")
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .build())
+                .addItem(MenuItem.builder(fireEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .name(Component.empty())
+                        .build())
+                // Explosion
+                .addItem(createTogglePropertyItem(player, town != null, Material.TNT, explosionEnabled, "explosion")
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .build())
+                .addItem(MenuItem.builder(explosionEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
+                        .name(Component.empty())
+                        .build())
+                // Mobs
+                .addItem(createTogglePropertyItem(player, town != null, Material.BAT_SPAWN_EGG, mobsEnabled, "mobs")
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .build())
+                .addItem(MenuItem.builder(mobsEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
+                        .name(Component.empty())
+                        .build())
+                // PVP
+                .addItem(createTogglePropertyItem(player, town != null, Material.WOODEN_AXE, pvpEnabled, "pvp")
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .build())
+                .addItem(MenuItem.builder(pvpEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(4)))
+                        .name(Component.empty())
+                        .build())
+                // Open
+                .addItem(createTogglePropertyItem(player, town != null, Material.GRASS_BLOCK, isOpen, "open")
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(6)))
+                        .build())
+                .addItem(MenuItem.builder(isOpen ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(6)))
+                        .name(Component.empty())
+                        .build())
+                // Public
+                .addItem(createTogglePropertyItem(player, town != null, Material.GRASS_BLOCK, isPublic, "public")
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(7)))
+                        .build())
+                .addItem(MenuItem.builder(isPublic ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(7)))
+                        .name(Component.empty())
+                        .build())
+                .build();
+    }
+
+    private static MenuItem.Builder createTogglePropertyItem(Player player, boolean hasTown, Material material, boolean propertyEnabled, String property) {
+        return MenuItem.builder(material)
+                .name(Component.text("Toggle " + property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1), propertyEnabled ? NamedTextColor.GREEN : NamedTextColor.RED))
+                .lore(() -> {
+                    if (!hasTown)
+                        return Component.text("You are not in a town.", NamedTextColor.GRAY);
+                    else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_TOGGLE.getNode(property)))
+                        return Component.text("You do not have permission to toggle " + property + ".", NamedTextColor.GRAY);
+                    else
+                        return Component.text(String.format("Click to %s %s.", propertyEnabled ? "disable" : "enable", property), NamedTextColor.GRAY);
+                })
+                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_TOGGLE_FIRE.getNode()) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in your town?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                    final Town town = TownyAPI.getInstance().getTown(player);
+                    if (town == null)
+                        return;
+
+                    try {
+                        TownCommand.townToggle(player, new String[]{property}, false, town);
+                    } catch (TownyException e) {
+                        TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                    }
+
+                    MenuHistory.reOpen(player, () -> formatTownToggleMenu(player));
+                })));
     }
 
     public static MenuItem.Builder formatTownInfo(Town town) {

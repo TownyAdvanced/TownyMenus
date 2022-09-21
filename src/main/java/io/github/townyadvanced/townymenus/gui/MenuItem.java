@@ -6,6 +6,7 @@ import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerialize
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -148,8 +149,16 @@ public class MenuItem {
             return this;
         }
 
-        public Builder lore(@NotNull Supplier<Component> supplier) {
-            return this.lore(supplier.get());
+        @SuppressWarnings("unchecked")
+        public Builder lore(@NotNull Supplier<Object> supplier) {
+            Object object = supplier.get();
+
+            if (object instanceof Component component)
+                return this.lore(component);
+            else if (object instanceof List<?> list)
+                return this.lore((List<Component>) list);
+
+            throw new IllegalArgumentException("Invalid lore class type: " + object.getClass().getName());
         }
 
         public Builder lore(@NotNull List<Component> lore) {
@@ -167,9 +176,12 @@ public class MenuItem {
 
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
+                String displayName = LegacyComponentSerializer.legacySection().serialize(name);
+                // Set to string with just a legacy color if empty.
+                if (displayName.isEmpty())
+                    displayName = "\u00A70";
 
-                if (!name.equals(Component.empty()))
-                    meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(name));
+                meta.setDisplayName(displayName);
 
                 if (!lore.isEmpty())
                     meta.setLore(lore.stream().map(component -> LegacyComponentSerializer.legacySection().serialize(component)).toList());
