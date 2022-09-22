@@ -45,7 +45,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 public class TownMenu {
     public static MenuInventory createTownMenu(@NotNull Player player) {
@@ -189,9 +188,20 @@ public class TownMenu {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
                             else
-                                return Component.text("Click to open the toggle menu.", NamedTextColor.GRAY);
+                                return Component.text("Click to open the town toggle menu.", NamedTextColor.GRAY);
                         })
                         .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownToggleMenu(player)))
+                        .build())
+                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                        .name(Component.text("Town Set", NamedTextColor.GREEN))
+                        .slot(7)
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to open the town set menu.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownSetMenu(player)))
                         .build())
                 .addItem(MenuHelper.backButton().build())
                 .build();
@@ -279,7 +289,7 @@ public class TownMenu {
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()))
-                                return Collections.singletonList(Component.text("You do not have permission to change this resident's title."));
+                                return Component.text("You do not have permission to change this resident's title.");
                             else
                                 return Arrays.asList(Component.text("Click to change this resident's title.", NamedTextColor.GRAY),
                                         Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY));
@@ -511,6 +521,106 @@ public class TownMenu {
 
                     MenuHistory.reOpen(player, () -> formatTownToggleMenu(player));
                 })));
+    }
+
+    public static MenuInventory formatTownSetMenu(Player player) {
+        final Town town = TownyAPI.getInstance().getTown(player);
+
+        return MenuInventory.builder()
+                .title(Component.text("Town Set Menu"))
+                .rows(3)
+                .addItem(MenuHelper.backButton().build())
+                .addItem(MenuItem.builder(Material.NAME_TAG)
+                        .name(Component.text("Change town name", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
+                                return Component.text("You do not have permission to change the town's name.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to change the town's name.", NamedTextColor.GRAY);
+                        })
+                        .action(true || town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter town name", title -> {
+                            final Town playerTown = TownyAPI.getInstance().getTown(player);
+                            if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
+                                return AnvilGUI.Response.close();
+
+                            try {
+                                // TODO: wait for https://github.com/TownyAdvanced/Towny/pull/6182 to be merged
+                                TownCommand.townSetName(player, new String[]{"", title}, town);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                return AnvilGUI.Response.text(e.getMessage(player));
+                            }
+
+                            MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
+                            return AnvilGUI.Response.close();
+                        }))
+                        .build())
+                .addItem(MenuItem.builder(Material.OAK_SIGN)
+                        // TODO: https://github.com/TownyAdvanced/Towny/pull/6186
+                        .name(Component.text("Change town board", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
+                                return Component.text("You do not have permission to change the town's board.", NamedTextColor.GRAY);
+                            else
+                                return Arrays.asList(Component.text("Click to change the town's board.", NamedTextColor.GRAY),
+                                        Component.text("Right click to clear the town's board.", NamedTextColor.GRAY));
+                        })
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter town board", board -> {
+                            final Town playerTown = TownyAPI.getInstance().getTown(player);
+                            if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
+                                return AnvilGUI.Response.close();
+
+                            try {
+                                // First arg is redundant
+                                TownCommand.townSetBoard(player, new String[]{"", board}, playerTown, player);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                return AnvilGUI.Response.text(e.getMessage(player));
+                            }
+
+                            MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
+                            return AnvilGUI.Response.text("");
+                        })))
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
+                            final Town playerTown = TownyAPI.getInstance().getTown(player);
+                            if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
+                                return;
+
+                            // TODO change to townSetBoard
+                            town.setBoard(TownySettings.getTownDefaultBoard());
+                            town.save();
+                        })))
+                        .build())
+                .addItem(MenuItem.builder(Material.RED_BED)
+                        .name(Component.text("Change town spawn", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SPAWN.getNode()))
+                                return Component.text("You do not have permission to change the town's spawn.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to change the town's spawn.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SPAWN.getNode()) ? ClickAction.NONE : ClickAction.run(() -> {
+                            final Town playerTown = TownyAPI.getInstance().getTown(player);
+                            if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SPAWN.getNode()))
+                                return;
+
+                            try {
+                                TownCommand.townSetSpawn(player, playerTown, false);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
+                        }))
+                        .build())
+                .build();
     }
 
     public static MenuItem.Builder formatTownInfo(Town town) {
