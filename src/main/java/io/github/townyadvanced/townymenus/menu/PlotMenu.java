@@ -202,7 +202,7 @@ public class PlotMenu {
 
                 // Should never be null, testPlotOwner returns false if it is not claimed anymore.
                 TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
-                if (townBlock1 == null || !townBlock1.getTypeName().equalsIgnoreCase(type.getName()))
+                if (townBlock1 == null || townBlock1.getTypeName().equalsIgnoreCase(type.getName()))
                     return;
 
                 PlotGroup plotGroup = townBlock1.getPlotObjectGroup();

@@ -1,7 +1,7 @@
 name: TownyMenus
 main: io.github.townyadvanced.townymenus.TownyMenus
 version: ${version}
-api-version: 1.18
+api-version: 1.16
 author: Warriorrr
 website: 'http://townyadvanced.github.io'
 depend: [Towny]
