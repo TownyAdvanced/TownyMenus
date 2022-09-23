@@ -41,7 +41,7 @@ public class ResidentMenu {
                         .name(Component.text("View Friends", NamedTextColor.GREEN))
                         .lore(Component.text("Click to see your friends list.", NamedTextColor.GRAY))
                         .slot(11)
-                        .action(ClickAction.openInventory(formatResidentFriends(player)))
+                        .action(ClickAction.openInventory(() -> formatResidentFriends(player)))
                         .build())
                 .addItem(formatResidentInfo(player.getUniqueId()).slot(13).build())
                 .addItem(MenuItem.builder(Material.RED_BED)
@@ -72,14 +72,22 @@ public class ResidentMenu {
     }
 
     public static MenuItem.Builder formatResidentInfo(@NotNull UUID uuid) {
-        return formatResidentInfo(TownyAPI.getInstance().getResident(uuid));
+        return formatResidentInfo(uuid, null);
+    }
+
+    public static MenuItem.Builder formatResidentInfo(@NotNull UUID uuid, @Nullable Player viewer) {
+        return formatResidentInfo(TownyAPI.getInstance().getResident(uuid), viewer);
+    }
+
+    public static MenuItem.Builder formatResidentInfo(@Nullable Resident resident) {
+        return formatResidentInfo(resident, null);
     }
 
     /**
      * @param resident The resident to format
      * @return A formatted menu item, or an 'error' item if the resident isn't registered.
      */
-    public static MenuItem.Builder formatResidentInfo(@Nullable Resident resident) {
+    public static MenuItem.Builder formatResidentInfo(@Nullable Resident resident, @Nullable Player viewer) {
         if (resident == null)
             return MenuItem.builder(Material.PLAYER_HEAD)
                     .skullOwner(resident.getUUID())
@@ -87,7 +95,9 @@ public class ResidentMenu {
                     .lore(Component.text("Unknown or invalid resident.", NamedTextColor.RED));
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("Status: ", NamedTextColor.DARK_GREEN).append(resident.isOnline() ? Component.text("● Online", NamedTextColor.GREEN) : Component.text("● Offline", NamedTextColor.RED)));
+
+        Player player = resident.getPlayer();
+        lore.add(Component.text("Status: ", NamedTextColor.DARK_GREEN).append(player != null && (viewer == null || viewer.canSee(player)) ? Component.text("● Online", NamedTextColor.GREEN) : Component.text("● Offline", NamedTextColor.RED)));
 
         if (resident.hasTown()) {
             lore.add(Component.text((resident.isMayor() ? "Mayor" : "Resident") + " of ", NamedTextColor.DARK_GREEN).append(Component.text(resident.getTownOrNull().getName(), NamedTextColor.GREEN)));
@@ -118,7 +128,7 @@ public class ResidentMenu {
 
         List<MenuItem> friends = new ArrayList<>();
         for (Resident friend : resident.getFriends())
-            friends.add(formatResidentInfo(friend.getUUID())
+            friends.add(formatResidentInfo(friend.getUUID(), player)
                     .lore(Component.text("Right click to remove this player as a friend.", NamedTextColor.GRAY))
                     .action(ClickAction.rightClick(ClickAction.confirmation(() -> Component.text("Are you sure you want to remove " + friend.getName() + " as a friend?", NamedTextColor.GRAY), ClickAction.run(() -> {
                         if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_FRIEND.getNode())) {

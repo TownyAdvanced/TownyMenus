@@ -449,7 +449,7 @@ public class PlotMenu {
         List<MenuItem> trustedPlayers = new ArrayList<>(trusted.size());
 
         for (Resident trustedResident : trusted) {
-            MenuItem.Builder builder = ResidentMenu.formatResidentInfo(trustedResident);
+            MenuItem.Builder builder = ResidentMenu.formatResidentInfo(trustedResident, player);
 
             if (canAddRemove)
                 builder.lore(Component.text("Right click to remove this player as trusted.", NamedTextColor.GRAY))

@@ -20,9 +20,9 @@ public class MenuScheduler {
         if (hasRunningTask.contains(uuid))
             return;
 
-        Bukkit.getScheduler().runTaskAsynchronously(TownyMenus.getPlugin(), () -> {
-            hasRunningTask.add(uuid);
+        hasRunningTask.add(uuid);
 
+        Bukkit.getScheduler().runTaskAsynchronously(TownyMenus.getPlugin(), () -> {
             try {
                 runnable.run();
             } finally {

@@ -8,6 +8,7 @@ import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
+import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
@@ -63,7 +64,7 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
                         .name(Component.text("Nation Settings", NamedTextColor.AQUA))
                         .lore(Component.text("Click to view the nation menu!", NamedTextColor.GRAY))
                         .slot(12)
-                        .action(ClickAction.close())
+                        .action(ClickAction.openInventory(() -> NationMenu.createNationMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Plot Settings", NamedTextColor.DARK_GREEN))

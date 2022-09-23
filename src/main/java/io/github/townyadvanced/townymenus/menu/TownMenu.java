@@ -166,7 +166,7 @@ public class TownMenu {
                                 if (!player.canSee(onlinePlayer))
                                     continue;
 
-                                online.add(ResidentMenu.formatResidentInfo(onlinePlayer.getUniqueId()).build());
+                                online.add(ResidentMenu.formatResidentInfo(onlinePlayer.getUniqueId(), player).build());
                             }
 
                             return MenuInventory.paginator().addItems(online).title(Component.text("Online in Town")).build();
@@ -242,7 +242,7 @@ public class TownMenu {
                 .title(Component.text("Resident Overview - " + town.getName()));
 
         for (Resident resident : town.getResidents()) {
-            builder.addItem(ResidentMenu.formatResidentInfo(resident)
+            builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
                     .lore(Component.text("Joined town ", NamedTextColor.DARK_GREEN).append(Component.text(Time.registeredOrAgo(res.getJoinedTownAt()), NamedTextColor.GREEN)))
                     .lore(Component.text("Right click to view additional options.", NamedTextColor.GRAY))
                     .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, town, resident))))
@@ -275,7 +275,7 @@ public class TownMenu {
                             TownCommand.townKickResidents(player, TownyAPI.getInstance().getResident(player), town, Collections.singletonList(resident));
                         })))
                         .build())
-                .addItem(ResidentMenu.formatResidentInfo(resident)
+                .addItem(ResidentMenu.formatResidentInfo(resident, player)
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
