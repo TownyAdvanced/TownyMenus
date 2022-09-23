@@ -179,8 +179,7 @@ public class ResidentMenu {
 
                             // Re-open resident friends menu
                             MenuHistory.reOpen(player, () -> formatResidentFriends(player));
-
-                            return AnvilGUI.Response.close();
+                            return AnvilGUI.Response.text("");
                         }))
                         .build())
                 .build();

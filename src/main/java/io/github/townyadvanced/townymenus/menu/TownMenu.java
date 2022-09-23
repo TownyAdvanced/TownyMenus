@@ -152,17 +152,18 @@ public class TownMenu {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_ONLINE.getNode()))
-                                return Component.text("You do not have permission to view the town's offline player list.", NamedTextColor.GRAY);
+                                return Component.text("You do not have permission to view the town's online player list.", NamedTextColor.GRAY);
                             else
                                 return Component.text("Click to view online players in the town.", NamedTextColor.GRAY);
                         })
                         .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_ONLINE.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
-                            if (!TownyUniverse.getInstance().hasTown(town.getUUID()))
+                            final Town playerTown = TownyAPI.getInstance().getTown(player);
+                            if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_ONLINE.getNode()))
                                 return MenuInventory.paginator().title(Component.text("Online in Town")).build();
 
                             List<MenuItem> online = new ArrayList<>();
 
-                            for (Player onlinePlayer : TownyAPI.getInstance().getOnlinePlayers(town)) {
+                            for (Player onlinePlayer : TownyAPI.getInstance().getOnlinePlayers(playerTown)) {
                                 if (!player.canSee(onlinePlayer))
                                     continue;
 
@@ -181,7 +182,7 @@ public class TownMenu {
                 .addItem(formatTownInfo(town)
                         .slot(5)
                         .build())
-                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                .addItem(MenuItem.builder(Material.LEVER)
                         .name(Component.text("Town Toggle", NamedTextColor.GREEN))
                         .slot(6)
                         .lore(() -> {
@@ -508,7 +509,7 @@ public class TownMenu {
                     else
                         return Component.text(String.format("Click to %s %s.", propertyEnabled ? "disable" : "enable", property), NamedTextColor.GRAY);
                 })
-                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_TOGGLE_FIRE.getNode()) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in your town?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in your town?", NamedTextColor.GRAY), ClickAction.run(() -> {
                     final Town town = TownyAPI.getInstance().getTown(player);
                     if (town == null)
                         return;
