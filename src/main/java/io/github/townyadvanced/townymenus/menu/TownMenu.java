@@ -54,9 +54,13 @@ public class TownMenu {
         return MenuInventory.builder()
                 .rows(6)
                 .title(Component.text("Town Menu - " + (town != null ? town.getName() : "No Town")))
+                .addItem(MenuHelper.backButton().build())
+                .addItem(formatTownInfo(town)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .build())
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
                         .name(Component.text("Transaction History", NamedTextColor.GREEN))
-                        .slot(0)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -70,7 +74,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Town Plots", NamedTextColor.GREEN))
-                        .slot(1)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromRight(3)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -122,7 +126,7 @@ public class TownMenu {
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .slot(2)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Town Spawn", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (town == null)
@@ -145,9 +149,9 @@ public class TownMenu {
                             player.closeInventory();
                         })))
                         .build())
-                .addItem(MenuItem.builder(Material.STONE)
+                .addItem(MenuItem.builder(Material.ENDER_EYE)
                         .name(Component.text("Online in Town", NamedTextColor.GREEN))
-                        .slot(3)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -177,34 +181,19 @@ public class TownMenu {
                         .name(Component.text("Resident Overview", NamedTextColor.GREEN))
                         .lore(Component.text("Click to view and manage residents in this town.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> createResidentOverview(player)))
-                        .slot(4)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(1)))
                         .build())
-                .addItem(formatTownInfo(town)
-                        .slot(5)
-                        .build())
-                .addItem(MenuItem.builder(Material.LEVER)
-                        .name(Component.text("Town Toggle", NamedTextColor.GREEN))
-                        .slot(6)
+                .addItem(MenuItem.builder(Material.GOLDEN_AXE)
+                        .name(Component.text("Town Management", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
                             else
-                                return Component.text("Click to open the town toggle menu.", NamedTextColor.GRAY);
+                                return Component.text("Click to open the town management menu.", NamedTextColor.GRAY);
                         })
-                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownToggleMenu(player)))
+                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownManagementMenu(player)))
                         .build())
-                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
-                        .name(Component.text("Town Set", NamedTextColor.GREEN))
-                        .slot(7)
-                        .lore(() -> {
-                            if (town == null)
-                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
-                            else
-                                return Component.text("Click to open the town set menu.", NamedTextColor.GRAY);
-                        })
-                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownSetMenu(player)))
-                        .build())
-                .addItem(MenuHelper.backButton().build())
                 .build();
     }
 
@@ -245,6 +234,7 @@ public class TownMenu {
         for (Resident resident : town.getResidents()) {
             builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
                     .lore(Component.text("Joined town ", NamedTextColor.DARK_GREEN).append(Component.text(Time.registeredOrAgo(res.getJoinedTownAt()), NamedTextColor.GREEN)))
+                    .lore(Component.text(" "))
                     .lore(Component.text("Right click to view additional options.", NamedTextColor.GRAY))
                     .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, town, resident))))
                     .build());
@@ -430,6 +420,27 @@ public class TownMenu {
         }
 
         return paginator.build();
+    }
+
+    public static MenuInventory formatTownManagementMenu(Player player) {
+        return MenuInventory.builder()
+                .rows(3)
+                .title(Component.text("Town Management"))
+                .addItem(MenuHelper.backButton().build())
+                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                        .name(Component.text("Open town set menu", NamedTextColor.GREEN))
+                        .lore(Component.text("Click to open the town set menu.", NamedTextColor.GRAY))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .action(ClickAction.openInventory(() -> formatTownSetMenu(player)))
+                        .build())
+                // TODO: Manage town permissions and trusted players
+                .addItem(MenuItem.builder(Material.LEVER)
+                        .name(Component.text("Open town toggle menu", NamedTextColor.GREEN))
+                        .lore(Component.text("Click to open the town toggle menu.", NamedTextColor.GRAY))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .action(ClickAction.openInventory(() -> formatTownToggleMenu(player)))
+                        .build())
+                .build();
     }
 
     public static MenuInventory formatTownToggleMenu(Player player) {

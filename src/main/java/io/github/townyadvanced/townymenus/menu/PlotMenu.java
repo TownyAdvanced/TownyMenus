@@ -63,7 +63,7 @@ public class PlotMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
                         .name(Component.text("Set Plot For Sale", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
                                 return Component.text("Wilderness plots cannot be put for sale.", NamedTextColor.GRAY);
@@ -79,7 +79,7 @@ public class PlotMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
                         .name(Component.text("Set Plot Not For Sale", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
                                 return Component.text("Wilderness plots cannot be put not for sale.", NamedTextColor.GRAY);
@@ -96,7 +96,7 @@ public class PlotMenu {
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
                         .name(Component.text("Trusted Players", NamedTextColor.GREEN))
                         .lore(Component.text("Click to view the current plot's trusted player list.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .action(ClickAction.openInventory(() -> formatPlotTrustMenu(player, worldCoord)))
                         .build())
                 .build();

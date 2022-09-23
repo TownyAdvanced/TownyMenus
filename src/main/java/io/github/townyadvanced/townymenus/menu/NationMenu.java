@@ -36,7 +36,7 @@ public class NationMenu {
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
                         .name(Component.text("Transaction History", NamedTextColor.GREEN))
-                        .slot(0)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(4)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
@@ -49,7 +49,7 @@ public class NationMenu {
                                 ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(nation)))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .slot(1)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .name(Component.text("Nation Spawn", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (nation == null)
@@ -72,9 +72,9 @@ public class NationMenu {
                             player.closeInventory();
                         })))
                         .build())
-                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                .addItem(MenuItem.builder(Material.LEVER)
                         .name(Component.text("Nation Toggle", NamedTextColor.GREEN))
-                        .slot(2)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You must be in a nation in order to view the toggle menu.", NamedTextColor.GRAY);
@@ -85,13 +85,13 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Nation Set", NamedTextColor.GREEN))
-                        .slot(3)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(2)))
                         .lore(Component.text("Click to open the nation set menu.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> formatNationSetMenu(player)))
                         .build())
-                .addItem(MenuItem.builder(Material.PLAYER_HEAD)
+                .addItem(MenuItem.builder(Material.ENDER_EYE)
                         .name(Component.text("Online in Nation", NamedTextColor.GREEN))
-                        .slot(4)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(2)))
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
                             final Nation playerNation = getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()))
