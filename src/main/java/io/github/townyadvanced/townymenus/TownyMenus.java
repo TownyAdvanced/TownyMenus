@@ -38,7 +38,9 @@ public class TownyMenus extends JavaPlugin {
 			getLogger().info("Towny version " + Towny.getPlugin().getVersion() + " found.");
 		}
 
+		/*
 		MenuSettings.loadConfig();
+		*/
 
 		Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
@@ -54,10 +56,12 @@ public class TownyMenus extends JavaPlugin {
 		TownyCommandAddonAPI.addSubCommand(CommandType.RESIDENT, "menu", new ResidentAddonCommand());
 		TownyCommandAddonAPI.addSubCommand(CommandType.TOWN, "menu", new TownAddonCommand());
 
+		/*
 		logger().info("Loading translations...");
 		TranslationLoader loader = new TranslationLoader(getDataFolder().toPath().resolve("lang"), this, TownyMenus.class);
 		loader.load();
 		TownyAPI.getInstance().addTranslations(this, loader.getTranslations());
+		*/
 	}
 
 	@Override
