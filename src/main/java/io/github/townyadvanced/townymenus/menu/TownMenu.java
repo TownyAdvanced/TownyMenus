@@ -33,6 +33,7 @@ import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.utils.Time;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
@@ -553,13 +554,14 @@ public class TownMenu {
                             else
                                 return Component.text("Click to change the town's name.", NamedTextColor.GRAY);
                         })
-                        .action(true || town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter town name", title -> {
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter town name", title -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
                                 return AnvilGUI.Response.close();
 
+                            AwaitingConfirmation.await(player);
+
                             try {
-                                // TODO: wait for https://github.com/TownyAdvanced/Towny/pull/6182 to be merged
                                 TownCommand.townSetName(player, new String[]{"", title}, town);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
@@ -567,11 +569,10 @@ public class TownMenu {
                             }
 
                             MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
-                            return AnvilGUI.Response.close();
+                            return AnvilGUI.Response.text("");
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
-                        // TODO: https://github.com/TownyAdvanced/Towny/pull/6186
                         .name(Component.text("Change town board", NamedTextColor.GREEN))
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .lore(() -> {
@@ -589,8 +590,7 @@ public class TownMenu {
                                 return AnvilGUI.Response.close();
 
                             try {
-                                // First arg is redundant
-                                TownCommand.townSetBoard(player, new String[]{"", board}, playerTown, player);
+                                TownCommand.townSetBoard(player, board, playerTown);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilGUI.Response.text(e.getMessage(player));
@@ -604,9 +604,11 @@ public class TownMenu {
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
                                 return;
 
-                            // TODO change to townSetBoard
-                            town.setBoard(TownySettings.getTownDefaultBoard());
-                            town.save();
+                            try {
+                                TownCommand.townSetBoard(player, "reset", playerTown);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)

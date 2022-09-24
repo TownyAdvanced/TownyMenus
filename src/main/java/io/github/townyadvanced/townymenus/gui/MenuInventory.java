@@ -76,14 +76,22 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     public void open(@NotNull HumanEntity player) {
-        Bukkit.getScheduler().runTask(TownyMenus.getPlugin(), () -> {
-            player.openInventory(this.inventory);
-            MenuHistory.addHistory(player.getUniqueId(), this);
-        });
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(TownyMenus.getPlugin(), () -> open(player));
+            return;
+        }
+
+        player.openInventory(this.inventory);
+        MenuHistory.addHistory(player.getUniqueId(), this);
     }
 
     public void openSilent(@NotNull HumanEntity player) {
-        Bukkit.getScheduler().runTask(TownyMenus.getPlugin(), () -> player.openInventory(this.inventory));
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(TownyMenus.getPlugin(), () -> openSilent(player));
+            return;
+        }
+
+        player.openInventory(this.inventory);
     }
 
     @NotNull

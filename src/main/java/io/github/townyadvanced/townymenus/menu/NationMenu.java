@@ -7,7 +7,6 @@ import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.command.NationCommand;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Nation;
-import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
@@ -17,6 +16,7 @@ import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public class NationMenu {
     public static MenuInventory createNationMenu(@NotNull Player player) {
-        Nation nation = getNation(player);
+        Nation nation = TownyAPI.getInstance().getNation(player);
 
         return MenuInventory.builder()
                 .title(Component.text("Nation Menu"))
@@ -93,7 +93,7 @@ public class NationMenu {
                         .name(Component.text("Online in Nation", NamedTextColor.GREEN))
                         .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(2)))
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
-                            final Nation playerNation = getNation(player);
+                            final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()))
                                 return MenuInventory.paginator().title(Component.text("Online in Nation")).build();
 
@@ -112,7 +112,7 @@ public class NationMenu {
     }
 
     public static MenuInventory formatNationToggleMenu(Player player) {
-        final Nation nation = getNation(player);
+        final Nation nation = TownyAPI.getInstance().getNation(player);
 
         final boolean isPublic = nation != null && nation.isPublic();
         final boolean isOpen = nation != null && nation.isOpen();
@@ -154,7 +154,7 @@ public class NationMenu {
                         return Component.text(String.format("Click to %s %s.", propertyEnabled ? "disable" : "enable", property), NamedTextColor.GRAY);
                 })
                 .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in your nation?", NamedTextColor.GRAY), ClickAction.run(() -> {
-                    final Nation nation = getNation(player);
+                    final Nation nation = TownyAPI.getInstance().getNation(player);
                     if (nation == null)
                         return;
 
@@ -169,7 +169,7 @@ public class NationMenu {
     }
 
     public static MenuInventory formatNationSetMenu(Player player) {
-        final Nation nation = getNation(player);
+        final Nation nation = TownyAPI.getInstance().getNation(player);
 
         return MenuInventory.builder()
                 .title(Component.text("Nation Set"))
@@ -187,12 +187,14 @@ public class NationMenu {
                                 return Component.text("Click to change the nation's name.", NamedTextColor.GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter new nation name", name -> {
-                            final Nation playerNation = getNation(player);
+                            final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()))
                                 return AnvilGUI.Response.close();
 
+                            // Await confirmation events for this player
+                            AwaitingConfirmation.await(player);
+                            
                             try {
-                                // TODO: Catch confirmation once confirmation pr is merged
                                 NationCommand.nationSet(player, ("name " + name).split(" "), false, playerNation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
@@ -215,7 +217,7 @@ public class NationMenu {
                                 return Component.text("Click to change the nation's board.", NamedTextColor.GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter nation board", board -> {
-                            final Nation playerNation = getNation(player);
+                            final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_BOARD.getNode()))
                                 return AnvilGUI.Response.close();
 
@@ -242,7 +244,7 @@ public class NationMenu {
                                 return Component.text("Click to change the nation's spawn.", NamedTextColor.GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SPAWN.getNode()) ? ClickAction.NONE : ClickAction.run(() -> {
-                            final Nation playerNation = getNation(player);
+                            final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SPAWN.getNode()))
                                 return;
 
@@ -255,12 +257,5 @@ public class NationMenu {
                         }))
                         .build())
                 .build();
-    }
-
-    // TODO: https://github.com/TownyAdvanced/Towny/pull/6190
-    public static Nation getNation(@NotNull Player player) {
-        Resident resident = TownyAPI.getInstance().getResident(player);
-
-        return resident == null ? null : resident.getNationOrNull();
     }
 }
