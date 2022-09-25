@@ -33,6 +33,7 @@ dependencies {
     compileOnly("com.palmergames.bukkit.towny:towny:${townyVersion}")
     compileOnly("org.jetbrains:annotations:23.0.0")
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+    annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.2")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -70,4 +71,13 @@ tasks {
 
 tasks.withType<JavaCompile> {
     options.encoding = Charsets.UTF_8.name()
+
+    // Configure source & release versions
+    // https://github.com/bsideup/jabel
+    sourceCompatibility = "16"
+    options.release.set(8)
+
+    javaCompiler.set(javaToolchains.compilerFor {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    })
 }

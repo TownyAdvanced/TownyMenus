@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class MenuItem {
     private SlotAnchor slot;
@@ -183,7 +184,7 @@ public class MenuItem {
                 meta.setDisplayName(displayName);
 
                 if (!lore.isEmpty())
-                    meta.setLore(lore.stream().map(component -> LegacyComponentSerializer.legacySection().serialize(component)).toList());
+                    meta.setLore(lore.stream().map(component -> LegacyComponentSerializer.legacySection().serialize(component)).collect(Collectors.toList()));
 
                 if (meta instanceof SkullMeta skullMeta && this.ownerUUID != null)
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(this.ownerUUID));
