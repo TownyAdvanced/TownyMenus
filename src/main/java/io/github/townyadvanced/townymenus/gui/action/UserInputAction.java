@@ -3,6 +3,7 @@ package io.github.townyadvanced.townymenus.gui.action;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,7 +24,7 @@ public class UserInputAction implements ClickAction {
     public void onClick(MenuInventory inventory, InventoryClickEvent event) {
         new AnvilGUI.Builder()
                 .title(title)
-                .onClose(inventory::openSilent) // Re-open previous inventory if closed
+                .onClose(player -> Bukkit.getScheduler().runTask(TownyMenus.getPlugin(), () -> inventory.openSilent(player))) // Re-open previous inventory if closed
                 .onComplete((player, input) -> inputFunction.apply(input))
                 .itemLeft(new ItemStack(Material.PAPER))
                 .plugin(TownyMenus.getPlugin())
