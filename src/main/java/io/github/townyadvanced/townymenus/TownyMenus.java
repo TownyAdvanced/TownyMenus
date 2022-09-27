@@ -32,6 +32,7 @@ public class TownyMenus extends JavaPlugin {
 
 		if (!townyVersionCheck()) {
 			getLogger().severe("Towny version does not meet required minimum version: " + requiredTownyVersion);
+			getLogger().severe("Download the latest version here: https://github.com/TownyAdvanced/Towny/releases");
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		} else {
