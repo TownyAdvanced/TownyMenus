@@ -74,10 +74,10 @@ tasks.withType<JavaCompile> {
 
     // Configure source & release versions
     // https://github.com/bsideup/jabel
-    sourceCompatibility = "16"
+    sourceCompatibility = "17"
     options.release.set(8)
 
     javaCompiler.set(javaToolchains.compilerFor {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(17))
     })
 }
