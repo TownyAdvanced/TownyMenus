@@ -4,3 +4,4 @@
   - Lower min. java version to 8.
   - Fix 'phantom inventory' being opened when exiting out of an anvil menu.
     - Closes #6
+  - Use a CompletableFuture for the menu scheduler instead of the Bukkit scheduler.

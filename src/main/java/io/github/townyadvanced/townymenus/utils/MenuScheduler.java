@@ -1,11 +1,10 @@
 package io.github.townyadvanced.townymenus.utils;
 
-import io.github.townyadvanced.townymenus.TownyMenus;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MenuScheduler {
@@ -22,12 +21,6 @@ public class MenuScheduler {
 
         hasRunningTask.add(uuid);
 
-        Bukkit.getScheduler().runTaskAsynchronously(TownyMenus.getPlugin(), () -> {
-            try {
-                runnable.run();
-            } finally {
-                hasRunningTask.remove(uuid);
-            }
-        });
+        CompletableFuture.runAsync(runnable).thenRun(() -> hasRunningTask.remove(uuid));
     }
 }
