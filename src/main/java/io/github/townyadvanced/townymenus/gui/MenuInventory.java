@@ -149,7 +149,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         }
 
         public MenuInventory build() {
-            Inventory inventory = Bukkit.createInventory(null, size, LegacyComponentSerializer.legacyAmpersand().serialize(title));
+            Inventory inventory = Bukkit.createInventory(null, size, LegacyComponentSerializer.legacySection().serialize(title));
 
             Map<Integer, List<ClickAction>> actions = new HashMap<>();
 

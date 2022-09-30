@@ -2,14 +2,19 @@ package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
+import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.command.BaseCommand;
 import com.palmergames.bukkit.towny.command.NationCommand;
+import com.palmergames.bukkit.towny.event.nation.NationRankAddEvent;
+import com.palmergames.bukkit.towny.event.nation.NationRankRemoveEvent;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
+import com.palmergames.bukkit.towny.permissions.TownyPerms;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -20,6 +25,7 @@ import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -162,7 +168,7 @@ public class NationMenu {
                 .build();
     }
 
-    // TODO: Make its so this is not just a straight copy of townmenu's
+    // TODO: Make its so this is not just a straight copy of town menu's
     private static MenuItem.Builder createTogglePropertyItem(Player player, boolean hasNation, Material material, boolean propertyEnabled, String property) {
         return MenuItem.builder(material)
                 .name(Component.text("Toggle " + property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1), propertyEnabled ? NamedTextColor.GREEN : NamedTextColor.RED))
@@ -375,6 +381,95 @@ public class NationMenu {
                             }
                         })))
                         .build())
+                .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
+                        .name(Component.text("Manage Ranks", NamedTextColor.GREEN))
+                        .lore(Component.text("Click to manage nation ranks for this resident.", NamedTextColor.GRAY))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(4)))
+                        .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, nation, resident)))
+                        .build())
                 .build();
+    }
+
+    // This and the town menu rank menu can maybe be abstracted into one method
+    public static MenuInventory formatRankManagementMenu(Player player, Nation nation, Resident resident) {
+        MenuInventory.PaginatorBuilder paginator = MenuInventory.paginator().title(Component.text("Rank Management"));
+
+        for (String nationRank : TownyPerms.getNationRanks()) {
+            MenuItem.Builder item = MenuItem.builder(Material.KNOWLEDGE_BOOK)
+                    .name(Component.text(nationRank.substring(0, 1).toUpperCase(Locale.ROOT) + nationRank.substring(1), NamedTextColor.GREEN));
+
+            final boolean hasPermission = player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_RANK.getNode(nationRank.toLowerCase(Locale.ROOT)));
+
+            if (resident.hasNationRank(nationRank)) {
+                item.withGlint();
+
+                if (hasPermission) {
+                    item.lore(Component.text("Click to remove the " + nationRank + " rank from " + resident.getName() + ".", NamedTextColor.GRAY));
+                    item.action(ClickAction.confirmation(Component.text("Are you sure you want to remove the rank of " + nationRank + " from " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                        if (!resident.hasNationRank(nationRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_RANK.getNode(nationRank.toLowerCase(Locale.ROOT)))) {
+                            MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
+                            return;
+                        }
+
+                        Resident playerResident = TownyAPI.getInstance().getResident(player);
+                        if (nation == null || resident.getNationOrNull() != nation || playerResident == null || playerResident.getNationOrNull() != nation)
+                            return;
+
+                        NationRankRemoveEvent event = new NationRankRemoveEvent(nation, nationRank, resident);
+                        Bukkit.getPluginManager().callEvent(event);
+
+                        if (event.isCancelled()) {
+                            TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                            MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
+                            return;
+                        }
+
+                        resident.removeNationRank(nationRank);
+
+                        if (resident.isOnline()) {
+                            TownyMessaging.sendMsg(resident, Translatable.of("msg_you_have_had_rank_taken", Translatable.of("nation_sing"), nationRank));
+                            Towny.getPlugin().deleteCache(resident);
+                        }
+
+                        TownyMessaging.sendMsg(player, Translatable.of("msg_you_have_taken_rank_from", Translatable.of("nation_sing"), nationRank, resident.getName()));
+                        MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
+                    })));
+                }
+            } else if (hasPermission) {
+                item.lore(Component.text("Click to grant the " + nationRank + " rank to " + resident.getName() + ".", NamedTextColor.GRAY));
+                item.action(ClickAction.confirmation(Component.text("Are you sure you want to give the rank of " + nationRank + " to " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                    if (resident.hasNationRank(nationRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_RANK.getNode(nationRank.toLowerCase(Locale.ROOT)))) {
+                        MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
+                        return;
+                    }
+
+                    Resident playerResident = TownyAPI.getInstance().getResident(player);
+                    if (nation == null || resident.getNationOrNull() != nation || playerResident == null || playerResident.getNationOrNull() != nation)
+                        return;
+
+                    NationRankAddEvent event = new NationRankAddEvent(nation, nationRank, resident);
+                    Bukkit.getPluginManager().callEvent(event);
+
+                    if (event.isCancelled()) {
+                        TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
+                        MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
+                        return;
+                    }
+
+                    resident.addNationRank(nationRank);
+                    if (resident.isOnline()) {
+                        TownyMessaging.sendMsg(resident, Translatable.of("msg_you_have_been_given_rank", Translatable.of("nation_sing"), nationRank));
+                        Towny.getPlugin().deleteCache(resident);
+                    }
+
+                    TownyMessaging.sendMsg(player, Translatable.of("msg_you_have_given_rank", Translatable.of("nation_sing"), nationRank, resident.getName()));
+                    MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
+                })));
+            }
+
+            paginator.addItem(item.build());
+        }
+
+        return paginator.build();
     }
 }
