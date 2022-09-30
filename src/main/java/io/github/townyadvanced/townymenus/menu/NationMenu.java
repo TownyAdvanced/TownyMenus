@@ -54,7 +54,7 @@ public class NationMenu {
                             else
                                 return Component.text("Click to view the nations's transaction history.", NamedTextColor.GRAY);
                         })
-                        .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode()) ? ClickAction.NONE :
+                        .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()) ? ClickAction.NONE :
                                 ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(nation)))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
