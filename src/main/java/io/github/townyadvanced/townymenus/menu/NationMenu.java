@@ -4,9 +4,11 @@ import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
+import com.palmergames.bukkit.towny.command.BaseCommand;
 import com.palmergames.bukkit.towny.command.NationCommand;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
@@ -23,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -92,6 +95,14 @@ public class NationMenu {
                 .addItem(MenuItem.builder(Material.ENDER_EYE)
                         .name(Component.text("Online in Nation", NamedTextColor.GREEN))
                         .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(2)))
+                        .lore(() -> {
+                            if (nation == null)
+                                return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()))
+                                return Component.text("You do not have permission to view residents online in your nation.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view online residents in your nation.", NamedTextColor.GRAY);
+                        })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()))
@@ -107,6 +118,16 @@ public class NationMenu {
 
                             return MenuInventory.paginator().title(Component.text("Online in Nation")).addItems(online).build();
                         }))
+                        .build())
+                .addItem(MenuItem.builder(Material.PLAYER_HEAD)
+                        .name(Component.text("Nation Resident Overview", NamedTextColor.GREEN))
+                        .lore(() -> {
+                            if (nation == null)
+                                return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view and manage residents in your nation.", NamedTextColor.GRAY);
+                        })
+                        .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
                         .build())
                 .build();
     }
@@ -255,6 +276,104 @@ public class NationMenu {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
                         }))
+                        .build())
+                .build();
+    }
+
+    public static MenuInventory createResidentOverview(Player player) {
+        final Nation nation = TownyAPI.getInstance().getNation(player);
+        if (nation == null)
+            return MenuInventory.paginator().title(Component.text("Resident Overview")).build();
+
+        final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(Component.text("Resident Overview - " + nation.getName()));
+
+        for (Resident resident : nation.getResidents()) {
+            builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
+                    .lore(Component.text(" "))
+                    .lore(Component.text("Right click to view additional options for this resident.", NamedTextColor.GRAY))
+                    .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, nation, resident))))
+                    .build());
+        }
+
+        return builder.build();
+    }
+
+    public static MenuInventory createResidentManagementScreen(Player player, Nation nation, Resident resident) {
+        return MenuInventory.builder()
+                .title(Component.text("Resident Management"))
+                .addItem(MenuHelper.backButton().build())
+                .addItem(ResidentMenu.formatResidentInfo(resident, player)
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .build())
+                .addItem(MenuItem.builder(Material.NAME_TAG)
+                        .name(Component.text("Change Resident Title", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()))
+                                return Component.text("You do not have permission to change this resident's title.", NamedTextColor.GRAY);
+                            else
+                                return Arrays.asList(Component.text("Click to change this resident's title.", NamedTextColor.GRAY),
+                                        Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY));
+                        })
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new title", title -> {
+                            final Nation playerNation = TownyAPI.getInstance().getNation(player);
+                            if (playerNation == null || playerNation != resident.getNationOrNull())
+                                return AnvilGUI.Response.close();
+
+                            try {
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode());
+                                NationCommand.nationSet(player, new String[]{"title", resident.getName(), title}, false, nation);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                return AnvilGUI.Response.text(e.getMessage(player));
+                            }
+
+                            MenuHistory.last(player);
+                            return AnvilGUI.Response.text("");
+                        })))
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
+                            try {
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode());
+                                NationCommand.nationSet(player, new String[]{"title", resident.getName(), ""}, false, nation);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
+                        })))
+                        .build())
+                .addItem(MenuItem.builder(Material.NAME_TAG)
+                        .name(Component.text("Change Resident Surname", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromRight(2)))
+                        .lore(() -> {
+                            if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()))
+                                return Component.text("You do not have permission to change this resident's surname.", NamedTextColor.GRAY);
+                            else
+                                return Arrays.asList(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY),
+                                        Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY));
+                        })
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new surname", surname -> {
+                            final Nation playerNation = TownyAPI.getInstance().getNation(player);
+                            if (playerNation == null || playerNation != resident.getNationOrNull())
+                                return AnvilGUI.Response.close();
+
+                            try {
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode());
+                                NationCommand.nationSet(player, new String[]{"surname", resident.getName(), surname}, false, nation);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                return AnvilGUI.Response.text(e.getMessage(player));
+                            }
+
+                            MenuHistory.last(player);
+                            return AnvilGUI.Response.text("");
+                        })))
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
+                            try {
+                                BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode());
+                                NationCommand.nationSet(player, new String[]{"surname", resident.getName(), ""}, false, nation);
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
+                        })))
                         .build())
                 .build();
     }

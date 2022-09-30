@@ -180,8 +180,13 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
                         .name(Component.text("Resident Overview", NamedTextColor.GREEN))
-                        .lore(Component.text("Click to view and manage residents in this town.", NamedTextColor.GRAY))
-                        .action(ClickAction.openInventory(() -> createResidentOverview(player)))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view and manage residents in your town.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
                         .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(1)))
                         .build())
                 .addItem(MenuItem.builder(Material.GOLDEN_AXE)
