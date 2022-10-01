@@ -24,6 +24,7 @@ import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
+import io.github.townyadvanced.townymenus.menu.helper.GovernmentMenus;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -149,7 +150,7 @@ public class NationMenu {
                 .title(Component.text("Nation Toggle"))
                 .addItem(MenuHelper.backButton().build())
                 // Open
-                .addItem(createTogglePropertyItem(player, nation != null, Material.GRASS_BLOCK, isOpen, "open")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, nation, Material.GRASS_BLOCK, isOpen, "open")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .build())
                 .addItem(MenuItem.builder(isOpen ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -157,7 +158,7 @@ public class NationMenu {
                         .name(Component.empty())
                         .build())
                 // Public
-                .addItem(createTogglePropertyItem(player, nation != null, Material.GRASS_BLOCK, isPublic, "public")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, nation, Material.GRASS_BLOCK, isPublic, "public")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .build())
                 .addItem(MenuItem.builder(isPublic ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -166,33 +167,6 @@ public class NationMenu {
                         .build())
                 // TODO: Ability to toggle neutral/peaceful
                 .build();
-    }
-
-    // TODO: Make its so this is not just a straight copy of town menu's
-    private static MenuItem.Builder createTogglePropertyItem(Player player, boolean hasNation, Material material, boolean propertyEnabled, String property) {
-        return MenuItem.builder(material)
-                .name(Component.text("Toggle " + property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1), propertyEnabled ? NamedTextColor.GREEN : NamedTextColor.RED))
-                .lore(() -> {
-                    if (!hasNation)
-                        return Component.text("You are not in a nation.", NamedTextColor.GRAY);
-                    else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_TOGGLE.getNode(property)))
-                        return Component.text("You do not have permission to toggle " + property + ".", NamedTextColor.GRAY);
-                    else
-                        return Component.text(String.format("Click to %s %s.", propertyEnabled ? "disable" : "enable", property), NamedTextColor.GRAY);
-                })
-                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in your nation?", NamedTextColor.GRAY), ClickAction.run(() -> {
-                    final Nation nation = TownyAPI.getInstance().getNation(player);
-                    if (nation == null)
-                        return;
-
-                    try {
-                        NationCommand.nationToggle(player, new String[]{property}, false, nation);
-                    } catch (TownyException e) {
-                        TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                    }
-
-                    MenuHistory.reOpen(player, () -> formatNationToggleMenu(player));
-                })));
     }
 
     public static MenuInventory formatNationSetMenu(Player player) {

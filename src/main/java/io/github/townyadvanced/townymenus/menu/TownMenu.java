@@ -34,6 +34,7 @@ import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
+import io.github.townyadvanced.townymenus.menu.helper.GovernmentMenus;
 import io.github.townyadvanced.townymenus.utils.Time;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
@@ -465,7 +466,7 @@ public class TownMenu {
                 .rows(4)
                 .addItem(MenuHelper.backButton().build())
                 // Fire
-                .addItem(createTogglePropertyItem(player, town != null, Material.FLINT_AND_STEEL, fireEnabled, "fire")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.FLINT_AND_STEEL, fireEnabled, "fire")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .build())
                 .addItem(MenuItem.builder(fireEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -473,7 +474,7 @@ public class TownMenu {
                         .name(Component.empty())
                         .build())
                 // Explosion
-                .addItem(createTogglePropertyItem(player, town != null, Material.TNT, explosionEnabled, "explosion")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.TNT, explosionEnabled, "explosion")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .build())
                 .addItem(MenuItem.builder(explosionEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -481,7 +482,7 @@ public class TownMenu {
                         .name(Component.empty())
                         .build())
                 // Mobs
-                .addItem(createTogglePropertyItem(player, town != null, Material.BAT_SPAWN_EGG, mobsEnabled, "mobs")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.BAT_SPAWN_EGG, mobsEnabled, "mobs")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .build())
                 .addItem(MenuItem.builder(mobsEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -489,7 +490,7 @@ public class TownMenu {
                         .name(Component.empty())
                         .build())
                 // PVP
-                .addItem(createTogglePropertyItem(player, town != null, Material.WOODEN_AXE, pvpEnabled, "pvp")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.WOODEN_AXE, pvpEnabled, "pvp")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(pvpEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -497,7 +498,7 @@ public class TownMenu {
                         .name(Component.empty())
                         .build())
                 // Open
-                .addItem(createTogglePropertyItem(player, town != null, Material.GRASS_BLOCK, isOpen, "open")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.GRASS_BLOCK, isOpen, "open")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(6)))
                         .build())
                 .addItem(MenuItem.builder(isOpen ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -505,7 +506,7 @@ public class TownMenu {
                         .name(Component.empty())
                         .build())
                 // Public
-                .addItem(createTogglePropertyItem(player, town != null, Material.GRASS_BLOCK, isPublic, "public")
+                .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.GRASS_BLOCK, isPublic, "public")
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(7)))
                         .build())
                 .addItem(MenuItem.builder(isPublic ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
@@ -513,32 +514,6 @@ public class TownMenu {
                         .name(Component.empty())
                         .build())
                 .build();
-    }
-
-    private static MenuItem.Builder createTogglePropertyItem(Player player, boolean hasTown, Material material, boolean propertyEnabled, String property) {
-        return MenuItem.builder(material)
-                .name(Component.text("Toggle " + property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1), propertyEnabled ? NamedTextColor.GREEN : NamedTextColor.RED))
-                .lore(() -> {
-                    if (!hasTown)
-                        return Component.text("You are not in a town.", NamedTextColor.GRAY);
-                    else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_TOGGLE.getNode(property)))
-                        return Component.text("You do not have permission to toggle " + property + ".", NamedTextColor.GRAY);
-                    else
-                        return Component.text(String.format("Click to %s %s.", propertyEnabled ? "disable" : "enable", property), NamedTextColor.GRAY);
-                })
-                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in your town?", NamedTextColor.GRAY), ClickAction.run(() -> {
-                    final Town town = TownyAPI.getInstance().getTown(player);
-                    if (town == null)
-                        return;
-
-                    try {
-                        TownCommand.townToggle(player, new String[]{property}, false, town);
-                    } catch (TownyException e) {
-                        TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                    }
-
-                    MenuHistory.reOpen(player, () -> formatTownToggleMenu(player));
-                })));
     }
 
     public static MenuInventory formatTownSetMenu(Player player) {

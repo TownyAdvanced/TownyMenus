@@ -5,3 +5,7 @@
   - Fix 'phantom inventory' being opened when exiting out of an anvil menu.
     - Closes #6
   - Use a CompletableFuture for the menu scheduler instead of the Bukkit scheduler.
+  - Initial resident management menu for nations
+  - Nation rank menu
+  - Use correct perm node for bank history
+  - Use the same code for town & nation toggle creation.
