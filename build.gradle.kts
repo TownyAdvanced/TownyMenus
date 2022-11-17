@@ -33,7 +33,7 @@ dependencies {
     compileOnly("com.palmergames.bukkit.towny:towny:${townyVersion}")
     compileOnly("org.jetbrains:annotations:23.0.0")
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
-    annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.2")
+    annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:1.0.0")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
