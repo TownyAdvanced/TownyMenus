@@ -29,13 +29,16 @@ import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -98,6 +101,33 @@ public class PlotMenu {
                         .lore(Component.text("Click to view the current plot's trusted player list.", NamedTextColor.GRAY))
                         .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .action(ClickAction.openInventory(() -> formatPlotTrustMenu(player, worldCoord)))
+                        .build())
+                .addItem(MenuItem.builder(Material.GRASS_BLOCK)
+                        .name(Component.text("Claim Plot", NamedTextColor.GREEN))
+                        .lore(() -> {
+                            if (townBlock == null)
+                                return Component.text("Only plots owned by towns can be claimed.", NamedTextColor.GRAY);
+                            else if (!townBlock.isForSale())
+                                return Component.text("Only plots that are for sale can be claimed.", NamedTextColor.GRAY);
+                            else
+                                return Arrays.asList(Component.text("Click to claim this plot.", NamedTextColor.GRAY), !TownyEconomyHandler.isActive() ? Component.empty() :
+                                        Component.text("Claiming this plot will cost " + TownyEconomyHandler.getFormattedBalance(townBlock.getPlotPrice()) + ".", NamedTextColor.GRAY));
+                        })
+                        .action(ClickAction.run(() -> {
+                            PluginCommand command = Towny.getPlugin().getCommand("plot");
+                            if (command == null || !(command.getExecutor() instanceof PlotCommand plotCommand))
+                                return;
+
+                            AwaitingConfirmation.await(player);
+
+                            try {
+                                plotCommand.parsePlotCommand(player, new String[]{"claim"});
+                            } catch (Exception e) {
+                                if (e.getCause() instanceof TownyException tex)
+                                    TownyMessaging.sendErrorMsg(player, tex.getMessage(player));
+                            }
+                        }))
+                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(5)))
                         .build())
                 .build();
     }
