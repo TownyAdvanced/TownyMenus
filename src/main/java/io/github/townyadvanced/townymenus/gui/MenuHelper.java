@@ -25,10 +25,6 @@ public class MenuHelper {
         return (int) Math.min(Math.ceil(size / 9d) * 9, 54);
     }
 
-    public static Component errorMessage(String message) {
-        return Component.text("✖ " + message, NamedTextColor.RED);
-    }
-
     public static MenuInventory createConfirmation(Component warningMessage, ClickAction confirmAction, ClickAction cancelAction) {
         return MenuInventory.builder()
                 .size(27)

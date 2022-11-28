@@ -61,7 +61,7 @@ public class PlotMenu {
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Plot Set", NamedTextColor.GREEN))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
-                        .lore(isWilderness ? MenuHelper.errorMessage("This menu cannot be opened while in the wilderness.") : Component.empty())
+                        .lore(isWilderness ? Component.text("This menu cannot be opened while in the wilderness.", NamedTextColor.GRAY) : Component.empty())
                         .action(isWilderness ? ClickAction.NONE : ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord, isOwner)))
                         .build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
