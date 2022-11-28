@@ -60,13 +60,13 @@ public class PlotMenu {
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Plot Set", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .lore(isWilderness ? MenuHelper.errorMessage("This menu cannot be opened while in the wilderness.") : Component.empty())
                         .action(isWilderness ? ClickAction.NONE : ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord, isOwner)))
                         .build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
                         .name(Component.text("Set Plot For Sale", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
                                 return Component.text("Wilderness plots cannot be put for sale.", NamedTextColor.GRAY);
@@ -82,7 +82,7 @@ public class PlotMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
                         .name(Component.text("Set Plot Not For Sale", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
                                 return Component.text("Wilderness plots cannot be put not for sale.", NamedTextColor.GRAY);
@@ -99,7 +99,7 @@ public class PlotMenu {
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
                         .name(Component.text("Trusted Players", NamedTextColor.GREEN))
                         .lore(Component.text("Click to view the current plot's trusted player list.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .action(ClickAction.openInventory(() -> formatPlotTrustMenu(player, worldCoord)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
@@ -127,7 +127,7 @@ public class PlotMenu {
                                     TownyMessaging.sendErrorMsg(player, tex.getMessage(player));
                             }
                         }))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(5)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(5)))
                         .build())
                 .build();
     }
@@ -138,7 +138,7 @@ public class PlotMenu {
                 .title(Component.text("Plot Set Menu"))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Set plot name", NamedTextColor.GREEN))
                         .lore(Component.text("Changes the name of the current plot.", NamedTextColor.GRAY))
                         .lore(() -> {
@@ -174,7 +174,7 @@ public class PlotMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
                         .name(Component.text("Clear plot name", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .lore(Component.text("Clears the name of the current plot.", NamedTextColor.GRAY))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
@@ -198,7 +198,7 @@ public class PlotMenu {
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Set plot type", NamedTextColor.GREEN))
                         .lore(Component.text("Changes the type of the current plot.", NamedTextColor.GRAY))
                         .lore(!isOwner ? Component.text("Only the owner of the plot can change it's type.", NamedTextColor.GRAY) : Component.empty())
@@ -373,7 +373,7 @@ public class PlotMenu {
                     .title(Component.text("Select plot sell price"))
                     .addItem(MenuItem.builder(Material.PAPER)
                             .name(Component.text("Custom Amount", NamedTextColor.GREEN))
-                            .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                            .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                             .lore(Component.text("Click to enter a custom amount as the new plot price.", NamedTextColor.GRAY))
                             .action(ClickAction.userInput("Enter plot price", price -> {
                                 TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
@@ -401,7 +401,7 @@ public class PlotMenu {
                             .build())
                     .addItem(MenuItem.builder(Material.EMERALD)
                             .name(Component.text("Free", NamedTextColor.GREEN))
-                            .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                            .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                             .lore(Component.text("Click to put this plot for sale for free.", NamedTextColor.GRAY))
                             .action(putForSale)
                             .build())
@@ -544,7 +544,7 @@ public class PlotMenu {
             builder.addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
                     .name(Component.text("Add player as trusted", NamedTextColor.GREEN))
                     .lore(Component.text("Click here to add a player as trusted", NamedTextColor.GRAY))
-                    .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                    .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
                     .action(ClickAction.userInput("Enter player name", name -> {
                         Resident resident = TownyAPI.getInstance().getResident(name);
                         if (resident == null)

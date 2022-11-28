@@ -58,11 +58,11 @@ public class TownMenu {
                 .title(Component.text("Town Menu - " + (town != null ? town.getName() : "No Town")))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(formatTownInfo(town)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
                         .name(Component.text("Transaction History", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -76,7 +76,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Town Plots", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromRight(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromRight(3)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -108,7 +108,7 @@ public class TownMenu {
                                     .addItems(plotItems)
                                     .addExtraItem(MenuItem.builder(Material.OAK_SIGN)
                                             .name(Component.text("Town Plots", NamedTextColor.DARK_GREEN))
-                                            .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                                            .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
                                             .lore(Component.text("Town Size: ", NamedTextColor.DARK_GREEN).append(Component.text(town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString(), NamedTextColor.GREEN))
                                                     .append(town.hasUnlimitedClaims()
                                                             ? Component.empty()
@@ -128,7 +128,7 @@ public class TownMenu {
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Town Spawn", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (town == null)
@@ -153,7 +153,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.ENDER_EYE)
                         .name(Component.text("Online in Town", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -188,11 +188,11 @@ public class TownMenu {
                                 return Component.text("Click to view and manage residents in your town.", NamedTextColor.GRAY);
                         })
                         .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(1)))
                         .build())
                 .addItem(MenuItem.builder(Material.GOLDEN_AXE)
                         .name(Component.text("Town Management", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -257,7 +257,7 @@ public class TownMenu {
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.WOODEN_AXE)
                         .name(Component.text("Kick Resident", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()))
                                 return Component.text("You do not have permission to kick this resident.", NamedTextColor.GRAY);
@@ -274,17 +274,17 @@ public class TownMenu {
                         })))
                         .build())
                 .addItem(ResidentMenu.formatResidentInfo(resident, player)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
                         .name(Component.text("Manage Ranks", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
                         .lore(Component.text("Click to manage ranks for this player.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, town, resident)))
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Town Title", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()))
                                 return Component.text("You do not have permission to change this resident's title.");
@@ -315,7 +315,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Town Surname", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()))
                                 return Collections.singletonList(Component.text("You do not have permission to change this resident's surname."));
@@ -437,14 +437,14 @@ public class TownMenu {
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Open town set menu", NamedTextColor.GREEN))
                         .lore(Component.text("Click to open the town set menu.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .action(ClickAction.openInventory(() -> formatTownSetMenu(player)))
                         .build())
                 // TODO: Manage town permissions and trusted players
                 .addItem(MenuItem.builder(Material.LEVER)
                         .name(Component.text("Open town toggle menu", NamedTextColor.GREEN))
                         .lore(Component.text("Click to open the town toggle menu.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .action(ClickAction.openInventory(() -> formatTownToggleMenu(player)))
                         .build())
                 .build();
@@ -467,50 +467,50 @@ public class TownMenu {
                 .addItem(MenuHelper.backButton().build())
                 // Fire
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.FLINT_AND_STEEL, fireEnabled, "fire")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .build())
                 .addItem(MenuItem.builder(fireEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .name(Component.empty())
                         .build())
                 // Explosion
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.TNT, explosionEnabled, "explosion")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .build())
                 .addItem(MenuItem.builder(explosionEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
                         .name(Component.empty())
                         .build())
                 // Mobs
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.BAT_SPAWN_EGG, mobsEnabled, "mobs")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .build())
                 .addItem(MenuItem.builder(mobsEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
                         .name(Component.empty())
                         .build())
                 // PVP
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.WOODEN_AXE, pvpEnabled, "pvp")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(pvpEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(4)))
                         .name(Component.empty())
                         .build())
                 // Open
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.GRASS_BLOCK, isOpen, "open")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(6)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(6)))
                         .build())
                 .addItem(MenuItem.builder(isOpen ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(6)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(6)))
                         .name(Component.empty())
                         .build())
                 // Public
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, town, Material.GRASS_BLOCK, isPublic, "public")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(7)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(7)))
                         .build())
                 .addItem(MenuItem.builder(isPublic ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(7)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(7)))
                         .name(Component.empty())
                         .build())
                 .build();
@@ -525,7 +525,7 @@ public class TownMenu {
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Change town name", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -554,7 +554,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
                         .name(Component.text("Change town board", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
@@ -593,7 +593,7 @@ public class TownMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
                         .name(Component.text("Change town spawn", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);

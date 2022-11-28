@@ -46,7 +46,7 @@ public class NationMenu {
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
                         .name(Component.text("Transaction History", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(4)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
@@ -59,7 +59,7 @@ public class NationMenu {
                                 ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(nation)))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .name(Component.text("Nation Spawn", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (nation == null)
@@ -84,7 +84,7 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.LEVER)
                         .name(Component.text("Nation Toggle", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You must be in a nation in order to view the toggle menu.", NamedTextColor.GRAY);
@@ -95,13 +95,13 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Nation Set", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(2)))
                         .lore(Component.text("Click to open the nation set menu.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> formatNationSetMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.ENDER_EYE)
                         .name(Component.text("Online in Nation", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
@@ -151,18 +151,18 @@ public class NationMenu {
                 .addItem(MenuHelper.backButton().build())
                 // Open
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, nation, Material.GRASS_BLOCK, isOpen, "open")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .build())
                 .addItem(MenuItem.builder(isOpen ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .name(Component.empty())
                         .build())
                 // Public
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, nation, Material.GRASS_BLOCK, isPublic, "public")
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .build())
                 .addItem(MenuItem.builder(isPublic ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
                         .name(Component.empty())
                         .build())
                 // TODO: Ability to toggle neutral/peaceful
@@ -178,7 +178,7 @@ public class NationMenu {
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Change nation name", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You must be in a nation in order to change the nation name.", NamedTextColor.GRAY);
@@ -207,7 +207,7 @@ public class NationMenu {
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .name(Component.text("Change nation board", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (nation == null)
@@ -234,7 +234,7 @@ public class NationMenu {
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .name(Component.text("Change nation spawn", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (nation == null)
@@ -283,11 +283,11 @@ public class NationMenu {
                 .title(Component.text("Resident Management"))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(ResidentMenu.formatResidentInfo(resident, player)
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Change Resident Title", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()))
                                 return Component.text("You do not have permission to change this resident's title.", NamedTextColor.GRAY);
@@ -322,7 +322,7 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .name(Component.text("Change Resident Surname", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromTop(2), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()))
                                 return Component.text("You do not have permission to change this resident's surname.", NamedTextColor.GRAY);
@@ -358,7 +358,7 @@ public class NationMenu {
                 .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
                         .name(Component.text("Manage Ranks", NamedTextColor.GREEN))
                         .lore(Component.text("Click to manage nation ranks for this resident.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(4)))
                         .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, nation, resident)))
                         .build())
                 .build();

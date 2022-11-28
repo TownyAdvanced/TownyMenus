@@ -9,16 +9,16 @@ public class SlotAnchor {
         this.horizontalAnchor = horizontalAnchor;
     }
 
-    public static SlotAnchor of(VerticalAnchor verticalAnchor, HorizontalAnchor horizontalAnchor) {
+    public static SlotAnchor anchor(VerticalAnchor verticalAnchor, HorizontalAnchor horizontalAnchor) {
         return new SlotAnchor(verticalAnchor, horizontalAnchor);
     }
 
     public static SlotAnchor ofSlot(int slot) {
-        return of(VerticalAnchor.fromTop(slot / 9), HorizontalAnchor.fromLeft(slot % 9));
+        return anchor(VerticalAnchor.fromTop(slot / 9), HorizontalAnchor.fromLeft(slot % 9));
     }
 
     public static SlotAnchor bottomRight() {
-        return of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0));
+        return anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0));
     }
 
     public int resolveSlot(int size) {

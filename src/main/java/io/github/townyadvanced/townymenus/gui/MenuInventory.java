@@ -249,11 +249,11 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
                             .name(Component.text("Back", NamedTextColor.GREEN, TextDecoration.BOLD))
                             .lore(Component.text("Click to go back to the previous page.", NamedTextColor.GOLD))
                             .action(ClickAction.sound(Sound.sound(Key.key(Key.MINECRAFT_NAMESPACE, "block.stone_button.click_on"), Sound.Source.PLAYER, 1.0f, 1.0f)))
-                            .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(0)))
+                            .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(0)))
                             .build());
 
                 builder.addItem(MenuHelper.backButton()
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(4)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(4)))
                         .build());
 
                 // Add a forward button if we're not on the last page
@@ -262,7 +262,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
                             .name(Component.text("Next", NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                             .lore(Component.text("Click to go to the next page.", NamedTextColor.GOLD))
                             .action(ClickAction.sound(Sound.sound(Key.key(Key.MINECRAFT_NAMESPACE, "block.stone_button.click_on"), Sound.Source.PLAYER, 1.0f, 1.0f)))
-                            .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0)))
+                            .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0)))
                             .build());
 
                 inventories[i] = builder.build();

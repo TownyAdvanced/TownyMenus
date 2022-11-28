@@ -158,7 +158,7 @@ public class ResidentMenu {
                 .addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
                         .name(Component.text("Add Friend", NamedTextColor.GREEN))
                         .lore(Component.text("Click here to add a player as a friend.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.of(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
                         .action(ClickAction.userInput("Enter player name.", name -> {
                             Resident resident = TownyAPI.getInstance().getResident(player);
                             if (resident == null)
