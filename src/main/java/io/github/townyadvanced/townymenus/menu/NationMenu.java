@@ -4,6 +4,7 @@ import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.command.BaseCommand;
 import com.palmergames.bukkit.towny.command.NationCommand;
@@ -135,6 +136,19 @@ public class NationMenu {
                                 return Component.text("Click to view and manage residents in your nation.", NamedTextColor.GRAY);
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
+                        .build())
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                        .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
+                        .slot(1)
+                        .lore(() -> {
+                            if (nation == null)
+                                return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
+                            else if (!TownyEconomyHandler.isActive())
+                                return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to deposit to or withdraw from the nation bank.", NamedTextColor.GRAY);
+                        })
+                        .action(nation == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, nation)))
                         .build())
                 .build();
     }

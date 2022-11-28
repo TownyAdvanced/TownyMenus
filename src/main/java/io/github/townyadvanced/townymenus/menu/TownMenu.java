@@ -201,6 +201,19 @@ public class TownMenu {
                         })
                         .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownManagementMenu(player)))
                         .build())
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                        .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
+                        .slot(0)
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!TownyEconomyHandler.isActive())
+                                return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to deposit to or withdraw from the town bank.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, town)))
+                        .build())
                 .build();
     }
 

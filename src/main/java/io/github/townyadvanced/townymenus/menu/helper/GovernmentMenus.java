@@ -11,15 +11,24 @@ import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.util.MathUtil;
+import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
+import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
+import io.github.townyadvanced.townymenus.gui.action.UserInputAction;
+import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
+import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
+import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
+import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 public class GovernmentMenus {
@@ -57,6 +66,50 @@ public class GovernmentMenus {
 
                     MenuHistory.reOpen(player, () -> isTown ? TownMenu.formatTownToggleMenu(player) : NationMenu.formatNationToggleMenu(player));
                 })));
+    }
+
+    public static MenuInventory createDepositWithdrawMenu(final Player player, final Government government) {
+        return MenuInventory.builder()
+                .title(Component.text("Deposit or Withdraw"))
+                .rows(3)
+                .addItem(MenuHelper.backButton().build())
+                .addItem(MenuItem.builder(Material.EMERALD)
+                        .name(Component.text("Deposit", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .lore(Component.text("Click to deposit into the bank.", NamedTextColor.GRAY))
+                        .action(depositOrWithdraw(player, government, false))
+                        .build())
+                .addItem(MenuItem.builder(Material.REDSTONE)
+                        .name(Component.text("Withdraw", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .lore(Component.text("Click to withdraw from the bank.", NamedTextColor.GRAY))
+                        .action(depositOrWithdraw(player, government, true))
+                        .build())
+                .build();
+    }
+
+    private static UserInputAction depositOrWithdraw(final Player player, final Government government, boolean withdraw) {
+        return ClickAction.userInput("Enter " + (withdraw ? "withdraw" : "deposit") + " amount", amount -> {
+            try {
+                MathUtil.getIntOrThrow(amount);
+            } catch (TownyException e) {
+                return AnvilGUI.Response.text(e.getMessage(player));
+            }
+
+            boolean town = government instanceof Town;
+            Class<?> clazz = town ? TownCommand.class : NationCommand.class;
+
+            try {
+                Method method = clazz.getDeclaredMethod(town ? "townTransaction" : "nationTransaction", Player.class, String[].class, boolean.class);
+                method.setAccessible(true);
+                method.invoke(null, player, new String[]{"", amount}, withdraw);
+
+                MenuHistory.last(player);
+                return AnvilGUI.Response.text("");
+            } catch (ReflectiveOperationException e) {
+                return AnvilGUI.Response.close();
+            }
+        });
     }
 
     private static boolean governmentExists(Government government) {
