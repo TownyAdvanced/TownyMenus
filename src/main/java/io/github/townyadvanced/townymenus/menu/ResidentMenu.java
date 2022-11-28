@@ -3,7 +3,9 @@ package io.github.townyadvanced.townymenus.menu;
 import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyMessaging;
+import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.command.ResidentCommand;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -105,6 +107,9 @@ public class ResidentMenu {
             if (resident.hasNation())
                 lore.add(Component.text((resident.isKing() ? "Leader" : "Member") + " of ", NamedTextColor.DARK_GREEN).append(Component.text(resident.getNationOrNull().getName(), NamedTextColor.GREEN)));
         }
+
+        if (TownySettings.isEconomyAsync() && TownyEconomyHandler.isActive())
+            lore.add(Component.text("Balance ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(resident.getAccount().getCachedBalance()), NamedTextColor.GREEN)));
 
         lore.add(Component.text("Registered ", NamedTextColor.DARK_GREEN).append(Component.text(Time.formatRegistered(resident.getRegistered()), NamedTextColor.GREEN)));
 

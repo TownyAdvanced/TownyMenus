@@ -640,6 +640,9 @@ public class TownMenu {
         lore.add(Component.text("Founded ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(town.getRegistered()), NamedTextColor.GREEN)));
         lore.add(Component.text(town.getNumResidents(), NamedTextColor.DARK_GREEN).append(Component.text(" Resident" + (town.getNumResidents() == 1 ? "" : "s"), NamedTextColor.GREEN)));
 
+        if (TownySettings.isEconomyAsync() && TownyEconomyHandler.isActive())
+            lore.add(Component.text("Balance ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance()), NamedTextColor.GREEN)));
+
         if (town.getMayor() != null)
             lore.add(Component.text("Owned by ", NamedTextColor.DARK_GREEN).append(Component.text(town.getMayor().getName(), NamedTextColor.GREEN)));
 
