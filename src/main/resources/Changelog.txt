@@ -10,4 +10,4 @@
   - Use correct perm node for bank history
   - Use the same code for town & nation toggle creation.
   - Added a plot claim button to the plot menu.
-  - Add balance line to town and resident info items.
+  - Added balance line to town and resident info items.
