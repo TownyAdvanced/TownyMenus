@@ -92,7 +92,6 @@ public class ResidentMenu {
     public static MenuItem.Builder formatResidentInfo(@Nullable Resident resident, @Nullable Player viewer) {
         if (resident == null)
             return MenuItem.builder(Material.PLAYER_HEAD)
-                    .skullOwner(resident.getUUID())
                     .name(Component.text("Error", NamedTextColor.DARK_RED))
                     .lore(Component.text("Unknown or invalid resident.", NamedTextColor.RED));
 
