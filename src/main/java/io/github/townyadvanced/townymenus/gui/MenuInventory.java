@@ -8,9 +8,9 @@ import com.palmergames.adventure.text.format.TextDecoration;
 import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
-import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
-import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
-import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -66,13 +66,15 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     public void addItem(@NotNull MenuItem item) {
-        if (item.resolveSlot(this.size) > this.inventory.getSize() - 1)
+        final int slot = item.slot().resolve(this.size);
+
+        if (slot > this.inventory.getSize() - 1)
             return;
 
-        this.inventory.setItem(item.resolveSlot(this.size), item.itemStack());
+        this.inventory.setItem(slot, item.itemStack());
 
         if (!item.actions().isEmpty())
-            clickActions.put(item.resolveSlot(this.size), item.actions());
+            clickActions.put(slot, item.actions());
     }
 
     public void open(@NotNull HumanEntity player) {
@@ -149,7 +151,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
             Map<Integer, List<ClickAction>> actions = new HashMap<>();
 
             for (MenuItem item : this.items) {
-                int slot = item.resolveSlot(this.size);
+                int slot = item.slot().resolve(this.size);
 
                 if (slot > this.size - 1 || inventory.getItem(slot) != null)
                     continue;

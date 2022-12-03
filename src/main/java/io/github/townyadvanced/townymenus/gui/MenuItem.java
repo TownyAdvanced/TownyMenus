@@ -4,7 +4,8 @@ import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.TextDecoration;
 import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
-import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.Slot;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -21,25 +22,26 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class MenuItem {
-    private SlotAnchor slot;
+    private Slot slot;
     private final ItemStack itemStack;
     private final List<ClickAction> actions = new ArrayList<>(0);
 
-    public MenuItem(ItemStack itemStack, SlotAnchor slot) {
+    public MenuItem(@NotNull ItemStack itemStack, @NotNull Slot slot) {
         this.itemStack = itemStack;
         this.slot = slot;
-    }
-
-    public int resolveSlot(int size) {
-        return this.slot.resolveSlot(size);
     }
 
     public void slot(int slot) {
         this.slot = SlotAnchor.ofSlot(slot);
     }
 
-    public void slot(SlotAnchor slot) {
+    public void slot(@NotNull Slot slot) {
         this.slot = slot;
+    }
+
+    @NotNull
+    public Slot slot() {
+        return this.slot;
     }
 
     public ItemStack itemStack() {
@@ -93,7 +95,7 @@ public class MenuItem {
         private Component name = Component.empty();
         private final List<Component> lore = new ArrayList<>(0);
         private int size = 1;
-        private SlotAnchor slot = SlotAnchor.ofSlot(0);
+        private Slot slot = SlotAnchor.ofSlot(0);
         private final List<ClickAction> actions = new ArrayList<>(0);
         private boolean glint;
         private UUID ownerUUID;
@@ -127,7 +129,7 @@ public class MenuItem {
             return this;
         }
 
-        public Builder slot(SlotAnchor slot) {
+        public Builder slot(Slot slot) {
             this.slot = slot;
             return this;
         }

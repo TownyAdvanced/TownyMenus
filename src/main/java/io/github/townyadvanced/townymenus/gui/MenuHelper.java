@@ -4,9 +4,9 @@ import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.adventure.text.format.TextDecoration;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
-import io.github.townyadvanced.townymenus.gui.anchor.HorizontalAnchor;
-import io.github.townyadvanced.townymenus.gui.anchor.SlotAnchor;
-import io.github.townyadvanced.townymenus.gui.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
+import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import org.bukkit.Material;
 
 public class MenuHelper {

@@ -1,6 +1,8 @@
-package io.github.townyadvanced.townymenus.gui.anchor;
+package io.github.townyadvanced.townymenus.gui.slot.anchor;
 
-public class SlotAnchor {
+import io.github.townyadvanced.townymenus.gui.slot.Slot;
+
+public class SlotAnchor implements Slot {
     private final VerticalAnchor verticalAnchor;
     private final HorizontalAnchor horizontalAnchor;
 
@@ -21,7 +23,8 @@ public class SlotAnchor {
         return anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromRight(0));
     }
 
-    public int resolveSlot(int size) {
-        return verticalAnchor.resolveY(size) + horizontalAnchor.offset();
+    @Override
+    public int resolve(final int inventorySize) {
+        return verticalAnchor.resolveY(inventorySize) + horizontalAnchor.offset();
     }
 }

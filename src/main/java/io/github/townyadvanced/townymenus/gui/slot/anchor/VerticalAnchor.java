@@ -1,4 +1,4 @@
-package io.github.townyadvanced.townymenus.gui.anchor;
+package io.github.townyadvanced.townymenus.gui.slot.anchor;
 
 public class VerticalAnchor {
     private final int offset;
