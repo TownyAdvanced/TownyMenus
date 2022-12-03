@@ -2,6 +2,7 @@ package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
+import com.palmergames.adventure.text.format.TextDecoration;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -26,6 +27,7 @@ import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.utils.PermissionGUIUtil;
 import com.palmergames.bukkit.towny.utils.PermissionGUIUtil.SetPermissionType;
 import com.palmergames.bukkit.util.NameValidation;
+import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -47,6 +49,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static com.palmergames.adventure.text.Component.text;
 import static com.palmergames.adventure.text.format.NamedTextColor.*;
@@ -633,8 +636,29 @@ public class PlotMenu {
                 if (entry.getValue().getLastChangedAt() > 0 && !entry.getValue().getLastChangedBy().isEmpty())
                     itemBuilder.lore(Translatable.of("msg_last_edited", TownyFormatter.lastOnlineFormat.format(entry.getValue().getLastChangedAt()), entry.getValue().getLastChangedBy()).locale(player).component());
 
-                itemBuilder.lore(Translatable.of("msg_click_to_edit").locale(player).component())
-                        .action(ClickAction.openInventory(() -> openPermissionOverrideEditor(player, worldCoord, entry.getKey(), entry.getValue())));
+                itemBuilder
+                        .lore(Translatable.of("msg_click_to_edit").locale(player).component())
+                        .lore(text("Right click to remove overrides for this player.", GOLD))
+                        .action(ClickAction.leftClick(ClickAction.openInventory(() -> openPermissionOverrideEditor(player, worldCoord, entry.getKey(), entry.getValue()))))
+                        .action(ClickAction.rightClick(ClickAction.confirmation(text("Are you sure you want to remove overrides for this player?", GRAY), ClickAction.run(() -> {
+                            final TownBlock tb = TownyAPI.getInstance().getTownBlock(worldCoord);
+                            if (tb == null || !testPlotOwner(player, tb) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_PERM_REMOVE.getNode())) {
+                                MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
+                                return;
+                            }
+
+                            PlotGroup group = tb.getPlotObjectGroup();
+                            if (group == null) {
+                                tb.getPermissionOverrides().remove(entry.getKey());
+                                tb.save();
+                            } else {
+                                group.removePermissionOverride(entry.getKey());
+                                group.save();
+                            }
+
+                            Towny.getPlugin().deleteCache(entry.getKey());
+                            MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
+                        }))));
             }
 
             builder.addItem(itemBuilder.build());
@@ -684,7 +708,7 @@ public class PlotMenu {
 
     private static List<Component> formatPermissionTypes(final SetPermissionType[] types) {
         return Arrays.asList(
-                text("Build", colorFromType(types[ActionType.BUILD.getIndex()])).append(text("  | ", DARK_GRAY)).append(text("Destroy", colorFromType(types[ActionType.SWITCH.getIndex()]))),
+                text("Build", colorFromType(types[ActionType.BUILD.getIndex()])).append(text("   | ", DARK_GRAY)).append(text("Destroy", colorFromType(types[ActionType.DESTROY.getIndex()]))),
                 text("Switch", colorFromType(types[ActionType.SWITCH.getIndex()])).append(text(" | ", DARK_GRAY)).append(text("Item", colorFromType(types[ActionType.ITEM_USE.getIndex()])))
         );
     }
@@ -700,38 +724,53 @@ public class PlotMenu {
     private static MenuInventory openPermissionOverrideEditor(final Player player, final WorldCoord worldCoord, final Resident resident, final PermissionData data) {
         final MenuInventory.Builder builder = MenuInventory.builder()
                 .title(Translatable.of("permission_gui_header").locale(resident).component())
-                .rows(6)
+                .rows(5)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
                         .name(text(resident.getName(), GREEN))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(0), HorizontalAnchor.fromLeft(4)))
                         .skullOwner(resident.getUUID())
                         .lore(formatPermissionTypes(data.getPermissionTypes()))
-                        .build())
-                .addItem(MenuItem.builder(Material.RED_WOOL)
-                        .name(text("Delete", DARK_RED))
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(0)))
-                        .lore(text("Click to delete overrides for this player.", GRAY))
-                        .action(ClickAction.confirmation(text("Are you sure you want to remove overrides for this player?", GRAY), ClickAction.run(() -> {
-                            final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
-                            if (townBlock == null || !testPlotOwner(player, worldCoord)) {
-                                MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
-                                return;
-                            }
-
-                            PlotGroup group = townBlock.getPlotObjectGroup();
-                            if (group == null) {
-                                townBlock.getPermissionOverrides().remove(resident);
-                                townBlock.save();
-                            } else {
-                                group.removePermissionOverride(resident);
-                                group.save();
-                            }
-
-                            Towny.getPlugin().deleteCache(resident);
-                            MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
-                        })))
                         .build());
+
+        final Consumer<ActionType> onClick = actionType -> {
+            final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+            if (townBlock == null || !testPlotOwner(player, townBlock)) {
+                MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
+                return;
+            }
+
+            SetPermissionType existing = data.getPermissionTypes()[actionType.getIndex()];
+
+            data.getPermissionTypes()[actionType.getIndex()] = switch (existing) {
+                case SET -> SetPermissionType.NEGATED;
+                case NEGATED -> SetPermissionType.UNSET;
+                case UNSET -> SetPermissionType.SET;
+            };
+
+            final PlotGroup group = townBlock.getPlotObjectGroup();
+            if (group != null) {
+                group.putPermissionOverride(resident, data);
+                group.save();
+            } else
+                townBlock.save();
+
+            Towny.getPlugin().deleteCache(resident);
+            MenuHistory.reOpen(player, () -> openPermissionOverrideEditor(player, worldCoord, resident, data));
+        };
+
+        for (ActionType type : ActionType.values()) {
+            builder.addItem(MenuItem.builder(data.getPermissionTypes()[type.getIndex()].getWoolColour())
+                    .name(text(type.getCommonName(), colorFromType(data.getPermissionTypes()[type.getIndex()])).decorate(TextDecoration.BOLD))
+                    .slot(switch (type) {
+                            case BUILD -> SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3));
+                            case DESTROY -> SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromRight(3));
+                            case SWITCH -> SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(3));
+                            case ITEM_USE -> SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(3));
+                    })
+                    .action(ClickAction.run(() -> onClick.accept(type)))
+                    .build());
+        }
 
         return builder.build();
     }
