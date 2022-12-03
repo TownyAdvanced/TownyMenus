@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.palmergames.adventure.text.Component.text;
@@ -124,20 +125,24 @@ public class PlotMenu {
                                         text("Claiming this plot will cost " + TownyEconomyHandler.getFormattedBalance(townBlock.getPlotPrice()) + ".", NamedTextColor.GRAY));
                         })
                         .action(ClickAction.run(() -> {
-                            PluginCommand command = Towny.getPlugin().getCommand("plot");
-                            if (command == null || !(command.getExecutor() instanceof PlotCommand plotCommand))
-                                return;
+                            plotCommand().ifPresent(plotCommand -> {
+                                AwaitingConfirmation.await(player);
 
-                            AwaitingConfirmation.await(player);
-
-                            try {
-                                plotCommand.parsePlotCommand(player, new String[]{"claim"});
-                            } catch (Exception e) {
-                                if (e.getCause() instanceof TownyException tex)
-                                    TownyMessaging.sendErrorMsg(player, tex.getMessage(player));
-                            }
+                                try {
+                                    plotCommand.parsePlotCommand(player, new String[]{"claim"});
+                                } catch (Exception e) {
+                                    if (e.getCause() instanceof TownyException tex)
+                                        TownyMessaging.sendErrorMsg(player, tex.getMessage(player));
+                                }
+                            });
                         }))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(5)))
+                        .build())
+                .addItem(MenuItem.builder(Material.LEVER)
+                        .name(text("Plot Toggle", GREEN))
+                        .lore(text("Click to open the plot toggle menu.", GRAY))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(5)))
+                        .action(ClickAction.openInventory(() -> formatPlotToggle(player, worldCoord)))
                         .build())
                 .addItem(MenuItem.builder(Material.STONE)
                         .name(text("Permission Overrides", GREEN))
@@ -772,6 +777,90 @@ public class PlotMenu {
         }
 
         return builder.build();
+    }
+
+    private static MenuInventory formatPlotToggle(final Player player, final WorldCoord worldCoord) {
+        final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+
+        final boolean fireEnabled = townBlock != null && townBlock.getPermissions().fire;
+        final boolean explosionEnabled = townBlock != null && townBlock.getPermissions().explosion;
+        final boolean mobsEnabled = townBlock != null && townBlock.getPermissions().mobs;
+        final boolean pvpEnabled = townBlock != null && townBlock.getPermissions().pvp;
+
+        return MenuInventory.builder()
+                .title(text("Plot Toggle"))
+                .rows(4)
+                .addItem(MenuHelper.backButton().build())
+                // Explosion
+                .addItem(createTogglePropertyItem(player, worldCoord, Material.TNT, explosionEnabled, "explosion")
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
+                        .build())
+                .addItem(MenuItem.builder(explosionEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
+                        .name(Component.empty())
+                        .build())
+                // Fire
+                .addItem(createTogglePropertyItem(player, worldCoord, Material.FLINT_AND_STEEL, fireEnabled, "fire")
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .build())
+                .addItem(MenuItem.builder(fireEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
+                        .name(Component.empty())
+                        .build())
+                // Mobs
+                .addItem(createTogglePropertyItem(player, worldCoord, Material.BAT_SPAWN_EGG, mobsEnabled, "mobs")
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
+                        .build())
+                .addItem(MenuItem.builder(mobsEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
+                        .name(Component.empty())
+                        .build())
+                // PVP
+                .addItem(createTogglePropertyItem(player, worldCoord, Material.WOODEN_AXE, pvpEnabled, "pvp")
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
+                        .build())
+                .addItem(MenuItem.builder(pvpEnabled ? Material.GREEN_CONCRETE : Material.RED_CONCRETE)
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(4)))
+                        .name(Component.empty())
+                        .build())
+                .build();
+    }
+
+    private static MenuItem.Builder createTogglePropertyItem(Player player, WorldCoord worldCoord, Material material, boolean propertyEnabled, String property) {
+        return MenuItem.builder(material)
+                .name(Component.text("Toggle " + property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1), propertyEnabled ? NamedTextColor.GREEN : NamedTextColor.RED))
+                .lore(() -> {
+                    if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) || !testPlotOwner(player, worldCoord))
+                        return Component.text("You do not have permission to toggle " + property + ".", NamedTextColor.GRAY);
+                    else
+                        return Component.text(String.format("Click to %s %s.", propertyEnabled ? "disable" : "enable", property), NamedTextColor.GRAY);
+                })
+                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in this plot?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                    TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+                    if (townBlock == null)
+                        return;
+
+                    plotCommand().ifPresent(command -> {
+                        try {
+                            command.plotToggle(player, townBlock, new String[]{property});
+                        } catch (Exception e) {
+                            if (e.getCause() instanceof TownyException ex)
+                                TownyMessaging.sendErrorMsg(player, ex.getMessage(player));
+                            else
+                                throw e;
+                        }
+                    });
+
+                    MenuHistory.reOpen(player, () -> formatPlotToggle(player, worldCoord));
+                })));
+    }
+
+    private static Optional<PlotCommand> plotCommand() {
+        PluginCommand command = Towny.getPlugin().getCommand("plot");
+        if (command == null || !(command.getExecutor() instanceof PlotCommand plotCommand))
+            return Optional.empty();
+
+        return Optional.of(plotCommand);
     }
 
     private static boolean testPlotOwner(Player player, WorldCoord worldCoord) {

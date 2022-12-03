@@ -11,3 +11,6 @@
   - Use the same code for town & nation toggle creation.
   - Added a plot claim button to the plot menu.
   - Added balance line to town and resident info items.
+  - Added button for withdrawing/depositing from/to nation or town banks.
+  - Added plot permission override support.
+  - Added a plot toggle menu.
