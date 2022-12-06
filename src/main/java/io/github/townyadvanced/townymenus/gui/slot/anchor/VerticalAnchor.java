@@ -1,10 +1,12 @@
 package io.github.townyadvanced.townymenus.gui.slot.anchor;
 
+import io.github.townyadvanced.townymenus.utils.Mth;
+
 public class VerticalAnchor {
     private final int offset;
 
     public VerticalAnchor(int offset) {
-        this.offset = Math.min(Math.max(offset, 0), 5);
+        this.offset = Mth.clamp(offset, 0, 5);
     }
 
     public static VerticalAnchor fromTop(int topOffset) {

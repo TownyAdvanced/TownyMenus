@@ -1,10 +1,12 @@
 package io.github.townyadvanced.townymenus.gui.slot.anchor;
 
+import io.github.townyadvanced.townymenus.utils.Mth;
+
 public class HorizontalAnchor {
     private final int offset;
 
     public HorizontalAnchor(int offset) {
-        this.offset = Math.min(Math.max(offset, 0), 8); // Ensure offset >= 0 & offset <= 8
+        this.offset = Mth.clamp(offset, 0, 8);
     }
 
     public static HorizontalAnchor fromLeft(int leftOffset) {
