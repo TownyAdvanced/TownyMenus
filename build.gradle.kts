@@ -29,9 +29,9 @@ repositories {
 val townyVersion: String by project
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("com.palmergames.bukkit.towny:towny:${townyVersion}")
-    compileOnly("org.jetbrains:annotations:23.0.0")
+    compileOnly("org.jetbrains:annotations:23.1.0")
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
     annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:1.0.0")
 }
@@ -39,7 +39,7 @@ dependencies {
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 tasks {
-    build {
+    assemble {
         dependsOn(shadowJar)
     }
 
