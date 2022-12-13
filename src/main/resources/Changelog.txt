@@ -6,11 +6,14 @@
     - Closes #6
   - Use a CompletableFuture for the menu scheduler instead of the Bukkit scheduler.
   - Initial resident management menu for nations
-  - Nation rank menu
-  - Use correct perm node for bank history
+  - Added a nation rank menu
+  - fix: Use the correct perm node for bank history
   - Use the same code for town & nation toggle creation.
   - Added a plot claim button to the plot menu.
   - Added balance line to town and resident info items.
   - Added button for withdrawing/depositing from/to nation or town banks.
   - Added plot permission override support.
   - Added a plot toggle menu.
+  - fix: User input text box is now empty by default
+  - Added town and nation bank menus that shows current bank balance and last transaction time
+  - Moved transaction history & deposit/withdraw buttons to the bank menus

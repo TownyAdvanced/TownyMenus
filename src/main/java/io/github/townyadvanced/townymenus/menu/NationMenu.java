@@ -45,22 +45,19 @@ public class NationMenu {
                 .title(Component.text("Nation Menu"))
                 .rows(6)
                 .addItem(MenuHelper.backButton().build())
-                .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                        .name(Component.text("Transaction History", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(4)))
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                        .name(Component.text("Nation Bank", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
-                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()))
-                                return Component.text("You do not have permission to view the nations's transaction history.", NamedTextColor.GRAY);
                             else
-                                return Component.text("Click to view the nations's transaction history.", NamedTextColor.GRAY);
+                                return Component.text("Click to view the nation bank menu.", NamedTextColor.GRAY);
                         })
-                        .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()) ? ClickAction.NONE :
-                                ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(nation)))
+                        .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatNationBankMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .name(Component.text("Nation Spawn", NamedTextColor.GREEN))
                         .lore(() -> {
                             if (nation == null)
@@ -85,7 +82,7 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.LEVER)
                         .name(Component.text("Nation Toggle", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You must be in a nation in order to view the toggle menu.", NamedTextColor.GRAY);
@@ -96,13 +93,13 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Nation Set", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromRight(3)))
                         .lore(Component.text("Click to open the nation set menu.", NamedTextColor.GRAY))
                         .action(ClickAction.openInventory(() -> formatNationSetMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.ENDER_EYE)
                         .name(Component.text("Online in Nation", NamedTextColor.GREEN))
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(2)))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
@@ -129,6 +126,7 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
                         .name(Component.text("Nation Resident Overview", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(1)))
                         .lore(() -> {
                             if (nation == null)
                                 return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
@@ -136,19 +134,6 @@ public class NationMenu {
                                 return Component.text("Click to view and manage residents in your nation.", NamedTextColor.GRAY);
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
-                        .build())
-                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
-                        .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
-                        .slot(1)
-                        .lore(() -> {
-                            if (nation == null)
-                                return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
-                            else if (!TownyEconomyHandler.isActive())
-                                return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
-                            else
-                                return Component.text("Click to deposit to or withdraw from the nation bank.", NamedTextColor.GRAY);
-                        })
-                        .action(nation == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, nation)))
                         .build())
                 .build();
     }
@@ -459,5 +444,49 @@ public class NationMenu {
         }
 
         return paginator.build();
+    }
+
+    public static MenuInventory formatNationBankMenu(final Player player) {
+        final Nation nation = TownyAPI.getInstance().getNation(player);
+
+        final MenuInventory.Builder builder = MenuInventory.builder()
+                .title(Component.text("Nation Bank"))
+                .rows(3)
+                .addItem(MenuHelper.backButton().build())
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                                .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
+                                .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                                .lore(() -> {
+                                    if (nation == null)
+                                        return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
+                                    else if (!TownyEconomyHandler.isActive())
+                                        return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
+                                    else
+                                        return Component.text("Click to deposit to or withdraw from the nation bank.", NamedTextColor.GRAY);
+                                })
+                                .action(nation == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, nation)))
+                                .build())
+                .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
+                        .name(Component.text("Transaction History", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .lore(() -> {
+                            if (nation == null)
+                                return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()))
+                                return Component.text("You do not have permission to view the nations's transaction history.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view the nations's transaction history.", NamedTextColor.GRAY);
+                        })
+                        .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()) ? ClickAction.NONE :
+                                ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(nation)))
+                        .build());
+
+        if (nation != null && TownyEconomyHandler.isActive()) {
+            builder.addItem(TownMenu.formatBankStatus(player, nation.getAccount(), false)
+                    .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(0), HorizontalAnchor.fromLeft(4)))
+                    .build());
+        }
+
+        return builder.build();
     }
 }

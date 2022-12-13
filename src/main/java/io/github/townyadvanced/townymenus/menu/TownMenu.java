@@ -22,6 +22,7 @@ import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
 import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
 import com.palmergames.bukkit.towny.object.TransactionType;
 import com.palmergames.bukkit.towny.object.Translatable;
+import com.palmergames.bukkit.towny.object.economy.Account;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.permissions.TownyPerms;
@@ -60,19 +61,16 @@ public class TownMenu {
                 .addItem(formatTownInfo(town)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
-                .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                        .name(Component.text("Transaction History", NamedTextColor.GREEN))
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                        .name(Component.text("Town Bank", NamedTextColor.GREEN))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (town == null)
                                 return Component.text("You are not part of a town.", NamedTextColor.GRAY);
-                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode()))
-                                return Component.text("You do not have permission to view the town's transaction history.", NamedTextColor.GRAY);
                             else
-                                return Component.text("Click to view the town's transaction history.", NamedTextColor.GRAY);
+                                return Component.text("Click to view the town bank menu.", NamedTextColor.GRAY);
                         })
-                        .action(town != null && player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode())
-                            ? ClickAction.openInventory(() -> createBankHistoryMenu(town)) : ClickAction.NONE)
+                        .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownBankMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(Component.text("Town Plots", NamedTextColor.GREEN))
@@ -200,19 +198,6 @@ public class TownMenu {
                                 return Component.text("Click to open the town management menu.", NamedTextColor.GRAY);
                         })
                         .action(town == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatTownManagementMenu(player)))
-                        .build())
-                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
-                        .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
-                        .slot(0)
-                        .lore(() -> {
-                            if (town == null)
-                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
-                            else if (!TownyEconomyHandler.isActive())
-                                return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
-                            else
-                                return Component.text("Click to deposit to or withdraw from the town bank.", NamedTextColor.GRAY);
-                        })
-                        .action(town == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, town)))
                         .build())
                 .build();
     }
@@ -628,6 +613,68 @@ public class TownMenu {
                         }))
                         .build())
                 .build();
+    }
+
+    public static MenuInventory formatTownBankMenu(final Player player) {
+        final Town town = TownyAPI.getInstance().getTown(player);
+
+        final MenuInventory.Builder builder = MenuInventory.builder()
+                .title(Component.text("Town Bank"))
+                .rows(3)
+                .addItem(MenuHelper.backButton().build())
+                .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
+                        .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!TownyEconomyHandler.isActive())
+                                return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to deposit to or withdraw from the town bank.", NamedTextColor.GRAY);
+                        })
+                        .action(town == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, town)))
+                        .build())
+                .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
+                        .name(Component.text("Transaction History", NamedTextColor.GREEN))
+                        .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
+                        .lore(() -> {
+                            if (town == null)
+                                return Component.text("You are not part of a town.", NamedTextColor.GRAY);
+                            else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode()))
+                                return Component.text("You do not have permission to view the town's transaction history.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to view the town's transaction history.", NamedTextColor.GRAY);
+                        })
+                        .action(town != null && player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode())
+                                ? ClickAction.openInventory(() -> createBankHistoryMenu(town)) : ClickAction.NONE)
+                        .build());
+
+        if (town != null && TownyEconomyHandler.isActive()) {
+            builder.addItem(formatBankStatus(player, town.getAccount(), true)
+                    .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(0), HorizontalAnchor.fromLeft(4)))
+                    .build());
+        }
+
+        return builder.build();
+    }
+
+    public static MenuItem.Builder formatBankStatus(final Player player, final Account account, final boolean town) {
+        return MenuItem.builder(Material.OAK_SIGN)
+                .name(Component.text("Bank Status", NamedTextColor.GREEN))
+                .lore(Component.text("Balance: ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(account.getCachedBalance()), NamedTextColor.GREEN)))
+                .lore(() -> {
+                    if (!player.hasPermission((town ? PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY : PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY).getNode()))
+                        return Component.empty();
+
+                    final List<BankTransaction> transactions = account.getAuditor().getTransactions();
+
+                    if (transactions.isEmpty())
+                        return Component.text("Last transaction: ", NamedTextColor.DARK_GREEN).append(Component.text("no recent transactions", NamedTextColor.GREEN));
+                    else
+                        // TODO: format as time ago when raw time is exposed in BankTransaction
+                        return Component.text("Last transaction: ", NamedTextColor.DARK_GREEN).append(Component.text(transactions.get(transactions.size() - 1).getTime(), NamedTextColor.GREEN));
+                });
     }
 
     public static MenuItem.Builder formatTownInfo(Town town) {
