@@ -3,7 +3,7 @@ main: io.github.townyadvanced.townymenus.TownyMenus
 version: ${version}
 api-version: 1.16
 author: Warriorrr
-website: 'http://townyadvanced.github.io'
+website: 'https://townyadvanced.github.io'
 depend: [Towny]
 
 commands:
