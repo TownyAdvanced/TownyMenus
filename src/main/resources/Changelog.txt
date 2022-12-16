@@ -17,3 +17,5 @@
   - fix: User input text box is now empty by default
   - Added town and nation bank menus that shows current bank balance and last transaction time
   - Moved transaction history & deposit/withdraw buttons to the bank menus
+0.0.3:
+  - Updated AnvilGUI version to 1.6.0-SNAPSHOT for proper 1.19.3 support.
