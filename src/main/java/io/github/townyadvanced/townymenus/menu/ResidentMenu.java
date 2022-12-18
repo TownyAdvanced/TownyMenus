@@ -156,36 +156,43 @@ public class ResidentMenu {
     }
 
     private static MenuInventory formatResidentFriends(Player player) {
-        return MenuInventory.paginator()
+        final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator()
                 .title(Component.text("Resident Friends"))
-                .addItems(formatFriendsView(player))
-                .addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                        .name(Component.text("Add Friend", NamedTextColor.GREEN))
-                        .lore(Component.text("Click here to add a player as a friend.", NamedTextColor.GRAY))
-                        .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                        .action(ClickAction.userInput("Enter player name.", name -> {
-                            Resident resident = TownyAPI.getInstance().getResident(player);
-                            if (resident == null)
-                                return AnvilGUI.Response.text("You are not registered.");
+                .addItems(formatFriendsView(player));
 
-                            Resident friend = TownyAPI.getInstance().getResident(name);
-                            if (friend == null || friend.isNPC() || friend.getUUID().equals(resident.getUUID()))
-                                return AnvilGUI.Response.text("Not a valid resident.");
+        if (player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_FRIEND.getNode())) {
+            builder.addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
+                    .name(Component.text("Add Friend", NamedTextColor.GREEN))
+                    .lore(Component.text("Click here to add a player as a friend.", NamedTextColor.GRAY))
+                    .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
+                    .action(ClickAction.userInput("Enter player name.", name -> {
+                        if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_FRIEND.getNode()))
+                            return AnvilGUI.Response.close();
 
-                            if (resident.hasFriend(friend))
-                                return AnvilGUI.Response.text(friend.getName() + " is already your friend!");
+                        Resident resident = TownyAPI.getInstance().getResident(player);
+                        if (resident == null)
+                            return AnvilGUI.Response.text("You are not registered.");
 
-                            List<Resident> friends = new ArrayList<>();
-                            friends.add(friend);
+                        Resident friend = TownyAPI.getInstance().getResident(name);
+                        if (friend == null || friend.isNPC() || friend.getUUID().equals(resident.getUUID()))
+                            return AnvilGUI.Response.text("Not a valid resident.");
 
-                            ResidentCommand.residentFriendAdd(player, resident, friends);
-                            TownyMenus.logger().info(player.getName() + " has added " + friend.getName() + " as a friend.");
+                        if (resident.hasFriend(friend))
+                            return AnvilGUI.Response.text(friend.getName() + " is already your friend!");
 
-                            // Re-open resident friends menu
-                            MenuHistory.reOpen(player, () -> formatResidentFriends(player));
-                            return AnvilGUI.Response.text("");
-                        }))
-                        .build())
-                .build();
+                        List<Resident> friends = new ArrayList<>();
+                        friends.add(friend);
+
+                        ResidentCommand.residentFriendAdd(player, resident, friends);
+                        TownyMenus.logger().info(player.getName() + " has added " + friend.getName() + " as a friend.");
+
+                        // Re-open resident friends menu
+                        MenuHistory.reOpen(player, () -> formatResidentFriends(player));
+                        return AnvilGUI.Response.text("");
+                    }))
+                    .build());
+        }
+
+        return builder.build();
     }
 }

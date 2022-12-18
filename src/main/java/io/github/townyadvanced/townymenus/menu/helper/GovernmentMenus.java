@@ -11,6 +11,7 @@ import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.util.MathUtil;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
@@ -69,6 +70,14 @@ public class GovernmentMenus {
     }
 
     public static MenuInventory createDepositWithdrawMenu(final Player player, final Government government) {
+        if (!governmentExists(government))
+            return MenuInventory.builder().rows(1)
+                    .addItem(MenuHelper.backButton().build())
+                    .addItem(MenuItem.builder(Material.BARRIER).name(Component.text("Invalid Government", NamedTextColor.GREEN)).build())
+                    .build();
+
+        final PermissionNodes root = government instanceof Town ? PermissionNodes.TOWNY_COMMAND_TOWN : PermissionNodes.TOWNY_COMMAND_NATION;
+
         return MenuInventory.builder()
                 .title(Component.text("Deposit or Withdraw"))
                 .rows(3)
@@ -76,14 +85,24 @@ public class GovernmentMenus {
                 .addItem(MenuItem.builder(Material.EMERALD)
                         .name(Component.text("Deposit", NamedTextColor.GREEN))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
-                        .lore(Component.text("Click to deposit into the bank.", NamedTextColor.GRAY))
-                        .action(depositOrWithdraw(player, government, false))
+                        .lore(() -> {
+                            if (!player.hasPermission(root.getNode("deposit")))
+                                return Component.text("You do not have permission to deposit into the bank.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to deposit into the bank.", NamedTextColor.GRAY);
+                        })
+                        .action(!player.hasPermission(root.getNode("deposit")) ? ClickAction.NONE : depositOrWithdraw(player, government, false))
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE)
                         .name(Component.text("Withdraw", NamedTextColor.GREEN))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
-                        .lore(Component.text("Click to withdraw from the bank.", NamedTextColor.GRAY))
-                        .action(depositOrWithdraw(player, government, true))
+                        .lore(() -> {
+                            if (!player.hasPermission(root.getNode("withdraw")))
+                                return Component.text("You do not have permission to withdraw from the bank.", NamedTextColor.GRAY);
+                            else
+                                return Component.text("Click to withdraw from the bank.", NamedTextColor.GRAY);
+                        })
+                        .action(!player.hasPermission(root.getNode("withdraw")) ? ClickAction.NONE : depositOrWithdraw(player, government, true))
                         .build())
                 .build();
     }
@@ -97,6 +116,9 @@ public class GovernmentMenus {
             }
 
             boolean town = government instanceof Town;
+            if (!player.hasPermission(town ? PermissionNodes.TOWNY_COMMAND_TOWN_DEPOSIT.getNode() : PermissionNodes.TOWNY_COMMAND_NATION_DEPOSIT.getNode()))
+                return AnvilGUI.Response.close();
+
             Class<?> clazz = town ? TownCommand.class : NationCommand.class;
 
             try {

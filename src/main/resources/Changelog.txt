@@ -19,3 +19,7 @@
   - Moved transaction history & deposit/withdraw buttons to the bank menus
 0.0.3:
   - Updated AnvilGUI version to 1.6.0-SNAPSHOT for proper 1.19.3 support.
+0.0.4:
+  - Fix withdraw/deposits not doing permission tests.
+    - Closes #8
+  - Add missing permission node test for adding a resident as a friend.
