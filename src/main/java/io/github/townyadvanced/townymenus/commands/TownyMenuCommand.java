@@ -3,6 +3,7 @@ package io.github.townyadvanced.townymenus.commands;
 import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.TownyMessaging;
+import com.palmergames.bukkit.towny.object.Translatable;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -41,6 +42,11 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
             TownyMessaging.sendErrorMsg(sender, "This command cannot be used by console!");
+            return true;
+        }
+
+        if (!player.hasPermission("townymenus.command.townymenu")) {
+            TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_command_disable"));
             return true;
         }
 
