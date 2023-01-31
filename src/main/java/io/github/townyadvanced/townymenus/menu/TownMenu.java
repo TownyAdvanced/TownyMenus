@@ -532,7 +532,7 @@ public class TownMenu {
                             else
                                 return Component.text("Click to change the town's name.", NamedTextColor.GRAY);
                         })
-                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter town name", title -> {
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter town name", name -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
                                 return AnvilGUI.Response.close();
@@ -540,7 +540,7 @@ public class TownMenu {
                             AwaitingConfirmation.await(player);
 
                             try {
-                                TownCommand.townSetName(player, new String[]{"", title}, town);
+                                TownCommand.townSetName(player, new String[]{"", name.replaceAll(" ", "_")}, town);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilGUI.Response.text(e.getMessage(player));
