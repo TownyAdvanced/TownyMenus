@@ -13,5 +13,7 @@ The plugin is currently still in beta, so any feedback is welcome! Feel free to 
 ## Downloading
 The plugin can be downloaded from [Modrinth](https://modrinth.com/plugin/townymenus) or from the [latest release](https://github.com/TownyAdvanced/TownyMenus/releases).
 
+Development builds can be downloaded by going to the [Actions](https://github.com/TownyAdvanced/TownyMenus/actions) tab and downloading the artifact produced by a specific actions run.
+
 ## Compiling from source
 Build with `gradlew build` (Windows) or `./gradlew build` (Linux), requires Java 17.
