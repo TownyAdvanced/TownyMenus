@@ -7,15 +7,16 @@ import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
 import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
-import io.github.townyadvanced.townymenus.commands.addon.NationAddonCommand;
-import io.github.townyadvanced.townymenus.commands.addon.PlotAddonCommand;
-import io.github.townyadvanced.townymenus.commands.addon.ResidentAddonCommand;
-import io.github.townyadvanced.townymenus.commands.addon.TownAddonCommand;
+import io.github.townyadvanced.townymenus.commands.MenuExtensionCommand;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.listeners.PlayerListener;
 import io.github.townyadvanced.townymenus.settings.MenuSettings;
+import io.github.townyadvanced.townymenus.menu.NationMenu;
+import io.github.townyadvanced.townymenus.menu.PlotMenu;
+import io.github.townyadvanced.townymenus.menu.ResidentMenu;
+import io.github.townyadvanced.townymenus.menu.TownMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -52,10 +53,10 @@ public class TownyMenus extends JavaPlugin {
 		getCommand("townymenu").setExecutor(townyMenuCommand);
 		TownyCommandAddonAPI.addSubCommand(CommandType.TOWNY, "menu", townyMenuCommand);
 
-		TownyCommandAddonAPI.addSubCommand(CommandType.NATION, "menu", new NationAddonCommand());
-		TownyCommandAddonAPI.addSubCommand(CommandType.PLOT, "menu", new PlotAddonCommand());
-		TownyCommandAddonAPI.addSubCommand(CommandType.RESIDENT, "menu", new ResidentAddonCommand());
-		TownyCommandAddonAPI.addSubCommand(CommandType.TOWN, "menu", new TownAddonCommand());
+		TownyCommandAddonAPI.addSubCommand(CommandType.NATION, "menu", new MenuExtensionCommand(NationMenu::createNationMenu));
+		TownyCommandAddonAPI.addSubCommand(CommandType.PLOT, "menu", new MenuExtensionCommand(PlotMenu::createPlotMenu));
+		TownyCommandAddonAPI.addSubCommand(CommandType.RESIDENT, "menu", new MenuExtensionCommand(ResidentMenu::createResidentMenu));
+		TownyCommandAddonAPI.addSubCommand(CommandType.TOWN, "menu", new MenuExtensionCommand(TownMenu::createTownMenu));
 
 		/*
 		logger().info("Loading translations...");

@@ -1,10 +1,9 @@
-package io.github.townyadvanced.townymenus.commands.addon;
+package io.github.townyadvanced.townymenus.commands;
 
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.object.Translatable;
-import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
-import io.github.townyadvanced.townymenus.menu.ResidentMenu;
+import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.utils.MenuScheduler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,7 +11,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class ResidentAddonCommand implements CommandExecutor {
+import java.util.function.Function;
+
+/**
+ * Used for Towny addon commands.
+ */
+public class MenuExtensionCommand implements CommandExecutor {
+    private final Function<Player, MenuInventory> menuInventoryFunction;
+
+    public MenuExtensionCommand(Function<Player, MenuInventory> menuInventoryFunction) {
+        this.menuInventoryFunction = menuInventoryFunction;
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
@@ -29,7 +39,7 @@ public class ResidentAddonCommand implements CommandExecutor {
             MenuHistory.clearHistory(player.getUniqueId());
 
             MenuHistory.addHistory(player.getUniqueId(), TownyMenuCommand.createRootMenu(player));
-            ResidentMenu.createResidentMenu(player).open(player);
+            menuInventoryFunction.apply(player).open(player);
         });
 
         return true;
