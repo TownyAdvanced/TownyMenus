@@ -23,3 +23,6 @@
   - Fix withdraw/deposits not doing permission tests.
     - Closes #8
   - Add missing permission node test for adding a resident as a friend.
+0.0.5:
+  - Fix /towny menu not checking for the townymenus.command.townymenu permission.
+  - Spaces in new town names are now replaced with spaces instead of an invalid name message being given.
