@@ -1,5 +1,6 @@
 package io.github.townyadvanced.townymenus.commands;
 
+import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.object.Translatable;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
@@ -27,6 +28,11 @@ public class MenuExtensionCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
             TownyMessaging.sendErrorMsg(sender, "This command cannot be used by console!");
+            return true;
+        }
+
+        if (Towny.getPlugin().isError()) {
+            TownyMessaging.sendErrorMsg(player, "You cannot use this command while Towny is locked in safe mode.");
             return true;
         }
 
