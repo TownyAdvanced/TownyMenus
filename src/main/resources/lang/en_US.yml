@@ -1,4 +1,54 @@
-name: TownyMenus
-author: Warriorrr
-version: 0.01
+main-menu-title: "Towny Menu"
 
+main-menu-town: "<green>Town Menu"
+main-menu-town-subtitle: "<gray>Click to view the town menu!"
+main-menu-nation: "<aqua>Nation Menu"
+main-menu-nation-subtitle: "<gray>Click to view the nation menu!"
+main-menu-plot: "<dark_green>Plot Menu"
+main-menu-plot-subtitle: "<gray>Click to view the plot menu!"
+main-menu-resident: "<yellow>Resident Menu"
+main-menu-resident-subtitle: "<gray>Click to view the resident menu!"
+
+town-menu-title: "Town Menu - %s"
+nation-menu-title: "Nation Menu"
+plot-menu-title: "Plot Menu"
+resident-menu-title: "Resident Menu"
+
+msg-error: "<dark_red>Error"
+msg-no-permission: "<red>You do not have permission to use this!"
+msg-click-to-confirm: "<gray>Click to confirm using %s."
+
+resident-menu-view-friends: "<green>View Friends"
+resident-menu-view-friends-subtitle: "<gray>Click to see your friends list."
+resident-menu-friends-title: "Resident Friends"
+resident-menu-no-friends: "<gray>You do not have any friends to list."
+resident-menu-remove-friend: "<gray>Right click to remove this player as a friend."
+resident-menu-remove-friend-confirm: "<gray>Are you sure you want to remove %s as a friend?"
+resident-menu-add-friend: "<green>Add Friend"
+resident-menu-add-friend-subtitle: "<gray>Click here to add a player as a friend."
+resident-menu-add-friend-prompt: "Enter player name"
+resident-menu-add-friend-invalid: "%s is not a valid resident"
+resident-menu-add-friend-already-friend: "%s is already your friend!"
+resident-menu-spawn: "<green>Spawn"
+resident-info-unknown: "<red>Unknown or invalid resident."
+resident-info-status: "<dark_green>Status: "
+status-online: "<green>● Online"
+status-offline: "<red>● Offline"
+# Resident of town name, leader of nation name
+resident-info-of: " of "
+resident-info-member: "Member"
+resident-info-balance: "<dark_green>Balance "
+resident-info-registered: "<dark_green>Registered "
+resident-info-last-online: "<dark_green>Last online "
+resident-res-spawn: "<gray>Click to teleport to your resident spawn!"
+
+time-future: "in the future"
+time-just-now: "just now"
+time-a-minute-ago: "a minute ago"
+time-x-minutes-ago: "%d minutes ago"
+time-an-hour-ago: "an hour ago"
+time-x-hours-ago: "%d hours ago"
+time-yesterday: "yesterday"
+time-x-days-ago: "%d days ago"
+
+town-menu-bank: "<green>Town Bank"

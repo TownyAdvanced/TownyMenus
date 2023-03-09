@@ -6,6 +6,7 @@ import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.adventure.text.format.TextDecoration;
 import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import com.palmergames.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
@@ -146,7 +147,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         }
 
         public MenuInventory build() {
-            Inventory inventory = Bukkit.createInventory(null, size, LegacyComponentSerializer.legacySection().serialize(title));
+            Inventory inventory = Bukkit.createInventory(null, size, PlainTextComponentSerializer.plainText().serialize(title));
 
             Map<Integer, List<ClickAction>> actions = new HashMap<>();
 

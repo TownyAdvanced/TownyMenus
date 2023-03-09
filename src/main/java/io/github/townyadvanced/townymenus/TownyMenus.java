@@ -58,12 +58,10 @@ public class TownyMenus extends JavaPlugin {
 		TownyCommandAddonAPI.addSubCommand(CommandType.RESIDENT, "menu", new MenuExtensionCommand(ResidentMenu::createResidentMenu));
 		TownyCommandAddonAPI.addSubCommand(CommandType.TOWN, "menu", new MenuExtensionCommand(TownMenu::createTownMenu));
 
-		/*
 		logger().info("Loading translations...");
 		TranslationLoader loader = new TranslationLoader(getDataFolder().toPath().resolve("lang"), this, TownyMenus.class);
 		loader.load();
 		TownyAPI.getInstance().addTranslations(this, loader.getTranslations());
-		*/
 	}
 
 	@Override

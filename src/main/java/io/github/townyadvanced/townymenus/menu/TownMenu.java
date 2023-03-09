@@ -22,6 +22,7 @@ import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
 import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
 import com.palmergames.bukkit.towny.object.TransactionType;
 import com.palmergames.bukkit.towny.object.Translatable;
+import com.palmergames.bukkit.towny.object.Translation;
 import com.palmergames.bukkit.towny.object.economy.Account;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
@@ -56,7 +57,7 @@ public class TownMenu {
 
         return MenuInventory.builder()
                 .rows(6)
-                .title(Component.text("Town Menu - " + (town != null ? town.getName() : "No Town")))
+                .title(Translatable.of("town-menu-title", (town != null ? town.getName() : "No Town")).locale(player).component())
                 .addItem(MenuHelper.backButton().build())
                 .addItem(formatTownInfo(town)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
@@ -238,7 +239,7 @@ public class TownMenu {
 
         for (Resident resident : town.getResidents()) {
             builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
-                    .lore(Component.text("Joined town ", NamedTextColor.DARK_GREEN).append(Component.text(Time.registeredOrAgo(res.getJoinedTownAt()), NamedTextColor.GREEN)))
+                    .lore(Component.text("Joined town ", NamedTextColor.DARK_GREEN).append(Component.text(Time.registeredOrAgo(res.getJoinedTownAt(), Translation.getDefaultLocale()), NamedTextColor.GREEN)))
                     .lore(Component.text(" "))
                     .lore(Component.text("Right click to view additional options.", NamedTextColor.GRAY))
                     .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, town, resident))))
@@ -684,7 +685,7 @@ public class TownMenu {
 
         List<Component> lore = new ArrayList<>();
 
-        lore.add(Component.text("Founded ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(town.getRegistered()), NamedTextColor.GREEN)));
+        lore.add(Component.text("Founded ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(town.getRegistered()).translate(), NamedTextColor.GREEN)));
         lore.add(Component.text(town.getNumResidents(), NamedTextColor.DARK_GREEN).append(Component.text(" Resident" + (town.getNumResidents() == 1 ? "" : "s"), NamedTextColor.GREEN)));
 
         if (TownySettings.isEconomyAsync() && TownyEconomyHandler.isActive())
