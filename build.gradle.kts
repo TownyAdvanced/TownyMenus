@@ -1,7 +1,7 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2" apply true
-    id("xyz.jpenilla.run-paper") version "1.0.6"
+    id("com.github.johnrengelman.shadow") version "8.1.0" apply true
+    id("xyz.jpenilla.run-paper") version "2.0.1"
 }
 
 repositories {
@@ -31,7 +31,7 @@ val townyVersion: String by project
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("com.palmergames.bukkit.towny:towny:${townyVersion}")
-    compileOnly("org.jetbrains:annotations:23.1.0")
+    compileOnly("org.jetbrains:annotations:24.0.1")
     implementation("net.wesjd:anvilgui:1.6.0-SNAPSHOT")
     annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:1.0.0")
 }
