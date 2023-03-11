@@ -8,20 +8,24 @@ import io.github.townyadvanced.townymenus.gui.slot.Slot;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class MenuItem {
+    public static final NamespacedKey PDC_KEY = Objects.requireNonNull(NamespacedKey.fromString("townymenus:menuitem")); // Hide the might be null message
     private Slot slot;
     private final ItemStack itemStack;
     private final List<ClickAction> actions = new ArrayList<>(0);
@@ -178,10 +182,13 @@ public class MenuItem {
 
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
+                meta.getPersistentDataContainer().set(PDC_KEY, PersistentDataType.BYTE, (byte) 1);
                 String displayName = LegacyComponentSerializer.legacySection().serialize(name);
-                // Set to string with just a legacy color if empty.
+
+                // Set to string with just a legacy color if empty, since spigot just sets the display name to null if it's empty.
+                // Why not just a space? Because a space is wider for players who don't have advanced tooltips enabled...
                 if (displayName.isEmpty())
-                    displayName = "\u00A70";
+                    displayName = "§0";
 
                 meta.setDisplayName(displayName);
 
@@ -193,7 +200,7 @@ public class MenuItem {
 
                 if (glint) {
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    meta.addEnchant(Enchantment.DURABILITY, 1, true);
+                    meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
                 }
 
                 itemStack.setItemMeta(meta);
