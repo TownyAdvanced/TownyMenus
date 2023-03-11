@@ -21,6 +21,7 @@ import io.github.townyadvanced.townymenus.gui.action.UserInputAction;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
+import io.github.townyadvanced.townymenus.utils.AnvilResponse;
 import io.github.townyadvanced.townymenus.utils.Localization;
 import io.github.townyadvanced.townymenus.utils.Time;
 import net.wesjd.anvilgui.AnvilGUI;
@@ -173,20 +174,20 @@ public class ResidentMenu {
                     .name(of("resident-menu-add-friend").component(locale))
                     .lore(of("resident-menu-add-friend-subtitle").component(locale))
                     .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                    .action(ClickAction.userInput(of("resident-menu-add-friend-prompt").translate(locale), name -> {
+                    .action(ClickAction.userInput(of("resident-menu-add-friend-prompt").translate(locale), completion -> {
                         if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_FRIEND.getNode()))
-                            return AnvilGUI.Response.close();
+                            return AnvilResponse.close();
 
                         Resident resident = TownyAPI.getInstance().getResident(player);
                         if (resident == null)
-                            return UserInputAction.text(of("msg_err_not_registered").translate(locale));
+                            return AnvilResponse.text(of("msg_err_not_registered").translate(locale));
 
-                        Resident friend = TownyAPI.getInstance().getResident(name);
+                        Resident friend = TownyAPI.getInstance().getResident(completion.getText());
                         if (friend == null || friend.isNPC() || friend.getUUID().equals(resident.getUUID()))
-                            return UserInputAction.text(of("resident-menu-add-friend-invalid", name).translate(locale));
+                            return AnvilResponse.text(of("resident-menu-add-friend-invalid", completion.getText()).translate(locale));
 
                         if (resident.hasFriend(friend))
-                            return UserInputAction.text(of("resident-menu-add-friend-already-friend", friend.getName()).translate(locale));
+                            return AnvilResponse.text(of("resident-menu-add-friend-already-friend", friend.getName()).translate(locale));
 
                         List<Resident> friends = new ArrayList<>();
                         friends.add(friend);
@@ -194,7 +195,7 @@ public class ResidentMenu {
                         ResidentCommand.residentFriendAdd(player, resident, friends);
 
                         // Re-open resident friends menu
-                        return UserInputAction.reOpen(player, () -> formatResidentFriends(player));
+                        return AnvilResponse.reOpen(() -> formatResidentFriends(player));
                     }))
                     .build());
         }

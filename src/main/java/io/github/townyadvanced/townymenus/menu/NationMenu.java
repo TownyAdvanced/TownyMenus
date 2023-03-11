@@ -26,6 +26,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.menu.helper.GovernmentMenus;
+import io.github.townyadvanced.townymenus.utils.AnvilResponse;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -189,7 +190,7 @@ public class NationMenu {
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter new nation name", name -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()))
-                                return AnvilGUI.Response.close();
+                                return AnvilResponse.close();
 
                             // Await confirmation events for this player
                             AwaitingConfirmation.await(player);
@@ -198,11 +199,11 @@ public class NationMenu {
                                 NationCommand.nationSet(player, ("name " + name).split(" "), false, playerNation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilGUI.Response.text(e.getMessage(player));
+                                return AnvilResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatNationSetMenu(player));
-                            return AnvilGUI.Response.text("");
+                            return AnvilResponse.nil();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
@@ -219,17 +220,17 @@ public class NationMenu {
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter nation board", board -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_BOARD.getNode()))
-                                return AnvilGUI.Response.close();
+                                return AnvilResponse.close();
 
                             try {
                                 NationCommand.nationSet(player, ("board " + board).split(" "), false, playerNation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilGUI.Response.text(e.getMessage(player));
+                                return AnvilResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatNationSetMenu(player));
-                            return AnvilGUI.Response.text("");
+                            return AnvilResponse.nil();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
@@ -294,21 +295,21 @@ public class NationMenu {
                                 return Arrays.asList(Component.text("Click to change this resident's title.", NamedTextColor.GRAY),
                                         Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY));
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new title", title -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new title", completion -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || playerNation != resident.getNationOrNull())
-                                return AnvilGUI.Response.close();
+                                return AnvilResponse.close();
 
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode());
-                                NationCommand.nationSet(player, new String[]{"title", resident.getName(), title}, false, nation);
+                                NationCommand.nationSet(player, new String[]{"title", resident.getName(), completion.getText()}, false, nation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilGUI.Response.text(e.getMessage(player));
+                                return AnvilResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
-                            return AnvilGUI.Response.text("");
+                            return AnvilResponse.nil();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
@@ -329,21 +330,21 @@ public class NationMenu {
                                 return Arrays.asList(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY),
                                         Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY));
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new surname", surname -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new surname", completion -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || playerNation != resident.getNationOrNull())
-                                return AnvilGUI.Response.close();
+                                return AnvilResponse.close();
 
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode());
-                                NationCommand.nationSet(player, new String[]{"surname", resident.getName(), surname}, false, nation);
+                                NationCommand.nationSet(player, new String[]{"surname", resident.getName(), completion.getText()}, false, nation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilGUI.Response.text(e.getMessage(player));
+                                return AnvilResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
-                            return AnvilGUI.Response.text("");
+                            return AnvilResponse.nil();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {

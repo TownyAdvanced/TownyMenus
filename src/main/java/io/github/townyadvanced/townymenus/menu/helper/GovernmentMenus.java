@@ -24,7 +24,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
-import net.wesjd.anvilgui.AnvilGUI;
+import io.github.townyadvanced.townymenus.utils.AnvilResponse;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -108,28 +108,28 @@ public class GovernmentMenus {
     }
 
     private static UserInputAction depositOrWithdraw(final Player player, final Government government, boolean withdraw) {
-        return ClickAction.userInput("Enter " + (withdraw ? "withdraw" : "deposit") + " amount", amount -> {
+        return ClickAction.userInput("Enter " + (withdraw ? "withdraw" : "deposit") + " amount", completion -> {
             try {
-                MathUtil.getIntOrThrow(amount);
+                MathUtil.getIntOrThrow(completion.getText());
             } catch (TownyException e) {
-                return AnvilGUI.Response.text(e.getMessage(player));
+                return AnvilResponse.text(e.getMessage(player));
             }
 
             boolean town = government instanceof Town;
             if (!player.hasPermission(town ? PermissionNodes.TOWNY_COMMAND_TOWN_DEPOSIT.getNode() : PermissionNodes.TOWNY_COMMAND_NATION_DEPOSIT.getNode()))
-                return AnvilGUI.Response.close();
+                return AnvilResponse.close();
 
             Class<?> clazz = town ? TownCommand.class : NationCommand.class;
 
             try {
                 Method method = clazz.getDeclaredMethod(town ? "townTransaction" : "nationTransaction", Player.class, String[].class, boolean.class);
                 method.setAccessible(true);
-                method.invoke(null, player, new String[]{"", amount}, withdraw);
+                method.invoke(null, player, new String[]{"", completion.getText()}, withdraw);
 
                 MenuHistory.last(player);
-                return AnvilGUI.Response.text("");
+                return AnvilResponse.nil();
             } catch (ReflectiveOperationException e) {
-                return AnvilGUI.Response.close();
+                return AnvilResponse.close();
             }
         });
     }
