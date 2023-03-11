@@ -26,3 +26,7 @@
 0.0.5:
   - Fix /towny menu not checking for the townymenus.command.townymenu permission.
   - Spaces in new town names are now replaced with spaces instead of an invalid name message being given.
+  - Exceptions thrown from inside async tasks are now logged to the console so that they can be properly logged.
+  - The /tgui command is now blocked when Towny is in safemode.
+  - Menu created items are now marked with a special entry so that they can be identified & removed when a menu is closed or an item is dropped.
+    - Not aware of any exploits that would allow menu items to be taken, but better safe than sorry.
