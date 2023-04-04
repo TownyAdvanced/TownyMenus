@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "8.1.0" apply true
+    id("com.github.johnrengelman.shadow") version "8.1.1" apply true
     id("xyz.jpenilla.run-paper") version "2.0.1"
 }
 
