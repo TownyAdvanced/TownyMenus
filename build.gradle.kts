@@ -26,14 +26,12 @@ repositories {
     }
 }
 
-val townyVersion: String by project
-
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
-    compileOnly("com.palmergames.bukkit.towny:towny:${townyVersion}")
-    compileOnly("org.jetbrains:annotations:24.0.1")
-    implementation("net.wesjd:anvilgui:1.6.3-SNAPSHOT")
-    annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:1.0.0")
+    compileOnly(libs.spigot)
+    compileOnly(libs.towny)
+    compileOnly(libs.jetbrains.annotations)
+    implementation(libs.anvilgui)
+    annotationProcessor(libs.jabel)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -65,7 +63,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19.3")
+        minecraftVersion("1.19.4")
     }
 }
 
