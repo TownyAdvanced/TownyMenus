@@ -842,13 +842,14 @@ public class PlotMenu {
                         return;
 
                     plotCommand().ifPresent(command -> {
+                        final Resident resident = TownyAPI.getInstance().getResident(player);
+                        if (resident == null)
+                            return;
+
                         try {
-                            command.plotToggle(player, townBlock, new String[]{property});
-                        } catch (Exception e) {
-                            if (e.getCause() instanceof TownyException ex)
-                                TownyMessaging.sendErrorMsg(player, ex.getMessage(player));
-                            else
-                                throw e;
+                            command.plotToggle(player, resident, townBlock, new String[]{property});
+                        } catch (TownyException e) {
+                            TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                         }
                     });
 
@@ -875,7 +876,7 @@ public class PlotMenu {
             return false;
 
         try {
-            PlotCommand.plotTestOwner(resident, townBlock);
+            TownyAPI.getInstance().testPlotOwnerOrThrow(resident, townBlock);
             return true;
         } catch (TownyException e) {
             return false;

@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.98.3.10");
+	private static final Version requiredTownyVersion = Version.fromString("0.98.6.15");
 	private static TownyMenus plugin;
 
 	@Override
