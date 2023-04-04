@@ -223,7 +223,7 @@ public class NationMenu {
                                 return AnvilResponse.close();
 
                             try {
-                                NationCommand.nationSet(player, ("board " + board).split(" "), false, playerNation);
+                                NationCommand.nationSet(player, ("board " + board.getText()).split(" "), false, playerNation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));

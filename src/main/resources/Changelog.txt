@@ -30,3 +30,5 @@
   - The /tgui command is now blocked when Towny is in safemode.
   - Menu created items are now marked with a special entry so that they can be identified & removed when a menu is closed or an item is dropped.
     - Not aware of any exploits that would allow menu items to be taken, but better safe than sorry.
+  - Fixed Towny compatibility on newer versions
+    - The minimum Towny version is now 0.98.6.15
