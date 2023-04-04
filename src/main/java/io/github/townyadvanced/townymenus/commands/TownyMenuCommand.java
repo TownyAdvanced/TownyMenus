@@ -67,7 +67,7 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
                 .rows(3)
                 .title(Translatable.of("main-menu-title").locale(player).component())
                 .addItem(MenuItem.builder(Material.EMERALD)
-                        .name(Translatable.of("town-menu-title").locale(player).component())
+                        .name(Translatable.of("main-menu-town").locale(player).component())
                         .lore(Translatable.of("main-menu-town-subtitle").locale(player).component())
                         .slot(10)
                         .action(ClickAction.openInventory(() -> TownMenu.createTownMenu(player)))
