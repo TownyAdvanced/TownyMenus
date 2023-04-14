@@ -16,7 +16,7 @@ public class MenuScheduler {
         scheduleAsync(entity.getUniqueId(), runnable);
     }
 
-    public static void scheduleAsync(UUID uuid, Runnable runnable) {
+    public static synchronized void scheduleAsync(UUID uuid, Runnable runnable) {
         // Prevent unwanted behaviour by only allowing 1 async task per player at a time
         if (hasRunningTask.contains(uuid))
             return;
