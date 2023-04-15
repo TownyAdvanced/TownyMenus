@@ -286,7 +286,7 @@ public class TownMenu {
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()))
-                                return Component.text("You do not have permission to change this resident's title.");
+                                return Component.text("You do not have permission to change this resident's title.", NamedTextColor.GRAY);
                             else
                                 return Arrays.asList(Component.text("Click to change this resident's title.", NamedTextColor.GRAY),
                                         Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY));
@@ -317,7 +317,7 @@ public class TownMenu {
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()))
-                                return Collections.singletonList(Component.text("You do not have permission to change this resident's surname."));
+                                return Component.text("You do not have permission to change this resident's surname.", NamedTextColor.GRAY);
                             else
                                 return Arrays.asList(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY),
                                         Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY));
