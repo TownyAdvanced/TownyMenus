@@ -17,14 +17,12 @@ import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
-import io.github.townyadvanced.townymenus.gui.action.UserInputAction;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.utils.AnvilResponse;
 import io.github.townyadvanced.townymenus.utils.Localization;
 import io.github.townyadvanced.townymenus.utils.Time;
-import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -44,16 +42,16 @@ public class ResidentMenu {
 
         return MenuInventory.builder()
                 .rows(3)
-                .title(of("resident-menu-title").locale(player).component())
+                .title(of("resident-menu-title").component(locale))
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
-                        .name(of("resident-menu-view-friends").locale(player).component())
-                        .lore(of("resident-menu-view-friends-subtitle").locale(player).component())
+                        .name(of("resident-menu-view-friends").component(locale))
+                        .lore(of("resident-menu-view-friends-subtitle").component(locale))
                         .slot(11)
                         .action(ClickAction.openInventory(() -> formatResidentFriends(player)))
                         .build())
                 .addItem(formatResidentInfo(player.getUniqueId()).slot(13).build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .name(of("resident-menu-spawn").locale(player).component())
+                        .name(of("resident-menu-spawn").component(locale))
                         .lore(player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_SPAWN.getNode())
                                 ? of("resident-res-spawn").component(locale)
                                 : of("msg-no-permission").component(locale))
@@ -142,8 +140,8 @@ public class ResidentMenu {
         List<MenuItem> friends = new ArrayList<>();
         for (Resident friend : resident.getFriends())
             friends.add(formatResidentInfo(friend.getUUID(), player)
-                    .lore(of("resident-menu-remove-friend").locale(player).component())
-                    .action(ClickAction.rightClick(ClickAction.confirmation(() -> of("resident-menu-remove-friend-confirm", friend.getName()).locale(player).component(), ClickAction.run(() -> {
+                    .lore(of("resident-menu-remove-friend").component(locale))
+                    .action(ClickAction.rightClick(ClickAction.confirmation(() -> of("resident-menu-remove-friend-confirm", friend.getName()).component(locale), ClickAction.run(() -> {
                         if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_RESIDENT_FRIEND.getNode())) {
                             TownyMessaging.sendErrorMsg(player, of("msg_err_command_disable"));
                             return;

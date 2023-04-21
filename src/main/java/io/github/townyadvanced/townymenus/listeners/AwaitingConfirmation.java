@@ -7,6 +7,7 @@ import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
+import io.github.townyadvanced.townymenus.utils.Localization;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +33,7 @@ public class AwaitingConfirmation implements Listener {
 
         event.setSendMessage(false);
         Bukkit.getScheduler().runTaskLater(TownyMenus.getPlugin(), () -> {
-            MenuHelper.createConfirmation(event.getConfirmation().getTitle().locale(player).component().colorIfAbsent(NamedTextColor.GRAY), ClickAction.run(() -> {
+            MenuHelper.createConfirmation(event.getConfirmation().getTitle().component(Localization.localeOrDefault(player)).colorIfAbsent(NamedTextColor.GRAY), ClickAction.run(() -> {
                 ConfirmationHandler.acceptConfirmation(player);
                 MenuHistory.last(player);
             }), ClickAction.run(() -> MenuHistory.last(player)))

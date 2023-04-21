@@ -37,6 +37,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.utils.AnvilResponse;
+import io.github.townyadvanced.townymenus.utils.Localization;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
@@ -626,6 +627,7 @@ public class PlotMenu {
     private static MenuInventory formatPlotPermissionOverrideMenu(final Player player, final WorldCoord worldCoord) {
         final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(text("Permission Overrides"));
         final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
+        final Locale locale = Localization.localeOrDefault(player);
 
         if (townBlock == null)
             return builder.build();
@@ -639,10 +641,10 @@ public class PlotMenu {
 
             if (canEdit) {
                 if (entry.getValue().getLastChangedAt() > 0 && !entry.getValue().getLastChangedBy().isEmpty())
-                    itemBuilder.lore(Translatable.of("msg_last_edited", TownyFormatter.lastOnlineFormat.format(entry.getValue().getLastChangedAt()), entry.getValue().getLastChangedBy()).locale(player).component());
+                    itemBuilder.lore(Translatable.of("msg_last_edited", TownyFormatter.lastOnlineFormat.format(entry.getValue().getLastChangedAt()), entry.getValue().getLastChangedBy()).component(locale));
 
                 itemBuilder
-                        .lore(Translatable.of("msg_click_to_edit").locale(player).component())
+                        .lore(Translatable.of("msg_click_to_edit").component(locale))
                         .lore(text("Right click to remove overrides for this player.", GOLD))
                         .action(ClickAction.leftClick(ClickAction.openInventory(() -> openPermissionOverrideEditor(player, worldCoord, entry.getKey(), entry.getValue()))))
                         .action(ClickAction.rightClick(ClickAction.confirmation(text("Are you sure you want to remove overrides for this player?", GRAY), ClickAction.run(() -> {

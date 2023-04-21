@@ -14,6 +14,7 @@ import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
+import io.github.townyadvanced.townymenus.utils.Localization;
 import io.github.townyadvanced.townymenus.utils.MenuScheduler;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class TownyMenuCommand implements CommandExecutor, TabCompleter {
     private final TownyMenus plugin;
@@ -63,12 +65,14 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
     }
 
     public static MenuInventory createRootMenu(Player player) {
+        final Locale locale = Localization.localeOrDefault(player);
+
         return MenuInventory.builder()
                 .rows(3)
-                .title(Translatable.of("main-menu-title").locale(player).component())
+                .title(Translatable.of("main-menu-title").component(locale))
                 .addItem(MenuItem.builder(Material.EMERALD)
-                        .name(Translatable.of("main-menu-town").locale(player).component())
-                        .lore(Translatable.of("main-menu-town-subtitle").locale(player).component())
+                        .name(Translatable.of("main-menu-town").component(locale))
+                        .lore(Translatable.of("main-menu-town-subtitle").component(locale))
                         .slot(10)
                         .action(ClickAction.openInventory(() -> TownMenu.createTownMenu(player)))
                         .build())

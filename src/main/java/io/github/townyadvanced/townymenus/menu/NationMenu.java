@@ -27,6 +27,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.menu.helper.GovernmentMenus;
 import io.github.townyadvanced.townymenus.utils.AnvilResponse;
+import io.github.townyadvanced.townymenus.utils.Localization;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -449,6 +450,7 @@ public class NationMenu {
 
     public static MenuInventory formatNationBankMenu(final Player player) {
         final Nation nation = TownyAPI.getInstance().getNation(player);
+        final Locale locale = Localization.localeOrDefault(player);
 
         final MenuInventory.Builder builder = MenuInventory.builder()
                 .title(Component.text("Nation Bank"))
@@ -461,7 +463,7 @@ public class NationMenu {
                                     if (nation == null)
                                         return Component.text("You are not part of a nation.", NamedTextColor.GRAY);
                                     else if (!TownyEconomyHandler.isActive())
-                                        return Translatable.of("msg_err_no_economy").locale(player).component().color(NamedTextColor.GRAY);
+                                        return Translatable.of("msg_err_no_economy").component(locale).color(NamedTextColor.GRAY);
                                     else
                                         return Component.text("Click to deposit to or withdraw from the nation bank.", NamedTextColor.GRAY);
                                 })
@@ -479,7 +481,7 @@ public class NationMenu {
                                 return Component.text("Click to view the nations's transaction history.", NamedTextColor.GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()) ? ClickAction.NONE :
-                                ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(nation)))
+                                ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(player, nation)))
                         .build());
 
         if (nation != null && TownyEconomyHandler.isActive()) {
