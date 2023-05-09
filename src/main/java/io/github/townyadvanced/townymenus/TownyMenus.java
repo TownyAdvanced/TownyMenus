@@ -5,6 +5,9 @@ import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
+import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
+import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
+import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
 import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.commands.MenuExtensionCommand;
@@ -24,8 +27,13 @@ import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.98.6.15");
+	private static final Version requiredTownyVersion = Version.fromString("0.99.0.6");
 	private static TownyMenus plugin;
+	private final TaskScheduler scheduler;
+
+	public TownyMenus() {
+		this.scheduler = isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this);
+	}
 
 	@Override
 	public void onEnable() {
@@ -91,5 +99,18 @@ public class TownyMenus extends JavaPlugin {
 
 	private boolean townyVersionCheck() {
 		return Version.fromString(Towny.getPlugin().getVersion()).compareTo(requiredTownyVersion) >= 0;
+	}
+
+	public TaskScheduler getScheduler() {
+		return this.scheduler;
+	}
+
+	private static boolean isFoliaClassPresent() {
+		try {
+			Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
 	}
 }

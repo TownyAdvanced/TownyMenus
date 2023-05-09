@@ -4,6 +4,7 @@ version: ${version}
 api-version: 1.16
 author: Warriorrr
 website: 'https://townyadvanced.github.io'
+folia-supported: true
 depend: [Towny]
 
 commands:

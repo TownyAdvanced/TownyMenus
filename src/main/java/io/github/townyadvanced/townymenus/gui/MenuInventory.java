@@ -7,6 +7,7 @@ import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.adventure.text.format.TextDecoration;
 import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.palmergames.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
@@ -84,8 +85,9 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     public void openSilent(@NotNull HumanEntity player) {
-        if (!Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(TownyMenus.getPlugin(), () -> openSilent(player));
+        TaskScheduler scheduler = TownyMenus.getPlugin().getScheduler();
+        if (!scheduler.isEntityThread(player)) {
+            scheduler.run(player, () -> openSilent(player));
             return;
         }
 
