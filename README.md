@@ -1,7 +1,7 @@
 # TownyMenus
 An easy-to-use and accessible way for players to use Towny commands.
 
-Requires [Towny](https://github.com/TownyAdvanced/Towny) version 0.98.3.10 or above.
+Requires [Towny](https://github.com/TownyAdvanced/Towny) version 0.99.0.6 or above.
 
 ## About
 TownyMenus is a plugin that adds lots of inventory menus that trivializes interfacing with Towny. Instead of having to scour through documentation, commands are just a mouseclick away.
@@ -11,7 +11,7 @@ Players can open the main menu using /townymenu or one of its aliases. The menu 
 The plugin is currently still in beta, so any feedback is welcome! Feel free to stop by our Discord if you have any ideas for the plugin, or if you just want to chat.
 
 ## Downloading
-The plugin can be downloaded from [Modrinth](https://modrinth.com/plugin/townymenus) or from the [latest release](https://github.com/TownyAdvanced/TownyMenus/releases).
+The plugin can be downloaded from [Hangar](https://hangar.papermc.io/Warrior/TownyMenus), [Modrinth](https://modrinth.com/plugin/townymenus) or from the [latest release](https://github.com/TownyAdvanced/TownyMenus/releases).
 
 Development builds can be downloaded by going to the [Actions](https://github.com/TownyAdvanced/TownyMenus/actions) tab and downloading the artifact produced by a specific actions run.
 
