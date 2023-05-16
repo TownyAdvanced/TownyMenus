@@ -29,10 +29,10 @@ public class TownyMenus extends JavaPlugin {
 
 	private static final Version requiredTownyVersion = Version.fromString("0.99.0.6");
 	private static TownyMenus plugin;
-	private final TaskScheduler scheduler;
+	private final Object scheduler;
 
 	public TownyMenus() {
-		this.scheduler = isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this);
+		this.scheduler = townyVersionCheck() ? isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this) : null;
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class TownyMenus extends JavaPlugin {
 	}
 
 	public TaskScheduler getScheduler() {
-		return this.scheduler;
+		return (TaskScheduler) this.scheduler;
 	}
 
 	private static boolean isFoliaClassPresent() {
