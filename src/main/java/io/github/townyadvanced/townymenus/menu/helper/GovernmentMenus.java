@@ -2,6 +2,7 @@ package io.github.townyadvanced.townymenus.menu.helper;
 
 import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
+import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownyUniverse;
@@ -12,7 +13,9 @@ import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
+import com.palmergames.bukkit.util.Version;
 import com.palmergames.util.MathUtil;
+import com.palmergames.util.StringMgmt;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -124,7 +127,13 @@ public class GovernmentMenus {
             try {
                 Method method = clazz.getDeclaredMethod(town ? "townTransaction" : "nationTransaction", Player.class, String[].class, boolean.class);
                 method.setAccessible(true);
-                method.invoke(null, player, new String[]{"", completion.getText()}, withdraw);
+
+                // This can be removed once the minimum required version is above 0.99.0.8
+                String[] args = new String[]{"", completion.getText()};
+                if (town || Version.fromString(Towny.getPlugin().getVersion()).compareTo(Version.fromString("0.99.0.8")) >= 0)
+                    args = StringMgmt.remFirstArg(args);
+
+                method.invoke(null, player, args, withdraw);
 
                 MenuHistory.last(player);
                 return AnvilResponse.nil();
