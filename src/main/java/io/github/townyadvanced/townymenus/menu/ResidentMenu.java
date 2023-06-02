@@ -1,7 +1,6 @@
 package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyMessaging;
@@ -35,6 +34,8 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static com.palmergames.bukkit.towny.object.Translatable.*;
+import static com.palmergames.adventure.text.Component.text;
+import static com.palmergames.adventure.text.format.NamedTextColor.*;
 
 public class ResidentMenu {
     public static MenuInventory createResidentMenu(@NotNull Player player) {
@@ -107,23 +108,23 @@ public class ResidentMenu {
         lore.add(of("resident-info-status").component(locale).append(player != null && (viewer == null || viewer.canSee(player)) ? of("status-online").component(locale) : of("status-offline").component(locale)));
 
         if (resident.hasTown()) {
-            lore.add(of(resident.isMayor() ? "mayor_sing" : "res_sing").append(of("resident-info-of")).component(locale).color(NamedTextColor.DARK_GREEN).append(Component.text(resident.getTownOrNull().getName(), NamedTextColor.GREEN)));
+            lore.add(of(resident.isMayor() ? "mayor_sing" : "res_sing").append(of("resident-info-of")).component(locale).color(DARK_GREEN).append(text(resident.getTownOrNull().getName(), GREEN)));
 
             if (resident.hasNation())
-                lore.add(of(resident.isKing() ? "king_sing" : "resident-info-member").append(of("resident-info-of")).component(locale).color(NamedTextColor.DARK_GREEN).append(Component.text(resident.getNationOrNull().getName(), NamedTextColor.GREEN)));
+                lore.add(of(resident.isKing() ? "king_sing" : "resident-info-member").append(of("resident-info-of")).component(locale).color(DARK_GREEN).append(text(resident.getNationOrNull().getName(), GREEN)));
         }
 
         if (TownySettings.isEconomyAsync() && TownyEconomyHandler.isActive())
-            lore.add(of("resident-info-balance").component(locale).append(Component.text(TownyEconomyHandler.getFormattedBalance(resident.getAccount().getCachedBalance()), NamedTextColor.GREEN)));
+            lore.add(of("resident-info-balance").component(locale).append(text(TownyEconomyHandler.getFormattedBalance(resident.getAccount().getCachedBalance()), GREEN)));
 
-        lore.add(of("resident-info-registered").component(locale).append(Component.text(Time.formatRegistered(resident.getRegistered()), NamedTextColor.GREEN)));
+        lore.add(of("resident-info-registered").component(locale).append(text(Time.formatRegistered(resident.getRegistered()), GREEN)));
 
         if (!resident.isOnline())
-            lore.add(of("resident-info-last-online").component(locale).append(Time.ago(resident.getLastOnline()).component(locale).color(NamedTextColor.GREEN)));
+            lore.add(of("resident-info-last-online").component(locale).append(Time.ago(resident.getLastOnline()).component(locale).color(GREEN)));
 
         return MenuItem.builder(Material.PLAYER_HEAD)
                 .skullOwner(resident.getUUID())
-                .name(Component.text(resident.getName(), NamedTextColor.GREEN))
+                .name(text(resident.getName(), GREEN))
                 .lore(lore);
     }
 
@@ -201,3 +202,4 @@ public class ResidentMenu {
         return builder.build();
     }
 }
+

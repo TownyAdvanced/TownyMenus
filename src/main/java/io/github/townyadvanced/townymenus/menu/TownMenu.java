@@ -1,7 +1,6 @@
 package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -51,6 +50,8 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.palmergames.bukkit.towny.object.Translatable.of;
+import static com.palmergames.adventure.text.Component.text;
+import static com.palmergames.adventure.text.format.NamedTextColor.*;
 
 public class TownMenu {
     public static MenuInventory createTownMenu(@NotNull Player player) {
@@ -60,9 +61,9 @@ public class TownMenu {
 
         return MenuInventory.builder()
                 .rows(6)
-                .title(of("town-menu-title", (town != null ? town.getName() : "No Town")).component(locale))
+                .title(of("town-menu-title", (town != null ? town.getName() : of("town-menu-no-town"))).component(locale))
                 .addItem(MenuHelper.backButton().build())
-                .addItem(formatTownInfo(town)
+                .addItem(formatTownInfo(player, town)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
@@ -98,34 +99,34 @@ public class TownMenu {
                                 int residentOwned = cache.getNumTownBlocks(type, CacheType.RESIDENTOWNED);
 
                                 plotItems.add(MenuItem.builder(Material.GRASS_BLOCK)
-                                        .name(Component.text(type.getFormattedName(), NamedTextColor.GREEN))
-                                        .lore(Component.text("Resident Owned: ", NamedTextColor.DARK_GREEN).append(Component.text(residentOwned, NamedTextColor.GREEN)))
-                                        .lore(Component.text("For Sale: ", NamedTextColor.DARK_GREEN).append(Component.text(cache.getNumTownBlocks(type, CacheType.FORSALE), NamedTextColor.GREEN)))
-                                        .lore(Component.text("Total: ", NamedTextColor.DARK_GREEN).append(Component.text(cache.getNumTownBlocks(type, CacheType.ALL), NamedTextColor.GREEN)))
-                                        .lore(!TownyEconomyHandler.isActive() ? Component.empty() : Component.text("Daily Revenue: ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(residentOwned * type.getTax(town)), NamedTextColor.GREEN)))
+                                        .name(of(type.getFormattedName()).component(locale).color(GREEN))
+                                        .lore(() -> of("town-menu-plots-resident-owned").component(locale).append(Component.text(residentOwned)))
+                                        .lore(() -> of("town-menu-plots-for-sale").component(locale).append(Component.text(cache.getNumTownBlocks(type, CacheType.FORSALE))))
+                                        .lore(() -> of("town-menu-plots-total").component(locale).append(Component.text(cache.getNumTownBlocks(type, CacheType.ALL))))
+                                        .lore(!TownyEconomyHandler.isActive() ? Component.empty() : of("town-menu-plots:daily-revenue").component(locale).append(Component.text(cache.getNumTownBlocks(type, CacheType.ALL))))
                                         .build());
                             }
 
                             return MenuInventory.paginator()
                                     .addItems(plotItems)
                                     .addExtraItem(MenuItem.builder(Material.OAK_SIGN)
-                                            .name(Component.text("Town Plots", NamedTextColor.DARK_GREEN))
+                                            .name(of("town-menu-plots").component(locale))
                                             .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                                            .lore(Component.text("Town Size: ", NamedTextColor.DARK_GREEN).append(Component.text(town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString(), NamedTextColor.GREEN))
+                                            .lore(of("Town Size: ").component(locale).append(Component.text(town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString(), GREEN))
                                                     .append(town.hasUnlimitedClaims()
                                                             ? Component.empty()
                                                             : TownySettings.isSellingBonusBlocks(town) ?
-                                                            Component.text(" [Bought: " + town.getPurchasedBlocks() + "/" + TownySettings.getMaxPurchasedBlocks(town) + "]", NamedTextColor.AQUA) :
+                                                            of("town-menu-plots-bought").append(town.getPurchasedBlocks() + "/" + TownySettings.getMaxPurchasedBlocks(town) + "]").component(locale).color(AQUA) :
                                                             Component.empty()
                                                                     .append(town.getBonusBlocks() > 0 ?
-                                                                            Component.text(" [Bonus: " + town.getBonusBlocks() + "]", NamedTextColor.AQUA) :
+                                                                            of("town-menu-plots-bonus").append(town.getBonusBlocks() + "]").component(locale).color(AQUA) :
                                                                             Component.empty())
                                                                     .append(TownySettings.getNationBonusBlocks(town) > 0 ?
-                                                                            Component.text(" [NationBonus: " + TownySettings.getNationBonusBlocks(town) + "]", NamedTextColor.AQUA) :
+                                                                            of("town-menu-plots-nation-bonus").append(TownySettings.getNationBonusBlocks(town) + "]").component(locale).color(AQUA) :
                                                                             Component.empty())))
-                                            .lore(Component.text("Town Owned Land: ", NamedTextColor.DARK_GREEN).append(Component.text(town.getTownBlocks().size() - cache.getNumberOfResidentOwnedTownBlocks(), NamedTextColor.GREEN)))
+                                            .lore(of("town-menu-plots-town-owned").component(locale).append(Component.text(town.getTownBlocks().size() - cache.getNumberOfResidentOwnedTownBlocks(), GREEN)))
                                             .build())
-                                    .title(Component.text("Town Plots"))
+                                    .title(of("town-menu-plots").component(locale))
                                     .build();
                         }))
                         .build())
@@ -178,7 +179,7 @@ public class TownMenu {
                                 online.add(ResidentMenu.formatResidentInfo(onlinePlayer.getUniqueId(), player).build());
                             }
 
-                            return MenuInventory.paginator().addItems(online).title(Component.text("Online in Town")).build();
+                            return MenuInventory.paginator().addItems(online).title(of("Online in Town").component(locale)).build();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
@@ -219,7 +220,7 @@ public class TownMenu {
             boolean added = transaction.getType() == TransactionType.ADD || transaction.getType() == TransactionType.DEPOSIT;
 
             transactionItems.add(MenuItem.builder(added ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK)
-                    .name(of("town-menu-transaction-number", i + 1, transaction.getTime()).component(locale).color(added ? NamedTextColor.GREEN : NamedTextColor.RED))
+                    .name(of("town-menu-transaction-number", i + 1, transaction.getTime()).component(locale).color(added ? GREEN : RED))
                     .lore(of("town-menu-transaction-amount", TownyEconomyHandler.getFormattedBalance(transaction.getAmount())).component(locale))
                     .lore(of("town-menu-transaction-new-balance", TownyEconomyHandler.getFormattedBalance(transaction.getBalance())).component(locale))
                     .lore(of("town-menu-transaction-reason", transaction.getReason()).component(locale))
@@ -240,11 +241,11 @@ public class TownMenu {
             return MenuInventory.paginator().title(of("town-menu-overview").component(locale)).build();
 
         MenuInventory.PaginatorBuilder builder = MenuInventory.paginator()
-                .title(of("town-menu-overview").append(" - " + town.getName()).component(locale));
+                .title(of("town-menu-overview").append(" - ").append(town.getName()).component(locale));
 
         for (Resident resident : town.getResidents()) {
             builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
-                    .lore(of("town-menu-overview-joined-town", Time.registeredOrAgo(res.getJoinedTownAt(), Translation.getLocale(player))).component(locale))
+                    .lore(of("town-menu-overview-joined-town").append(Time.registeredOrAgo(res.getJoinedTownAt(), Translation.getLocale(player))).component(locale))
                     .lore(Component.space())
                     .lore(of("msg-right-click-additional-options").component(locale))
                     .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, town, resident))))
@@ -255,22 +256,24 @@ public class TownMenu {
     }
 
     public static MenuInventory createResidentManagementScreen(Player player, Town town, Resident resident) {
+        final Locale locale = Localization.localeOrDefault(player);
+
         return MenuInventory.builder()
                 .rows(5)
-                .title(Component.text("Resident Management"))
+                .title(of("town-menu-management-resident-title").component(locale))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.WOODEN_AXE)
-                        .name(Component.text("Kick Resident", NamedTextColor.GREEN))
+                        .name(of("town-menu-management-resident-kick-title").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()))
-                                return Component.text("You do not have permission to kick this resident.", NamedTextColor.GRAY);
+                                return of("msg-no-permission-to" + "town-menu-management-resident-kick").component(locale);
                             else if (player.getUniqueId().equals(resident.getUUID()))
-                                return Component.text("You cannot kick yourself!", NamedTextColor.GRAY);
+                                return of("town-menu-management-resident-cannot-kick-self").component(locale);
                             else
-                                return Component.text("Click to kick this player from the town.", NamedTextColor.GRAY);
+                                return of("msg-click-to").append(of("town-menu-management-resident-kick-subtitle")).component(locale);
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()) || player.getUniqueId().equals(resident.getUUID()) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to kick " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()) || player.getUniqueId().equals(resident.getUUID()) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to kick " + resident.getName() + "?", GRAY), ClickAction.run(() -> {
                             if (town == null || !TownyUniverse.getInstance().hasTown(town.getUUID()) || !town.hasResident(resident))
                                 return;
 
@@ -281,22 +284,22 @@ public class TownMenu {
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
-                        .name(Component.text("Manage Ranks", NamedTextColor.GREEN))
+                        .name(of("town-menu-management-resident-ranks").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
-                        .lore(Component.text("Click to manage ranks for this player.", NamedTextColor.GRAY))
+                        .lore(of("msg-click-to").append(of("town-menu-management-resident-ranks-subtitle")).component(locale))
                         .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, town, resident)))
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(Component.text("Town Title", NamedTextColor.GREEN))
+                        .name(of("town-menu-management-resident-title-title").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()))
-                                return Component.text("You do not have permission to change this resident's title.", NamedTextColor.GRAY);
+                                return of("msg-no-permission-to").append(of("town-menu-management-resident-title-title-subtitle")).component(locale).color(GRAY);
                             else
-                                return Arrays.asList(Component.text("Click to change this resident's title.", NamedTextColor.GRAY),
-                                        Component.text("Right click to clear this resident's title.", NamedTextColor.GRAY));
+                                return Arrays.asList(of("msg-click-to").append(of("town-menu-management-resident-title-title-subtitle")).component(locale),
+                                        of("msg-right-click-to").append(of("town-menu-management-resident-title-clear")).component(locale));
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new title", completion -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-management-resident-enter-new-title").toString(), completion -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
                                 TownCommand.townSetTitle(player, resident, completion.getText(), false);
@@ -318,16 +321,16 @@ public class TownMenu {
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(Component.text("Town Surname", NamedTextColor.GREEN))
+                        .name(of("town-menu-management-resident-surname").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(3), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()))
-                                return Component.text("You do not have permission to change this resident's surname.", NamedTextColor.GRAY);
+                                return of("msg-no-permission-to").append(of("town-menu-management-resident-surname-subtitle")).component(locale);
                             else
-                                return Arrays.asList(Component.text("Click to change this resident's surname.", NamedTextColor.GRAY),
-                                        Component.text("Right click to clear this resident's surname.", NamedTextColor.GRAY));
+                                return Arrays.asList(of("msg-click-to").append(of("town-menu-management-resident-surname-subtitle")).component(locale),
+                                        of("msg-right-click-to").append(of("town-menu-management-resident-surname-clear")).component(locale));
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter new surname", completion -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-management-resident-enter-new-surname").toString(), completion -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
                                 TownCommand.townSetSurname(player, resident, completion.getText(), false);
@@ -352,11 +355,13 @@ public class TownMenu {
     }
 
     public static MenuInventory formatRankManagementMenu(Player player, Town town, Resident resident) {
-        MenuInventory.PaginatorBuilder paginator = MenuInventory.paginator().title(Component.text("Rank Management"));
+        final Locale locale = Localization.localeOrDefault(player);
+
+        MenuInventory.PaginatorBuilder paginator = MenuInventory.paginator().title(of("town-menu-management-rank").component(locale));
 
         for (String townRank : TownyPerms.getTownRanks()) {
             MenuItem.Builder item = MenuItem.builder(Material.KNOWLEDGE_BOOK)
-                    .name(Component.text(townRank.substring(0, 1).toUpperCase(Locale.ROOT) + townRank.substring(1), NamedTextColor.GREEN));
+                    .name(Component.text(townRank.substring(0, 1).toUpperCase(Locale.ROOT) + townRank.substring(1), GREEN));
 
             final boolean hasPermission = player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_RANK.getNode(townRank.toLowerCase(Locale.ROOT)));
 
@@ -364,8 +369,8 @@ public class TownMenu {
                 item.withGlint();
 
                 if (hasPermission) {
-                    item.lore(Component.text("Click to remove the " + townRank + " rank from " + resident.getName() + ".", NamedTextColor.GRAY));
-                    item.action(ClickAction.confirmation(Component.text("Are you sure you want to remove the rank of " + townRank + " from " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                    item.lore(of("msg-click-to").append(of("rank-remove")).append(townRank).append(of("rank-from")).append(resident.getName()).append(text(".")).component(locale).color(GRAY));
+                    item.action(ClickAction.confirmation(of("rank-remove-confirmation").append(townRank).append(of("from").append(resident.getName()).append("?")).component(locale).color(GRAY), ClickAction.run(() -> {
                         if (!resident.hasTownRank(townRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_RANK.getNode(townRank.toLowerCase(Locale.ROOT)))) {
                             MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
                             return;
@@ -396,8 +401,8 @@ public class TownMenu {
                     })));
                 }
             } else if (hasPermission) {
-                item.lore(Component.text("Click to grant the " + townRank + " rank to " + resident.getName() + ".", NamedTextColor.GRAY));
-                item.action(ClickAction.confirmation(Component.text("Are you sure you want to give the rank of " + townRank + " to " + resident.getName() + "?", NamedTextColor.GRAY), ClickAction.run(() -> {
+                item.lore(of("msg-click-to-grant-the").append(townRank).append(of("rank-to")).append(resident.getName()).append(".").component(locale).color(GRAY));
+                item.action(ClickAction.confirmation(of("rank-give-confirmation").append(townRank).append(of("to").append(resident.getName()).append("?")).component(locale).color(GRAY), ClickAction.run(() -> {
                     if (resident.hasTownRank(townRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_RANK.getNode(townRank.toLowerCase(Locale.ROOT)))) {
                         MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, town, resident));
                         return;
@@ -434,20 +439,22 @@ public class TownMenu {
     }
 
     public static MenuInventory formatTownManagementMenu(Player player) {
+        final Locale locale = Localization.localeOrDefault(player);
+
         return MenuInventory.builder()
                 .rows(3)
-                .title(Component.text("Town Management"))
+                .title(of("town-menu-management-town-title").component(locale))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
-                        .name(Component.text("Open town set menu", NamedTextColor.GREEN))
-                        .lore(Component.text("Click to open the town set menu.", NamedTextColor.GRAY))
+                        .name(of("town-menu-management-town-menu-title").component(locale))
+                        .lore(of("msg-click-to").append(of("town-menu-management-town-menu-subtitle")).component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .action(ClickAction.openInventory(() -> formatTownSetMenu(player)))
                         .build())
                 // TODO: Manage town permissions and trusted players
                 .addItem(MenuItem.builder(Material.LEVER)
-                        .name(Component.text("Open town toggle menu", NamedTextColor.GREEN))
-                        .lore(Component.text("Click to open the town toggle menu.", NamedTextColor.GRAY))
+                        .name(of("town-menu-management-town-toggle-title").component(locale))
+                        .lore(of("msg-click-to").append(of("town-menu-management-town-toggle-subtitle")).component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .action(ClickAction.openInventory(() -> formatTownToggleMenu(player)))
                         .build())
@@ -455,6 +462,7 @@ public class TownMenu {
     }
 
     public static MenuInventory formatTownToggleMenu(Player player) {
+        final Locale locale = Localization.localeOrDefault(player);
         Town town = TownyAPI.getInstance().getTown(player);
 
         final boolean fireEnabled = town != null && town.isFire();
@@ -466,7 +474,7 @@ public class TownMenu {
         final boolean isPublic = town != null && town.isPublic();
 
         return MenuInventory.builder()
-                .title(Component.text("Town Toggle"))
+                .title(of("town-menu-management").component(locale))
                 .rows(4)
                 .addItem(MenuHelper.backButton().build())
                 // Explosion
@@ -525,21 +533,21 @@ public class TownMenu {
         final Town town = TownyAPI.getInstance().getTown(player);
 
         return MenuInventory.builder()
-                .title(Component.text("Town Set Menu"))
+                .title(of("town-menu-town-set-title").component(locale))
                 .rows(3)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(Component.text("Change town name", NamedTextColor.GREEN))
+                        .name(of("town-menu-town-set-change-name").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (town == null)
                                 return of("msg-err-not-part-of-town").component(locale);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
-                                return Component.text("You do not have permission to change the town's name.", NamedTextColor.GRAY);
+                                return of("msg-no-permission-to").append(of("town-menu-town-set-change-name-subtitle")).component(locale);
                             else
-                                return Component.text("Click to change the town's name.", NamedTextColor.GRAY);
+                                return of("msg-click-to").append(of("town-menu-town-set-change-name-subtitle")).component(locale);
                         })
-                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter town name", completion -> {
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput(of("town-menu-town-set-enter-town-name").toString(), completion -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
                                 return AnvilResponse.close();
@@ -558,18 +566,18 @@ public class TownMenu {
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
-                        .name(Component.text("Change town board", NamedTextColor.GREEN))
+                        .name(of("town-menu-town-set-change-board").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .lore(() -> {
                             if (town == null)
                                 return of("msg-err-not-part-of-town").component(locale);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
-                                return Component.text("You do not have permission to change the town's board.", NamedTextColor.GRAY);
+                                return of("msg-no-permission-to").append(of("town-menu-town-set-change-board-subtitle")).component(locale).color(GRAY);
                             else
-                                return Arrays.asList(Component.text("Click to change the town's board.", NamedTextColor.GRAY),
-                                        Component.text("Right click to clear the town's board.", NamedTextColor.GRAY));
+                                return Arrays.asList(of("msg-click-to").append(of("town-menu-town-set-change-board-subtitle")).component(locale).color(GRAY),
+                                        of("msg-right-click-to").append(of("town-menu-town-set-change-board-subtitle")).component(locale).color(GRAY));
                         })
-                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput("Enter town board", completion -> {
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-town-set-enter-town-board").toString(), completion -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
                                 return AnvilResponse.close();
@@ -597,15 +605,15 @@ public class TownMenu {
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
-                        .name(Component.text("Change town spawn", NamedTextColor.GREEN))
+                        .name(of("town-menu-town-set-change-spawn").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (town == null)
                                 return of("msg-err-not-part-of-town").component(locale);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SPAWN.getNode()))
-                                return Component.text("You do not have permission to change the town's spawn.", NamedTextColor.GRAY);
+                                return of("msg-no-permission-to").append(of("town-menu-town-set-change-spawn-subtitle")).component(locale).color(GRAY);
                             else
-                                return Component.text("Click to change the town's spawn.", NamedTextColor.GRAY);
+                                return of("msg-click-to").append(of("town-menu-town-set-change-spawn-subtitle")).component(locale).color(GRAY);
                         })
                         .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SPAWN.getNode()) ? ClickAction.NONE : ClickAction.run(() -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
@@ -631,20 +639,20 @@ public class TownMenu {
                 .rows(3)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
-                        .name(Component.text("Deposit or Withdraw", NamedTextColor.GREEN))
+                        .name(of("town-menu-bank-deposit-or-withdraw").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (town == null)
                                 return of("msg-err-not-part-of-town").component(locale);
                             else if (!TownyEconomyHandler.isActive())
-                                return of("msg_err_no_economy").component(locale).color(NamedTextColor.GRAY);
+                                return of("msg_err_no_economy").component(locale).color(GRAY);
                             else
                                 return of("msg-click-to").append(of("town-menu-bank-deposit-or-withdraw-subtitle")).component(locale);
                         })
                         .action(town == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, town)))
                         .build())
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                        .name(Component.text("Transaction History", NamedTextColor.GREEN))
+                        .name(of("town-menu-bank-transaction-history").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (town == null)
@@ -668,9 +676,11 @@ public class TownMenu {
     }
 
     public static MenuItem.Builder formatBankStatus(final Player player, final Account account, final boolean town) {
+        final Locale locale = Localization.localeOrDefault(player);
+
         return MenuItem.builder(Material.OAK_SIGN)
-                .name(Component.text("Bank Status", NamedTextColor.GREEN))
-                .lore(Component.text("Balance: ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(account.getCachedBalance()), NamedTextColor.GREEN)))
+                .name(of("town-menu-bank-status").component(locale))
+                .lore(of("town-menu-bank-balance").component(locale).append(text(TownyEconomyHandler.getFormattedBalance(account.getCachedBalance()), GREEN)))
                 .lore(() -> {
                     if (!player.hasPermission((town ? PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY : PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY).getNode()))
                         return Component.empty();
@@ -678,34 +688,37 @@ public class TownMenu {
                     final List<BankTransaction> transactions = account.getAuditor().getTransactions();
 
                     if (transactions.isEmpty())
-                        return Component.text("Last transaction: ", NamedTextColor.DARK_GREEN).append(Component.text("no recent transactions", NamedTextColor.GREEN));
+                        return of("town-menu-bank-last-transaction").append(of("town-menu-bank-no-transaction")).component(locale);
                     else
                         // TODO: format as time ago when raw time is exposed in BankTransaction
-                        return Component.text("Last transaction: ", NamedTextColor.DARK_GREEN).append(Component.text(transactions.get(transactions.size() - 1).getTime(), NamedTextColor.GREEN));
+                        return of("town-menu-bank-last-transaction").component(locale).append(text(transactions.get(transactions.size() - 1).getTime(), GREEN));
                 });
     }
 
-    public static MenuItem.Builder formatTownInfo(Town town) {
+    public static MenuItem.Builder formatTownInfo(Player player,Town town) {
+        final Locale locale = Localization.localeOrDefault(player);
+
         if (town == null)
             return MenuItem.builder(Material.GRASS_BLOCK)
-                    .name(Component.text("No Town", NamedTextColor.GREEN));
+                    .name(of("town-menu-no-town").component(locale).color(GREEN));
 
         List<Component> lore = new ArrayList<>();
 
-        lore.add(Component.text("Founded ", NamedTextColor.DARK_GREEN).append(Component.text(Time.ago(town.getRegistered()).translate(), NamedTextColor.GREEN)));
-        lore.add(Component.text(town.getNumResidents(), NamedTextColor.DARK_GREEN).append(Component.text(" Resident" + (town.getNumResidents() == 1 ? "" : "s"), NamedTextColor.GREEN)));
+        lore.add(of("town-menu-town-info-founded").append(Time.ago(town.getRegistered()).translate()).component(locale).color(GREEN));
+        lore.add(text(town.getNumResidents(), DARK_GREEN).append(of("town-menu-town-info-resident").append(town.getNumResidents() == 1 ? "" : "s").component(locale).color(GREEN)));
 
         if (TownySettings.isEconomyAsync() && TownyEconomyHandler.isActive())
-            lore.add(Component.text("Balance ", NamedTextColor.DARK_GREEN).append(Component.text(TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance()), NamedTextColor.GREEN)));
+            lore.add(of("town-menu-town-info-balance").component(locale).append(text(TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance()), GREEN)));
 
         if (town.getMayor() != null)
-            lore.add(Component.text("Owned by ", NamedTextColor.DARK_GREEN).append(Component.text(town.getMayor().getName(), NamedTextColor.GREEN)));
+            lore.add(of("town-menu-town-info-owned-by").component(locale).append(text(town.getMayor().getName(), GREEN)));
 
         if (town.getNationOrNull() != null)
-            lore.add(Component.text("Member of ", NamedTextColor.DARK_GREEN).append(Component.text(town.getNationOrNull().getName(), NamedTextColor.GREEN)));
+            lore.add(of("town-menu-town-info-member-of").component(locale).append(text(town.getNationOrNull().getName(), GREEN)));
 
         return MenuItem.builder(Material.GRASS_BLOCK)
-                .name(Component.text(town.getFormattedName(), NamedTextColor.GREEN))
+                .name(text(town.getFormattedName(), GREEN))
                 .lore(lore);
     }
 }
+
