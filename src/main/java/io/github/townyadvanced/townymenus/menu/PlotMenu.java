@@ -161,7 +161,7 @@ public class PlotMenu {
 
         return MenuInventory.builder()
                 .rows(4)
-                .title(text("plot-menu-plot-set-title"))
+                .title(of("plot-menu-plot-set-title").component(locale))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
@@ -169,7 +169,7 @@ public class PlotMenu {
                         .lore(of("plot-menu-plot-set-name-subtitle").component(locale))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
-                                return of("msg-no-permission-to").append(of("plot-menu-plot-set-name").component(locale).color(GRAY));
+                                return of("msg-no-permission-to").append(of("plot-menu-plot-set-name")).component(locale).color(GRAY);
                             else if (!isOwner)
                                 return of("plot-menu-only-owner-can-set-name").component(locale);
                             else return Component.empty();
@@ -199,7 +199,7 @@ public class PlotMenu {
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
-                        .name(of("plot-menu-clear-plot-name").component(locale))
+                        .name(of("plot-menu-clear-plot-name-title").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .lore(of("plot-menu-clear-plot-name-subtitle").component(locale))
                         .lore(() -> {
@@ -225,8 +225,8 @@ public class PlotMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
-                        .name(text("plot-menu-set-plot-type-title"))
-                        .lore(text("plot-menu-set-plot-type-subtitle"))
+                        .name(of("plot-menu-set-plot-type-title").component(locale))
+                        .lore(of("plot-menu-set-plot-type-subtitle").component(locale))
                         .lore(!isOwner ? text("plot-menu-only-owner-can-set-plot-type") : Component.empty())
                         .action(!isOwner ? ClickAction.NONE : ClickAction.openInventory(() -> formatPlotSetType(player, worldCoord)))
                         .build())
@@ -802,7 +802,7 @@ public class PlotMenu {
         final boolean pvpEnabled = townBlock != null && townBlock.getPermissions().pvp;
 
         return MenuInventory.builder()
-                .title(text("plot-menu-plot-toggle-title"))
+                .title(of("plot-menu-plot-toggle-title").component(Localization.localeOrDefault(player)))
                 .rows(4)
                 .addItem(MenuHelper.backButton().build())
                 // Explosion
@@ -844,12 +844,12 @@ public class PlotMenu {
         final Locale locale = Localization.localeOrDefault(player);
 
         return MenuItem.builder(material)
-                .name(of("Toggle ").component(locale).append(text(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1), propertyEnabled ? GREEN : RED)))
+                .name(of("plot-menu-toggle-title").append(text(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1))).component(locale).color(propertyEnabled ? GREEN : RED))
                 .lore(() -> {
                     if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) || !testPlotOwner(player, worldCoord))
                         return of("msg-no-permission-to").append(of("plot-menu-toggle")).append(property + ".").component(locale).color(GRAY);
                     else
-                        return text(String.format(of("msg-click-to").translate(locale) + "%s %s.", propertyEnabled ? of("plot-menu-toggle-disable").translate(locale) : of("plot-menu-toggle-enable").translate(locale), property), GRAY);
+                        return of("msg-click-to").append(propertyEnabled ? of("plot-menu-toggle-disable") : of("plot-menu-toggle-enable")).append(" " + property + ".").component(locale);
                 })
                 .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in this plot?", GRAY), ClickAction.run(() -> {
                     TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
