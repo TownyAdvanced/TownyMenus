@@ -56,7 +56,7 @@ public class NationMenu {
                             if (nation == null)
                                 return of("msg-err-not-part-of-nation").component(locale);
                             else
-                                return of("msg-click-to").append(of("nation-menu-view-bank").component(locale).color(GRAY));
+                                return of("msg-click-to").append(of("nation-menu-view-bank")).component(locale).color(GRAY);
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatNationBankMenu(player)))
                         .build())
@@ -135,7 +135,7 @@ public class NationMenu {
                             if (nation == null)
                                 return of("msg-err-not-part-of-nation").component(locale);
                             else
-                                return of("msg-click-to").append(of("nation-menu-view-manage-resident")).component(locale).color(GRAY);
+                                return of("msg-click-to").append(of("nation-menu-view-manage-resident")).component(locale);
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
                         .build())
@@ -182,7 +182,7 @@ public class NationMenu {
                 .rows(3)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(of("nation-menu-set-change-name").component(locale))
+                        .name(of("nation-menu-set-change-name-title").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (nation == null)
@@ -472,7 +472,7 @@ public class NationMenu {
                             if (nation == null)
                                 return of("msg-err-not-part-of-nation").component(locale);
                             else if (!TownyEconomyHandler.isActive())
-                                return of("msg-err-no-economy").component(locale).color(GRAY);
+                                return of("msg_err_no_economy").component(locale).color(GRAY);
                             else
                                 return of("msg-click-to").append(of("nation-menu-bank-deposit-or-withdraw")).component(locale).color(GRAY);
                         })
@@ -485,9 +485,9 @@ public class NationMenu {
                             if (nation == null)
                                 return of("msg-err-not-part-of-nation").component(locale);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-bank-transaction-history")).component(locale).color(GRAY);
+                                return of("msg-no-permission-to").append(of("nation-menu-bank-transaction-history")).component(locale);
                             else
-                                return of("msg-click-to").append("nation-menu-bank-transaction-history").component(locale).color(GRAY);
+                                return of("msg-click-to").append(of("nation-menu-bank-transaction-history")).component(locale);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()) ? ClickAction.NONE :
                                 ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(player, nation)))

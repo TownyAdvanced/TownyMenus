@@ -95,15 +95,15 @@ public class PlotMenu {
                                 : ClickAction.NONE)
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
-                        .name(text("plot-menu-sell-plot"))
+                        .name(of("plot-menu-sell-plot").component(locale))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
-                                return text("plot-menu-cannot-sell-wild-plot");
+                                return of("plot-menu-cannot-sell-wild-plot").component(locale);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()))
                                 return of("msg-no-permission-to").append(of("plot-menu-put-for-sale")).component(locale).color(GRAY);
                             else if (!isOwner)
-                                return of("plot-menu-sell-not-owner");
+                                return of("plot-menu-sell-not-owner").component(locale);
                             else return Component.empty();
                         })
                         .action(isOwner && player.hasPermission(townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_NOTFORSALE.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_NOTFORSALE.getNode())

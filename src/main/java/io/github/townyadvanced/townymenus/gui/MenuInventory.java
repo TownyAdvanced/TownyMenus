@@ -5,7 +5,6 @@ import com.palmergames.adventure.sound.Sound;
 import com.palmergames.adventure.text.Component;
 import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.adventure.text.format.TextDecoration;
-import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.palmergames.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import io.github.townyadvanced.townymenus.TownyMenus;
@@ -37,7 +36,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     private final Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
 
     public MenuInventory(@NotNull Inventory inventory, @NotNull Component title) {
-        this.inventory = Bukkit.createInventory(this, inventory.getSize(), LegacyComponentSerializer.legacyAmpersand().serialize(title));
+        this.inventory = Bukkit.createInventory(this, inventory.getSize(), PlainTextComponentSerializer.plainText().serialize(title));
         this.inventory.setContents(inventory.getContents());
         this.size = this.inventory.getSize();
     }

@@ -99,11 +99,11 @@ public class TownMenu {
                                 int residentOwned = cache.getNumTownBlocks(type, CacheType.RESIDENTOWNED);
 
                                 plotItems.add(MenuItem.builder(Material.GRASS_BLOCK)
-                                        .name(of(type.getFormattedName()).component(locale).color(GREEN))
-                                        .lore(() -> of("town-menu-plots-resident-owned").component(locale).append(Component.text(residentOwned)))
-                                        .lore(() -> of("town-menu-plots-for-sale").component(locale).append(Component.text(cache.getNumTownBlocks(type, CacheType.FORSALE))))
-                                        .lore(() -> of("town-menu-plots-total").component(locale).append(Component.text(cache.getNumTownBlocks(type, CacheType.ALL))))
-                                        .lore(!TownyEconomyHandler.isActive() ? Component.empty() : of("town-menu-plots:daily-revenue").component(locale).append(Component.text(cache.getNumTownBlocks(type, CacheType.ALL))))
+                                        .name(text(type.getFormattedName(), GREEN))
+                                        .lore(() -> of("town-menu-plots-resident-owned", residentOwned).component(locale))
+                                        .lore(() -> of("town-menu-plots-for-sale", cache.getNumTownBlocks(type, CacheType.FORSALE)).component(locale))
+                                        .lore(() -> of("town-menu-plots-total", cache.getNumTownBlocks(type, CacheType.ALL)).component(locale))
+                                        .lore(!TownyEconomyHandler.isActive() ? Component.empty() : of("town-menu-plots-daily-revenue", cache.getNumTownBlocks(type, CacheType.ALL)).component(locale))
                                         .build());
                             }
 
@@ -112,19 +112,19 @@ public class TownMenu {
                                     .addExtraItem(MenuItem.builder(Material.OAK_SIGN)
                                             .name(of("town-menu-plots").component(locale))
                                             .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                                            .lore(of("Town Size: ").component(locale).append(Component.text(town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString(), GREEN))
+                                            .lore(of("msg_town_plots_town_size", town.getTownBlocks().size(), town.getMaxTownBlocksAsAString()).component(locale)
                                                     .append(town.hasUnlimitedClaims()
                                                             ? Component.empty()
                                                             : TownySettings.isSellingBonusBlocks(town) ?
-                                                            of("town-menu-plots-bought").append(town.getPurchasedBlocks() + "/" + TownySettings.getMaxPurchasedBlocks(town) + "]").component(locale).color(AQUA) :
+                                                            of("msg_town_plots_town_bought", town.getPurchasedBlocks(), TownySettings.getMaxPurchasedBlocks(town)).component(locale) :
                                                             Component.empty()
                                                                     .append(town.getBonusBlocks() > 0 ?
-                                                                            of("town-menu-plots-bonus").append(town.getBonusBlocks() + "]").component(locale).color(AQUA) :
+                                                                            of("msg_town_plots_town_bonus", town.getBonusBlocks()).component(locale) :
                                                                             Component.empty())
                                                                     .append(TownySettings.getNationBonusBlocks(town) > 0 ?
-                                                                            of("town-menu-plots-nation-bonus").append(TownySettings.getNationBonusBlocks(town) + "]").component(locale).color(AQUA) :
+                                                                            of("msg_town_plots_town_nationbonus", TownySettings.getNationBonusBlocks(town)).component(locale) :
                                                                             Component.empty())))
-                                            .lore(of("town-menu-plots-town-owned").component(locale).append(Component.text(town.getTownBlocks().size() - cache.getNumberOfResidentOwnedTownBlocks(), GREEN)))
+                                            .lore(of("msg_town_plots_town_owned_land", town.getTownBlocks().size() - cache.getNumberOfResidentOwnedTownBlocks()).component(locale))
                                             .build())
                                     .title(of("town-menu-plots").component(locale))
                                     .build();
@@ -443,7 +443,7 @@ public class TownMenu {
 
         return MenuInventory.builder()
                 .rows(3)
-                .title(of("town-menu-management-town-title").component(locale))
+                .title(of("town-menu-management").component(locale))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .name(of("town-menu-management-town-menu-title").component(locale))

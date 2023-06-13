@@ -46,14 +46,14 @@ public class GovernmentMenus {
         final String permNode = String.format("towny.command.%s.toggle.%s", townOrNation, property);
 
         return MenuItem.builder(material)
-                .name(of("government-menus-toggle").append(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1)).component(locale).color(propertyEnabled ? GREEN : RED))
+                .name(of("government-menus-toggle").append(" ").append(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1)).component(locale).color(propertyEnabled ? GREEN : RED))
                 .lore(() -> {
                     if (getGovernment(player, isTown) == null)
                         return of("government-menus-not-in").append(townOrNation + ".").component(locale).color(GRAY);
                     else if (!player.hasPermission(permNode))
                         return of("government-menus-no-permission").append(property + ".").component(locale).color(GRAY);
                     else
-                        return of(String.format(of("msg-click-to").translate(locale) + "%s %s.", propertyEnabled ? of("government-menus-disable").translate(locale) : of("government-menus-enable").translate(locale), property)).component(locale).color(GRAY);
+                        return of("msg-click-to").append(propertyEnabled ? of("government-menus-disable") : of("government-menus-enable")).append(" " + property + ".").component(locale).color(GRAY);
                 })
                 .action(!player.hasPermission(permNode) ? ClickAction.NONE : ClickAction.confirmation(of("government-menus-toggle-confirm" + property + "government-menus-in-your" + townOrNation + "?").component(locale), ClickAction.run(() -> {
                     Government playerGovernment = getGovernment(player, isTown);
