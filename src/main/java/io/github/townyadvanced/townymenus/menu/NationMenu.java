@@ -192,7 +192,7 @@ public class NationMenu {
                             else
                                 return of("msg-click-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
                         })
-                        .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter new nation name", name -> {
+                        .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter new nation name", snapshot -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()))
                                 return AnvilResponse.close();
@@ -200,7 +200,7 @@ public class NationMenu {
                             // Await confirmation events for this player
                             AwaitingConfirmation.await(player);
                             try {
-                                NationCommand.nationSet(player, ("name " + name).split(" "), false, playerNation);
+                                NationCommand.nationSet(player, ("name " + snapshot.getText()).split(" "), false, playerNation);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));

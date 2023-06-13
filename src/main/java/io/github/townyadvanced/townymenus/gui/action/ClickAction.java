@@ -3,14 +3,12 @@ package io.github.townyadvanced.townymenus.gui.action;
 import com.palmergames.adventure.sound.Sound;
 import com.palmergames.adventure.text.Component;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
-import io.github.townyadvanced.townymenus.utils.AnvilResponse;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -71,7 +69,7 @@ public interface ClickAction {
         return new ClickTypeAction(type, rightClickAction);
     }
 
-    static UserInputAction userInput(String title, Function<AnvilGUI.Completion, AnvilGUI.ResponseAction> inputFunction) {
+    static UserInputAction userInput(String title, Function<AnvilGUI.StateSnapshot, AnvilGUI.ResponseAction> inputFunction) {
         return new UserInputAction(title, completion -> Collections.singletonList(inputFunction.apply(completion)));
     }
 }
