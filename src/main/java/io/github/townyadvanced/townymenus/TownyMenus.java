@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.99.0.6");
+	private static final Version requiredTownyVersion = Version.fromString("0.99.0.8");
 	private static TownyMenus plugin;
 	private final Object scheduler;
 

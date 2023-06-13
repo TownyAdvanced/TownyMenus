@@ -116,7 +116,7 @@ public class GovernmentMenus {
     private static UserInputAction depositOrWithdraw(final Player player, final Government government, boolean withdraw) {
         final Locale locale = Localization.localeOrDefault(player);
 
-        return ClickAction.userInput(of("government-menus-input").translate(locale) + (withdraw ? of("government-menus-withdraw").translate(locale) : of("government-menus-deposit").translate(locale)) + of("government-menus-amount").translate(locale), completion -> {
+        return ClickAction.userInput(of("government-menus-input").append(withdraw ? of("government-menus-input-withdraw") : of("government-menus-input-deposit")).append(of("government-menus-input-amount")).stripColors(true).translate(locale), completion -> {
             try {
                 MathUtil.getIntOrThrow(completion.getText());
             } catch (TownyException e) {
@@ -132,7 +132,7 @@ public class GovernmentMenus {
             try {
                 Method method = clazz.getDeclaredMethod(town ? "townTransaction" : "nationTransaction", Player.class, String[].class, boolean.class);
                 method.setAccessible(true);
-                method.invoke(null, player, new String[]{"", completion.getText()}, withdraw);
+                method.invoke(null, player, new String[]{completion.getText()}, withdraw);
 
                 MenuHistory.last(player);
                 return AnvilResponse.nil();
