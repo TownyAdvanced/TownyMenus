@@ -134,7 +134,7 @@ public class PlotMenu {
                                 try {
                                     plotCommand.parsePlotCommand(player, new String[]{"claim"});
                                 } catch (Exception e) {
-                                    if (e.getCause() instanceof TownyException tex)
+                                    if (e instanceof TownyException tex)
                                         TownyMessaging.sendErrorMsg(player, tex.getMessage(player));
                                 }
                             });
