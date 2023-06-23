@@ -124,7 +124,7 @@ public class PlotMenu {
                             else if (!townBlock.isForSale())
                                 return of("plot-menu-only-claim-for-sale-plots").component(locale);
                             else
-                                return Arrays.asList(of("msg-click-to").append(of("plot-menu-claim-plot").component(locale)), !TownyEconomyHandler.isActive() ? Component.empty() :
+                                return Arrays.asList(of("msg-click-to").append(of("plot-menu-claim-plot")).component(locale), !TownyEconomyHandler.isActive() ? Component.empty() :
                                         of("plot-menu-claim-plot-will-cost").append(TownyEconomyHandler.getFormattedBalance(townBlock.getPlotPrice())).append(".").component(locale).color(GRAY));
                         })
                         .action(ClickAction.run(() -> {

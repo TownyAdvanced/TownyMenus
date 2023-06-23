@@ -55,7 +55,7 @@ public class GovernmentMenus {
                     else
                         return of("msg-click-to").append(propertyEnabled ? of("government-menus-disable") : of("government-menus-enable")).append(" " + property + ".").component(locale).color(GRAY);
                 })
-                .action(!player.hasPermission(permNode) ? ClickAction.NONE : ClickAction.confirmation(of("government-menus-toggle-confirm" + property + "government-menus-in-your" + townOrNation + "?").component(locale), ClickAction.run(() -> {
+                .action(!player.hasPermission(permNode) ? ClickAction.NONE : ClickAction.confirmation(of("government-menus-toggle-confirm").append(property).append(of("government-menus-in-your")).append(townOrNation + "?").component(locale), ClickAction.run(() -> {
                     Government playerGovernment = getGovernment(player, isTown);
                     if (playerGovernment == null)
                         return;
