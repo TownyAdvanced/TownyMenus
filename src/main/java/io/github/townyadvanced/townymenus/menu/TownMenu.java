@@ -179,7 +179,7 @@ public class TownMenu {
                                 online.add(ResidentMenu.formatResidentInfo(onlinePlayer.getUniqueId(), player).build());
                             }
 
-                            return MenuInventory.paginator().addItems(online).title(of("Online in Town").component(locale)).build();
+                            return MenuInventory.paginator().addItems(online).title(of("town-menu-online").component(locale)).build();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)

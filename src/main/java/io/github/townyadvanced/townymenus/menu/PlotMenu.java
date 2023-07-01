@@ -358,9 +358,9 @@ public class PlotMenu {
 
             plotTypeItems.add(MenuItem.builder(Material.GRASS_BLOCK)
                     .name(text(type.getFormattedName(), GREEN))
-                    .lore(alreadySelected ? of("plot-menu-plot-currently-selected").component(locale) : of("msg-clicl-to").append("plot-menu-change-plot-type-to").append(type.getFormattedName() + ".").component(locale).color(GRAY))
+                    .lore(alreadySelected ? of("plot-menu-plot-currently-selected").component(locale) : of("msg-click-to").append(of("plot-menu-change-plot-type-to")).append(type.getFormattedName() + ".").component(locale).color(GRAY))
                     .lore(!alreadySelected && changeCost > 0 && TownyEconomyHandler.isActive() ? of("plot-menu-setting-type-cost").append(TownyEconomyHandler.getFormattedBalance(changeCost) + ".").component(locale).color(GRAY) : Component.empty())
-                    .lore(!alreadySelected && TownyEconomyHandler.isActive() && townBlock.getTownOrNull() != null && type.getTax(townBlock.getTownOrNull()) > 0 ? text("Tax for this type is " + TownyEconomyHandler.getFormattedBalance(type.getTax(townBlock.getTownOrNull())) + ".", GRAY) : Component.empty())
+                    .lore(!alreadySelected && TownyEconomyHandler.isActive() && townBlock.getTownOrNull() != null && type.getTax(townBlock.getTownOrNull()) > 0 ? of("plot-menu-plot-type-tax", TownyEconomyHandler.getFormattedBalance(type.getTax(townBlock.getTownOrNull()))).component(locale) : Component.empty())
                     .withGlint(alreadySelected)
                     .action(alreadySelected ? ClickAction.NONE : changeCost > 0 && TownyEconomyHandler.isActive() // Add confirmation if cost > 0 and economy is active
                             ? ClickAction.confirmation(() -> of("plot-menu-change-type-cost").append(TownyEconomyHandler.getFormattedBalance(changeCost)).append("plot-menu-change-type-confirm").component(locale).color(RED), ClickAction.run(onClick))
@@ -741,7 +741,7 @@ public class PlotMenu {
 
     private static MenuInventory openPermissionOverrideEditor(final Player player, final WorldCoord worldCoord, final Resident resident, final PermissionData data) {
         final MenuInventory.Builder builder = MenuInventory.builder()
-                .title(of("plot-menu-permission-gui-header").locale(resident).component())
+                .title(of("permission_gui_header").locale(resident).component())
                 .rows(5)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)

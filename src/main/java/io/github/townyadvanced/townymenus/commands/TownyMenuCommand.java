@@ -1,10 +1,7 @@
 package io.github.townyadvanced.townymenus.commands;
 
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyMessaging;
-import com.palmergames.bukkit.towny.object.Translatable;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -28,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class TownyMenuCommand implements CommandExecutor, TabCompleter {
     private final TownyMenus plugin;
@@ -54,7 +53,7 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
         }
 
         if (!player.hasPermission("townymenus.command.townymenu")) {
-            TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_command_disable"));
+            TownyMessaging.sendErrorMsg(player, of("msg_err_command_disable"));
             return true;
         }
 
@@ -69,29 +68,29 @@ public class TownyMenuCommand implements CommandExecutor, TabCompleter {
 
         return MenuInventory.builder()
                 .rows(3)
-                .title(Translatable.of("main-menu-title").component(locale))
+                .title(of("main-menu-title").component(locale))
                 .addItem(MenuItem.builder(Material.EMERALD)
-                        .name(Translatable.of("main-menu-town").component(locale))
-                        .lore(Translatable.of("main-menu-town-subtitle").component(locale))
+                        .name(of("main-menu-town").component(locale))
+                        .lore(of("main-menu-town-subtitle").component(locale))
                         .slot(10)
                         .action(ClickAction.openInventory(() -> TownMenu.createTownMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.DIAMOND)
-                        .name(Component.text("Nation Settings", NamedTextColor.AQUA))
-                        .lore(Component.text("Click to view the nation menu!", NamedTextColor.GRAY))
+                        .name(of("main-menu-nation").component(locale))
+                        .lore(of("main-menu-nation-subtitle").component(locale))
                         .slot(12)
                         .action(ClickAction.openInventory(() -> NationMenu.createNationMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
-                        .name(Component.text("Plot Settings", NamedTextColor.DARK_GREEN))
-                        .lore(Component.text("Click to view the plot menu!", NamedTextColor.GRAY))
+                        .name(of("main-menu-plot").component(locale))
+                        .lore(of("main-menu-plot-subtitle").component(locale))
                         .slot(14)
                         .action(ClickAction.openInventory(() -> PlotMenu.createPlotMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
                         .skullOwner(player.getUniqueId())
-                        .name(Component.text("Resident Settings", NamedTextColor.YELLOW))
-                        .lore(Component.text("Click to view the resident menu!", NamedTextColor.GRAY))
+                        .name(of("main-menu-resident").component(locale))
+                        .lore(of("main-menu-resident-subtitle").component(locale))
                         .slot(16)
                         .action(ClickAction.openInventory(() -> ResidentMenu.createResidentMenu(player)))
                         .build())
