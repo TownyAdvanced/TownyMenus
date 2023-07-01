@@ -206,7 +206,7 @@ public class PlotMenu {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
                                 return of("msg-no-permission-to").append(of("plot-menu-clear-plot-name")).component(locale).color(GRAY);
                             else if (!isOwner)
-                                return of("plot-menu-only-owner-clear-plot-name");
+                                return of("plot-menu-only-owner-clear-plot-name").component(locale);
                             else return Component.empty();
                         })
                         .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.confirmation(() -> text("Click to confirm removing the plot's name.", GRAY), ClickAction.run(() -> {
