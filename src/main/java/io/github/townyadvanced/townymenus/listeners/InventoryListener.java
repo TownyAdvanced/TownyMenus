@@ -10,6 +10,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -60,5 +61,13 @@ public class InventoryListener implements Listener {
 
         if (meta != null && meta.getPersistentDataContainer().has(MenuItem.PDC_KEY, PersistentDataType.BYTE))
             event.getItemDrop().remove();
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    public void onInventoryDrag(final InventoryDragEvent event) {
+        if (!(PaperLib.getHolder(event.getInventory(), false).getHolder() instanceof MenuInventory menu))
+            return;
+
+        event.setCancelled(false);
     }
 }
