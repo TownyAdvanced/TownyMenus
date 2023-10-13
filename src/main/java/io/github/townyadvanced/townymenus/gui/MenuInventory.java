@@ -1,22 +1,24 @@
 package io.github.townyadvanced.townymenus.gui;
 
-import com.palmergames.adventure.key.Key;
-import com.palmergames.adventure.sound.Sound;
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
-import com.palmergames.adventure.text.format.TextDecoration;
-import com.palmergames.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,10 +35,10 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     private static final ItemStack backgroundGlass = MenuItem.builder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build().itemStack();
     private final Inventory inventory;
     private final int size;
-    private final Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
+    private final Map<Integer, Collection<ClickAction>> clickActions = new HashMap<>();
 
     public MenuInventory(@NotNull Inventory inventory, @NotNull Component title) {
-        this.inventory = Bukkit.createInventory(this, inventory.getSize(), PlainTextComponentSerializer.plainText().serialize(title));
+        this.inventory = Bukkit.createInventory(this, inventory.getSize(), title);
         this.inventory.setContents(inventory.getContents());
         this.size = this.inventory.getSize();
     }
@@ -51,7 +53,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
     }
 
     @Nullable
-    public List<ClickAction> actions(int slot) {
+    public Collection<ClickAction> actions(int slot) {
         return clickActions.get(slot);
     }
 
@@ -61,7 +63,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         clickActions.get(slot).add(action);
     }
 
-    public void addActions(Map<Integer, List<ClickAction>> actions) {
+    public void addActions(Map<Integer, Collection<ClickAction>> actions) {
         if (!actions.isEmpty())
             clickActions.putAll(actions);
     }
@@ -83,14 +85,38 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         MenuHistory.addHistory(player.getUniqueId(), this);
     }
 
-    public void openSilent(@NotNull HumanEntity player) {
-        TaskScheduler scheduler = TownyMenus.getPlugin().getScheduler();
-        if (!scheduler.isEntityThread(player)) {
-            scheduler.run(player, () -> openSilent(player));
+    public void openSilent(@NotNull HumanEntity entity) {
+        if (!(entity instanceof Player player))
+            return;
+
+        if (!Bukkit.getServer().isOwnedByCurrentRegion(player)) {
+            player.getScheduler().run(TownyMenus.getPlugin(), task -> openSilent(player), () -> {});
             return;
         }
 
-        player.openInventory(this.inventory);
+        for (final ItemStack item : this.inventory) {
+            item.editMeta(meta -> {
+                // Attempt to resolve any translatable components in the name/lore
+                if (meta.hasDisplayName())
+                    meta.displayName(GlobalTranslator.render(meta.displayName(), player.locale()));
+
+                if (meta.hasLore()) {
+                    final List<Component> newLore = new ArrayList<>();
+
+                    for (final Component line : meta.lore())
+                        newLore.add(GlobalTranslator.render(line, player.locale()).decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.FALSE));
+
+                    meta.lore(newLore);
+                }
+            });
+        }
+
+        final InventoryView view = player.openInventory(this.inventory);
+
+        final Component translated = GlobalTranslator.render(view.title(), player.locale());
+        // TODO: use component method once it's added
+        if (!view.title().equals(translated))
+            view.setTitle(PlainTextComponentSerializer.plainText().serialize(translated));
     }
 
     @NotNull
@@ -148,9 +174,9 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         }
 
         public MenuInventory build() {
-            Inventory inventory = Bukkit.createInventory(null, size, PlainTextComponentSerializer.plainText().serialize(title));
+            Inventory inventory = Bukkit.createInventory(null, size, this.title);
 
-            Map<Integer, List<ClickAction>> actions = new HashMap<>();
+            Map<Integer, Collection<ClickAction>> actions = new HashMap<>();
 
             for (MenuItem item : this.items) {
                 int slot = item.slot().resolve(this.size);
@@ -180,6 +206,8 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
         private final List<MenuItem> extraItems = new ArrayList<>(0);
         private Component title = Component.empty();
         private boolean showPageCount = true;
+
+        private PaginatorBuilder() {}
 
         public PaginatorBuilder addItem(MenuItem item) {
             this.items.add(item);

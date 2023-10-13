@@ -43,3 +43,6 @@
   - Prevented snapshotting of the clicked inventory holder, however useful that may be.
   - Updated AnvilGUI to version 1.9.0-SNAPSHOT for 1.20.2 support.
   - Fixed translations not being re-added when Towny reloads them.
+  - Dropped 1.16-1.19 support, plugin will now only support 1.20 and up.
+  - Added hex support for item names
+  - Removed spigot support

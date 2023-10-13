@@ -1,11 +1,11 @@
 package io.github.townyadvanced.townymenus.gui;
 
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.TextDecoration;
-import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.slot.Slot;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -18,14 +18,14 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class MenuItem {
-    public static final NamespacedKey PDC_KEY = Objects.requireNonNull(NamespacedKey.fromString("townymenus:menuitem")); // Hide the might be null message
+    public static final NamespacedKey PDC_KEY = Objects.requireNonNull(NamespacedKey.fromString("townymenus:menuitem"));
     private Slot slot;
     private final ItemStack itemStack;
     private final List<ClickAction> actions = new ArrayList<>(0);
@@ -53,7 +53,7 @@ public class MenuItem {
     }
 
     @NotNull
-    public List<ClickAction> actions() {
+    public Collection<ClickAction> actions() {
         return this.actions;
     }
 
@@ -61,7 +61,7 @@ public class MenuItem {
         this.actions.add(action);
     }
 
-    public void addActions(@NotNull List<ClickAction> actions) {
+    public void addActions(final @NotNull Collection<ClickAction> actions) {
         this.actions.addAll(actions);
     }
 
@@ -79,12 +79,12 @@ public class MenuItem {
             builder.withGlint(meta.hasEnchants());
 
             if (meta.hasDisplayName())
-                builder.name(LegacyComponentSerializer.legacySection().deserialize(meta.getDisplayName()));
+                builder.name(meta.displayName());
 
             if (meta.hasLore())
-                meta.getLore().forEach(lore -> builder.lore(LegacyComponentSerializer.legacySection().deserialize(lore)));
+                builder.lore(meta.lore());
 
-            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.hasOwner() && skullMeta.getOwnerProfile().isComplete())
+            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.hasOwner() && skullMeta.getPlayerProfile().isComplete())
                 builder.skullOwner(skullMeta.getOwnerProfile().getUniqueId());
         }
 
@@ -96,8 +96,8 @@ public class MenuItem {
 
     public static class Builder {
         private final Material type;
-        private Component name = Component.empty();
-        private final List<Component> lore = new ArrayList<>(0);
+        private ComponentLike name = Component.empty();
+        private final List<ComponentLike> lore = new ArrayList<>(0);
         private int size = 1;
         private Slot slot = SlotAnchor.ofSlot(0);
         private final List<ClickAction> actions = new ArrayList<>(0);
@@ -178,33 +178,24 @@ public class MenuItem {
         }
 
         public MenuItem build() {
-            ItemStack itemStack = new ItemStack(type, size);
+            final ItemStack itemStack = new ItemStack(type, size);
 
-            ItemMeta meta = itemStack.getItemMeta();
-            if (meta != null) {
+            itemStack.editMeta(meta -> {
                 meta.getPersistentDataContainer().set(PDC_KEY, PersistentDataType.BYTE, (byte) 1);
-                String displayName = LegacyComponentSerializer.legacySection().serialize(name);
 
-                // Set to string with just a legacy color if empty, since spigot just sets the display name to null if it's empty.
-                // Why not just a space? Because a space is wider for players who don't have advanced tooltips enabled...
-                if (displayName.isEmpty())
-                    displayName = "§0";
+                meta.displayName(this.name.asComponent());
 
-                meta.setDisplayName(displayName);
-
-                if (!lore.isEmpty())
-                    meta.setLore(lore.stream().map(component -> LegacyComponentSerializer.legacySection().serialize(component)).collect(Collectors.toList()));
+                if (!this.lore.isEmpty())
+                    meta.lore(this.lore.stream().map(ComponentLike::asComponent).toList());
 
                 if (meta instanceof SkullMeta skullMeta && this.ownerUUID != null)
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(this.ownerUUID));
 
-                if (glint) {
+                if (this.glint) {
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
                 }
-
-                itemStack.setItemMeta(meta);
-            }
+            });
 
             MenuItem item = new MenuItem(itemStack, slot);
             item.addActions(this.actions);

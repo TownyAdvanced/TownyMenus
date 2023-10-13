@@ -6,9 +6,6 @@ import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.event.TranslationLoadEvent;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
-import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
-import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
-import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
 import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.commands.MenuExtensionCommand;
@@ -16,11 +13,12 @@ import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.listeners.PlayerListener;
-import io.github.townyadvanced.townymenus.settings.MenuSettings;
 import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
+import io.github.townyadvanced.townymenus.utils.Localization;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,13 +27,11 @@ import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin implements Listener {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.99.0.8");
+	private static final Version requiredTownyVersion = Version.fromString("0.99.6.0");
 	private static TownyMenus plugin;
-	private final Object scheduler;
 
 	public TownyMenus() {
 		plugin = this;
-		this.scheduler = townyVersionCheck() ? isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this) : null;
 	}
 
 	@Override
@@ -70,6 +66,7 @@ public class TownyMenus extends JavaPlugin implements Listener {
 
 		logger().info("Loading translations...");
 		TownyAPI.getInstance().addTranslations(this, loadTranslations().getTranslations());
+		GlobalTranslator.translator().addSource(Localization.newTranslator());
 	}
 
 	@Override
@@ -99,19 +96,6 @@ public class TownyMenus extends JavaPlugin implements Listener {
 
 	private boolean townyVersionCheck() {
 		return Version.fromString(Towny.getPlugin().getVersion()).compareTo(requiredTownyVersion) >= 0;
-	}
-
-	public TaskScheduler getScheduler() {
-		return (TaskScheduler) this.scheduler;
-	}
-
-	private static boolean isFoliaClassPresent() {
-		try {
-			Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-			return true;
-		} catch (ClassNotFoundException e) {
-			return false;
-		}
 	}
 
 	private TranslationLoader loadTranslations() {

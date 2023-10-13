@@ -1,6 +1,7 @@
 package io.github.townyadvanced.townymenus.menu;
 
-import com.palmergames.adventure.text.Component;
+import com.palmergames.bukkit.towny.object.Translatable;
+import net.kyori.adventure.text.Component;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -36,9 +37,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static com.palmergames.bukkit.towny.object.Translatable.*;
-import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class NationMenu {
     public static MenuInventory createNationMenu(@NotNull Player player) {
@@ -46,32 +47,32 @@ public class NationMenu {
         Nation nation = TownyAPI.getInstance().getNation(player);
 
         return MenuInventory.builder()
-                .title(of("nation-menu-title").component(locale))
+                .title(translatable("nation-menu-title"))
                 .rows(6)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
-                        .name(of("nation-menu-bank-title").component(locale))
+                        .name(translatable("nation-menu-bank-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-err-not-part-of-nation").component(locale);
+                                return translatable("msg-err-not-part-of-nation");
                             else
-                                return of("msg-click-to").append(of("nation-menu-view-bank")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-view-bank"));
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatNationBankMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
-                        .name(of("nation-menu-nation-spawn").component(locale))
+                        .name(translatable("nation-menu-nation-spawn"))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-err-not-part-of-nation").component(locale);
+                                return translatable("msg-err-not-part-of-nation");
                             else if (!player.hasPermission("towny.nation.spawn.nation"))
-                                return of("msg-no-permission").component(locale);
+                                return translatable("msg-no-permission");
                             else
-                                return of("msg-click-to").append(of("nation-menu-teleport-to-spawn")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-teleport-to-spawn")).color(GRAY);
                         })
-                        .action(nation == null || !player.hasPermission("towny.nation.spawn.nation") ? ClickAction.NONE : ClickAction.confirmation(() -> of("nation-menu-teleport-confirm").component(locale), ClickAction.run(() -> {
+                        .action(nation == null || !player.hasPermission("towny.nation.spawn.nation") ? ClickAction.NONE : ClickAction.confirmation(() -> translatable("nation-menu-teleport-confirm"), ClickAction.run(() -> {
                             if (!player.hasPermission("towny.nation.spawn.nation"))
                                 return;
 
@@ -85,37 +86,37 @@ public class NationMenu {
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.LEVER)
-                        .name(of("nation-menu-toggle-title").component(locale))
+                        .name(translatable("nation-menu-toggle-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-must-be-in-nation-to").append(of("nation-menu-toggle-open")).component(locale).color(GRAY);
+                                return translatable("msg-must-be-in-nation-to").append(translatable("nation-menu-toggle-open")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("nation-menu-toggle-open")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-toggle-open")).color(GRAY);
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> formatNationToggleMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
-                        .name(of("nation-menu-set-title").component(locale))
+                        .name(translatable("nation-menu-set-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(1), HorizontalAnchor.fromRight(3)))
-                        .lore(of("msg-click-to").append(of("nation-menu-set-open")).component(locale).color(GRAY))
+                        .lore(translatable("msg-click-to").append(translatable("nation-menu-set-open")).color(GRAY))
                         .action(ClickAction.openInventory(() -> formatNationSetMenu(player)))
                         .build())
                 .addItem(MenuItem.builder(Material.ENDER_EYE)
-                        .name(of("nation-menu-online").component(locale))
+                        .name(translatable("nation-menu-online"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-err-not-part-of-nation").component(locale);
+                                return translatable("msg-err-not-part-of-nation");
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-view-online")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("nation-menu-view-online")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("nation-menu-view-online")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-view-online")).color(GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()) ? ClickAction.NONE : ClickAction.openInventory(() -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_ONLINE.getNode()))
-                                return MenuInventory.paginator().title(of("nation-menu-online").component(locale)).build();
+                                return MenuInventory.paginator().title(translatable("nation-menu-online")).build();
 
                             List<MenuItem> online = new ArrayList<>();
                             for (Player onlinePlayer : TownyAPI.getInstance().getOnlinePlayers(playerNation)) {
@@ -125,17 +126,17 @@ public class NationMenu {
                                 online.add(ResidentMenu.formatResidentInfo(onlinePlayer.getUniqueId(), player).build());
                             }
 
-                            return MenuInventory.paginator().title(of("nation-menu-online").component(locale)).addItems(online).build();
+                            return MenuInventory.paginator().title(translatable("nation-menu-online")).addItems(online).build();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
-                        .name(of("nation-menu-resident-overview-title").component(locale))
+                        .name(translatable("nation-menu-resident-overview-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromRight(1)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-err-not-part-of-nation").component(locale);
+                                return translatable("msg-err-not-part-of-nation");
                             else
-                                return of("msg-click-to").append(of("nation-menu-view-manage-resident")).component(locale);
+                                return translatable("msg-click-to").append(translatable("nation-menu-view-manage-resident"));
                         })
                         .action(nation == null ? ClickAction.NONE : ClickAction.openInventory(() -> createResidentOverview(player)))
                         .build())
@@ -151,7 +152,7 @@ public class NationMenu {
 
         return MenuInventory.builder()
                 .rows(4)
-                .title(of("nation-menu-toggle-title").component(locale))
+                .title(translatable("nation-menu-toggle-title"))
                 .addItem(MenuHelper.backButton().build())
                 // Open
                 .addItem(GovernmentMenus.createTogglePropertyItem(player, nation, Material.GRASS_BLOCK, isOpen, "open")
@@ -178,19 +179,19 @@ public class NationMenu {
         final Nation nation = TownyAPI.getInstance().getNation(player);
 
         return MenuInventory.builder()
-                .title(of("nation-menu-set-title").component(locale))
+                .title(translatable("nation-menu-set-title"))
                 .rows(3)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(of("nation-menu-set-change-name-title").component(locale))
+                        .name(translatable("nation-menu-set-change-name-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-must-be-in-nation-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
+                                return translatable("msg-must-be-in-nation-to").append(translatable("nation-menu-set-change-name")).color(GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()))
-                                return of("msg-bo-permission-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
+                                return translatable("msg-bo-permission-to").append(translatable("nation-menu-set-change-name")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-set-change-name")).color(GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter new nation name", snapshot -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
@@ -212,14 +213,14 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
-                        .name(of("nation-menu-set-change-board-title").component(locale))
+                        .name(translatable("nation-menu-set-change-board-title"))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-must-be-in-nation-to").append(of("nation-menu-set-change-board")).component(locale).color(GRAY);
+                                return translatable("msg-must-be-in-nation-to").append(translatable("nation-menu-set-change-board")).color(GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_BOARD.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-set-change-board")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("nation-menu-set-change-board")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("nation-menu-set-change-board")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-set-change-board")).color(GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.userInput("Enter nation board", board -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
@@ -239,14 +240,14 @@ public class NationMenu {
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
-                        .name(of("nation-menu-set-change-spawn-title").component(locale))
+                        .name(translatable("nation-menu-set-change-spawn-title"))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-must-be-in-nation-to").append(of("nation-menu-set-change-spawn")).component(locale).color(GRAY);
+                                return translatable("msg-must-be-in-nation-to").append(translatable("nation-menu-set-change-spawn")).color(GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SPAWN.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-set-change-spawn")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("nation-menu-set-change-spawn")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("nation-menu-set-change-spawn")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-set-change-spawn")).color(GRAY);
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SPAWN.getNode()) ? ClickAction.NONE : ClickAction.run(() -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
@@ -269,14 +270,14 @@ public class NationMenu {
         final Nation nation = TownyAPI.getInstance().getNation(player);
 
         if (nation == null)
-            return MenuInventory.paginator().title(of("nation-menu-resident-overview-title").component(locale)).build();
+            return MenuInventory.paginator().title(translatable("nation-menu-resident-overview-title")).build();
 
-        final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(of("nation-menu-resident-overview-title").append( " - " + nation.getName()).component(locale));
+        final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(translatable("nation-menu-resident-overview-title").append(text(" - " + nation.getName())));
 
         for (Resident resident : nation.getResidents()) {
             builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
                     .lore(text(" "))
-                    .lore(of("msg-right-click-to").append(of("nation-menu-view-resident-options")).component(locale).color(GRAY))
+                    .lore(translatable("msg-right-click-to").append(translatable("nation-menu-view-resident-options")).color(GRAY))
                     .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, nation, resident))))
                     .build());
         }
@@ -288,22 +289,22 @@ public class NationMenu {
         final Locale locale = Localization.localeOrDefault(player);
 
         return MenuInventory.builder()
-                .title(of("nation-menu-resident-management").component(locale))
+                .title(translatable("nation-menu-resident-management"))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(ResidentMenu.formatResidentInfo(resident, player)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(4)))
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(of("nation-menu-change-resident-title-title").component(locale).color(GRAY))
+                        .name(translatable("nation-menu-change-resident-title-title").color(GRAY))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-change-resident-title")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("nation-menu-change-resident-title")).color(GRAY);
                             else
-                                return Arrays.asList(of("msg-click-to").append(of("nation-menu-change-resident-title")).component(locale).color(GRAY),
-                                        of("msg-right-click-to").append(of("nation-menu-clear-resident-title")).component(locale).color(GRAY));
+                                return Arrays.asList(translatable("msg-click-to").append(translatable("nation-menu-change-resident-title")).color(GRAY),
+                                        translatable("msg-right-click-to").append(translatable("nation-menu-clear-resident-title")).color(GRAY));
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("nation-menu-enter-title").translate(locale), completion -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(Translatable.of("nation-menu-enter-title").translate(locale), completion -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || playerNation != resident.getNationOrNull())
                                 return AnvilResponse.close();
@@ -329,16 +330,16 @@ public class NationMenu {
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(of("nation-menu-change-resident-surname-title").component(locale))
+                        .name(translatable("nation-menu-change-resident-surname-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-change-resident-surname")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("nation-menu-change-resident-surname")).color(GRAY);
                             else
-                                return Arrays.asList(of("msg-click-to").append(of("nation-menu-change-resident-surname")).component(locale).color(GRAY),
-                                        of("msg-right-click-to").append(of("nation-menu-clear-resident-title")).component(locale).color(GRAY));
+                                return Arrays.asList(translatable("msg-click-to").append(translatable("nation-menu-change-resident-surname")).color(GRAY),
+                                        translatable("msg-right-click-to").append(translatable("nation-menu-clear-resident-title")).color(GRAY));
                         })
-                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("nation-menu-enter-surname").translate(locale), completion -> {
+                        .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(Translatable.of("nation-menu-enter-surname").translate(locale), completion -> {
                             final Nation playerNation = TownyAPI.getInstance().getNation(player);
                             if (playerNation == null || playerNation != resident.getNationOrNull())
                                 return AnvilResponse.close();
@@ -364,8 +365,8 @@ public class NationMenu {
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.KNOWLEDGE_BOOK)
-                        .name(of("nation-menu-manage-ranks-title").component(locale))
-                        .lore(of("msg-click-to").append(of("nation-menu-manage-ranks")).component(locale))
+                        .name(translatable("nation-menu-manage-ranks-title"))
+                        .lore(translatable("msg-click-to").append(translatable("nation-menu-manage-ranks")))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(2), HorizontalAnchor.fromLeft(4)))
                         .action(ClickAction.openInventory(() -> formatRankManagementMenu(player, nation, resident)))
                         .build())
@@ -376,7 +377,7 @@ public class NationMenu {
     public static MenuInventory formatRankManagementMenu(Player player, Nation nation, Resident resident) {
         final Locale locale = Localization.localeOrDefault(player);
 
-        MenuInventory.PaginatorBuilder paginator = MenuInventory.paginator().title(of("nation-menu-manage-ranks-title").component(locale));
+        MenuInventory.PaginatorBuilder paginator = MenuInventory.paginator().title(translatable("nation-menu-manage-ranks-title"));
 
         for (String nationRank : TownyPerms.getNationRanks()) {
             MenuItem.Builder item = MenuItem.builder(Material.KNOWLEDGE_BOOK)
@@ -388,8 +389,8 @@ public class NationMenu {
                 item.withGlint();
 
                 if (hasPermission) {
-                    item.lore(of("msg-click-to").append(of("rank-remove")).append(nationRank).append(of("rank-from")).append(resident.getName()).append(text(".")).component(locale).color(GRAY));
-                    item.action(ClickAction.confirmation(of("rank-remove-confirmation").append(nationRank).append(of("from").append(resident.getName()).append("?")).component(locale).color(GRAY), ClickAction.run(() -> {
+                    item.lore(translatable("msg-click-to").append(translatable("rank-remove")).append(text(nationRank)).append(translatable("rank-from")).append(text(resident.getName() + ".")).color(GRAY));
+                    item.action(ClickAction.confirmation(translatable("rank-remove-confirmation").append(text(nationRank)).append(translatable("from").append(text(resident.getName() + "?"))).color(GRAY), ClickAction.run(() -> {
                         if (!resident.hasNationRank(nationRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_RANK.getNode(nationRank.toLowerCase(Locale.ROOT)))) {
                             MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
                             return;
@@ -411,17 +412,17 @@ public class NationMenu {
                         resident.removeNationRank(nationRank);
 
                         if (resident.isOnline()) {
-                            TownyMessaging.sendMsg(resident, of("msg_you_have_had_rank_taken", of("nation_sing"), nationRank));
+                            TownyMessaging.sendMsg(resident, Translatable.of("msg_you_have_had_rank_taken", Translatable.of("nation_sing"), nationRank));
                             Towny.getPlugin().deleteCache(resident);
                         }
 
-                        TownyMessaging.sendMsg(player, of("msg_you_have_taken_rank_from", of("nation_sing"), nationRank, resident.getName()));
+                        TownyMessaging.sendMsg(player, Translatable.of("msg_you_have_taken_rank_from", Translatable.of("nation_sing"), nationRank, resident.getName()));
                         MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
                     })));
                 }
             } else if (hasPermission) {
-                item.lore(of("msg-click-to-grant-the").append(nationRank).append(of("rank-to")).append(resident.getName()).append(".").component(locale).color(GRAY));
-                item.action(ClickAction.confirmation(of("rank-give-confirmation").append(nationRank).append(of("to").append(resident.getName()).append("?")).component(locale).color(GRAY), ClickAction.run(() -> {
+                item.lore(translatable("msg-click-to-grant-the").append(text(nationRank)).append(translatable("rank-to")).append(text(resident.getName() + ".")).color(GRAY));
+                item.action(ClickAction.confirmation(translatable("rank-give-confirmation").append(text(nationRank)).append(translatable("to").append(text(resident.getName() + "?"))).color(GRAY), ClickAction.run(() -> {
                     if (resident.hasNationRank(nationRank) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_RANK.getNode(nationRank.toLowerCase(Locale.ROOT)))) {
                         MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
                         return;
@@ -442,11 +443,11 @@ public class NationMenu {
 
                     resident.addNationRank(nationRank);
                     if (resident.isOnline()) {
-                        TownyMessaging.sendMsg(resident, of("msg_you_have_been_given_rank", of("nation_sing"), nationRank));
+                        TownyMessaging.sendMsg(resident, Translatable.of("msg_you_have_been_given_rank", Translatable.of("nation_sing"), nationRank));
                         Towny.getPlugin().deleteCache(resident);
                     }
 
-                    TownyMessaging.sendMsg(player, of("msg_you_have_given_rank", of("nation_sing"), nationRank, resident.getName()));
+                    TownyMessaging.sendMsg(player, Translatable.of("msg_you_have_given_rank", Translatable.of("nation_sing"), nationRank, resident.getName()));
                     MenuHistory.reOpen(player, () -> formatRankManagementMenu(player, nation, resident));
                 })));
             }
@@ -462,32 +463,32 @@ public class NationMenu {
         final Locale locale = Localization.localeOrDefault(player);
 
         final MenuInventory.Builder builder = MenuInventory.builder()
-                .title(of("nation-menu-bank-title").component(locale))
+                .title(translatable("nation-menu-bank-title"))
                 .rows(3)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
-                        .name(of("nation-menu-bank-deposit-or-withdraw-title").component(locale))
+                        .name(translatable("nation-menu-bank-deposit-or-withdraw-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-err-not-part-of-nation").component(locale);
+                                return translatable("msg-err-not-part-of-nation");
                             else if (!TownyEconomyHandler.isActive())
-                                return of("msg_err_no_economy").component(locale).color(GRAY);
+                                return translatable("msg_err_no_economy").color(GRAY);
                             else
-                                return of("msg-click-to").append(of("nation-menu-bank-deposit-or-withdraw")).component(locale).color(GRAY);
+                                return translatable("msg-click-to").append(translatable("nation-menu-bank-deposit-or-withdraw")).color(GRAY);
                         })
                         .action(nation == null || !TownyEconomyHandler.isActive() ? ClickAction.NONE : ClickAction.openInventory(() -> GovernmentMenus.createDepositWithdrawMenu(player, nation)))
                         .build())
                 .addItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                        .name(of("nation-menu-bank-transaction-history-title").component(locale))
+                        .name(translatable("nation-menu-bank-transaction-history-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (nation == null)
-                                return of("msg-err-not-part-of-nation").component(locale);
+                                return translatable("msg-err-not-part-of-nation");
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()))
-                                return of("msg-no-permission-to").append(of("nation-menu-bank-transaction-history")).component(locale);
+                                return translatable("msg-no-permission-to").append(translatable("nation-menu-bank-transaction-history"));
                             else
-                                return of("msg-click-to").append(of("nation-menu-bank-transaction-history")).component(locale);
+                                return translatable("msg-click-to").append(translatable("nation-menu-bank-transaction-history"));
                         })
                         .action(nation == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode()) ? ClickAction.NONE :
                                 ClickAction.openInventory(() -> TownMenu.createBankHistoryMenu(player, nation)))

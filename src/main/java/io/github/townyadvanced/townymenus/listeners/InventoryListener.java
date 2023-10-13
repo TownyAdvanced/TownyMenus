@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.List;
+import java.util.Collection;
 
 public class InventoryListener implements Listener {
     private final TownyMenus plugin;
@@ -32,7 +32,7 @@ public class InventoryListener implements Listener {
 
         event.setCancelled(true);
 
-        List<ClickAction> actions = menu.actions(event.getSlot());
+        final Collection<ClickAction> actions = menu.actions(event.getSlot());
         if (actions != null)
             actions.forEach(action -> action.onClick(menu, event));
     }

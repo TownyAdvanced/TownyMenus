@@ -24,6 +24,9 @@ import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
 import io.github.townyadvanced.townymenus.utils.AnvilResponse;
 import io.github.townyadvanced.townymenus.utils.Localization;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -31,31 +34,34 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-import static com.palmergames.bukkit.towny.object.Translatable.*;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
+/**
+ * Shared code for towns and nations.
+ */
 public class GovernmentMenus {
     public static MenuItem.Builder createTogglePropertyItem(Player player, Government government, Material material, boolean propertyEnabled, String property) {
         final Locale locale = Localization.localeOrDefault(player);
 
         if (!governmentExists(government))
-            return MenuItem.builder(Material.BARRIER).name(of("government-menus-invalid").component(locale));
+            return MenuItem.builder(Material.BARRIER).name(Component.translatable("government-menus-invalid"));
 
         final boolean isTown = government instanceof Town;
         final String townOrNation = isTown ? "town" : "nation";
         final String permNode = String.format("towny.command.%s.toggle.%s", townOrNation, property);
 
         return MenuItem.builder(material)
-                .name(of("government-menus-toggle").append(" ").append(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1)).component(locale).color(propertyEnabled ? GREEN : RED))
+                .name(Component.translatable("government-menus-toggle").appendSpace().append(text(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1))).color(propertyEnabled ? GREEN : RED))
                 .lore(() -> {
                     if (getGovernment(player, isTown) == null)
-                        return of("government-menus-not-in").append(townOrNation + ".").component(locale).color(GRAY);
+                        return Component.translatable("government-menus-not-in").append(text(townOrNation + ".")).color(GRAY);
                     else if (!player.hasPermission(permNode))
-                        return of("government-menus-no-permission").append(property + ".").component(locale).color(GRAY);
+                        return Component.translatable("government-menus-no-permission").append(text(property + ".")).color(GRAY);
                     else
-                        return of("msg-click-to").append(propertyEnabled ? of("government-menus-disable") : of("government-menus-enable")).append(" " + property + ".").component(locale).color(GRAY);
+                        return Component.translatable("msg-click-to").append(propertyEnabled ? Component.translatable("government-menus-disable") : Component.translatable("government-menus-enable")).append(text(" " + property + ".")).color(GRAY);
                 })
-                .action(!player.hasPermission(permNode) ? ClickAction.NONE : ClickAction.confirmation(of("government-menus-toggle-confirm").append(property).append(of("government-menus-in-your")).append(townOrNation + "?").component(locale), ClickAction.run(() -> {
+                .action(!player.hasPermission(permNode) ? ClickAction.NONE : ClickAction.confirmation(Component.translatable("government-menus-toggle-confirm").append(text(property)).append(Component.translatable("government-menus-in-your")).append(text(townOrNation + "?")), ClickAction.run(() -> {
                     Government playerGovernment = getGovernment(player, isTown);
                     if (playerGovernment == null)
                         return;
@@ -77,36 +83,37 @@ public class GovernmentMenus {
         final Locale locale = Localization.localeOrDefault(player);
 
         if (!governmentExists(government))
-            return MenuInventory.builder().rows(1)
+            return MenuInventory.builder()
+                    .rows(1)
                     .addItem(MenuHelper.backButton().build())
-                    .addItem(MenuItem.builder(Material.BARRIER).name(of("government-menus-invalid").component(locale)).build())
+                    .addItem(MenuItem.builder(Material.BARRIER).name(Component.translatable("government-menus-invalid")).build())
                     .build();
 
         final PermissionNodes root = government instanceof Town ? PermissionNodes.TOWNY_COMMAND_TOWN : PermissionNodes.TOWNY_COMMAND_NATION;
 
         return MenuInventory.builder()
-                .title(of("government-menus-deposit-or-withdraw").component(locale))
+                .title(Component.translatable("government-menus-deposit-or-withdraw"))
                 .rows(3)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.EMERALD)
-                        .name(of("government-menus-deposit").component(locale))
+                        .name(Component.translatable("government-menus-deposit"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
                         .lore(() -> {
                             if (!player.hasPermission(root.getNode("deposit")))
-                                return of("msg-no-permission-to").append(of("government-menus-deposit-into-bank")).component(locale).color(GRAY);
+                                return Component.translatable("msg-no-permission-to").append(Component.translatable("government-menus-deposit-into-bank")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("government-menus-deposit-into-bank")).component(locale).color(GRAY);
+                                return Component.translatable("msg-click-to").append(Component.translatable("government-menus-deposit-into-bank")).color(GRAY);
                         })
                         .action(!player.hasPermission(root.getNode("deposit")) ? ClickAction.NONE : depositOrWithdraw(player, government, false))
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE)
-                        .name(of("government-menus-withdraw").component(locale))
+                        .name(Component.translatable("government-menus-withdraw"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
                         .lore(() -> {
                             if (!player.hasPermission(root.getNode("withdraw")))
-                                return of("msg-no-permission-to").append(of("government-menus-withdraw-from-bank")).component(locale).color(GRAY);
+                                return Component.translatable("msg-no-permission-to").append(Component.translatable("government-menus-withdraw-from-bank")).color(GRAY);
                             else
-                                return of("msg-click-to").append(of("government-menus-withdraw-from-bank")).component(locale).color(GRAY);
+                                return Component.translatable("msg-click-to").append(Component.translatable("government-menus-withdraw-from-bank")).color(GRAY);
                         })
                         .action(!player.hasPermission(root.getNode("withdraw")) ? ClickAction.NONE : depositOrWithdraw(player, government, true))
                         .build())
@@ -115,8 +122,10 @@ public class GovernmentMenus {
 
     private static UserInputAction depositOrWithdraw(final Player player, final Government government, boolean withdraw) {
         final Locale locale = Localization.localeOrDefault(player);
+        final String title = PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(
+                Component.translatable("government-menus-input").append(withdraw ? Component.translatable("government-menus-input-withdraw") : Component.translatable("government-menus-input-deposit")).append(Component.translatable("government-menus-input-amount")), locale));
 
-        return ClickAction.userInput(of("government-menus-input").append(withdraw ? of("government-menus-input-withdraw") : of("government-menus-input-deposit")).append(of("government-menus-input-amount")).stripColors(true).translate(locale), completion -> {
+        return ClickAction.userInput(title, completion -> {
             try {
                 MathUtil.getIntOrThrow(completion.getText());
             } catch (TownyException e) {

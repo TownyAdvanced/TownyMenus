@@ -1,6 +1,6 @@
 package io.github.townyadvanced.townymenus.gui.action;
 
-import com.palmergames.adventure.text.Component;
+import net.kyori.adventure.text.Component;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
@@ -27,7 +27,7 @@ public class UserInputAction implements ClickAction {
     public void onClick(MenuInventory inventory, InventoryClickEvent event) {
         new AnvilGUI.Builder()
                 .title(title)
-                .onClose(snapshot -> TownyMenus.getPlugin().getScheduler().run(snapshot.getPlayer(), () -> inventory.openSilent(snapshot.getPlayer()))) // Re-open previous inventory if closed
+                .onClose(snapshot -> inventory.openSilent(snapshot.getPlayer())) // Re-open previous inventory if closed
                 .onClick((slot, snapshot) -> {
                     if (slot != AnvilGUI.Slot.OUTPUT)
                         return Collections.emptyList();

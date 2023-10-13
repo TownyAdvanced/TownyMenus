@@ -1,8 +1,8 @@
 package io.github.townyadvanced.townymenus.menu;
 
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
-import com.palmergames.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -52,9 +52,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.palmergames.bukkit.towny.object.Translatable.*;
-import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class PlotMenu {
     public static MenuInventory createPlotMenu(@NotNull Player player) {
@@ -69,25 +69,25 @@ public class PlotMenu {
         boolean isWilderness = townBlock == null;
 
         return MenuInventory.builder()
-                .title(of("plot-menu-title").component(locale))
+                .title(translatable("plot-menu-title"))
                 .rows(4)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
-                        .name(of("plot-menu-plot-set").component(locale))
+                        .name(translatable("plot-menu-plot-set"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
-                        .lore(isWilderness ? of("plot-menu-cannot-open-in-wilderness").component(locale) : Component.empty())
+                        .lore(isWilderness ? translatable("plot-menu-cannot-open-in-wilderness") : Component.empty())
                         .action(isWilderness ? ClickAction.NONE : ClickAction.openInventory(() -> createPlotSetMenu(player, worldCoord, isOwner)))
                         .build())
                 .addItem(MenuItem.builder(Material.EMERALD_BLOCK)
-                        .name(of("plot-menu-sell-plot").component(locale))
+                        .name(translatable("plot-menu-sell-plot"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
-                                return of("plot-menu-cannot-sell-wild-plot").component(locale);
+                                return translatable("plot-menu-cannot-sell-wild-plot");
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()))
-                                return of("msg-no-permission-to").append(of("plot-menu-put-for-sale")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("plot-menu-put-for-sale")).color(GRAY);
                             else if (!isOwner)
-                                return of("plot-menu-sell-not-owner").component(locale);
+                                return translatable("plot-menu-sell-not-owner");
                             else return Component.empty();
                         })
                         .action(isOwner && player.hasPermission(townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_FORSALE.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode())
@@ -95,15 +95,15 @@ public class PlotMenu {
                                 : ClickAction.NONE)
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
-                        .name(of("plot-menu-sell-plot").component(locale))
+                        .name(translatable("plot-menu-sell-plot"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(3)))
                         .lore(() -> {
                             if (isWilderness)
-                                return of("plot-menu-cannot-sell-wild-plot").component(locale);
+                                return translatable("plot-menu-cannot-sell-wild-plot");
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()))
-                                return of("msg-no-permission-to").append(of("plot-menu-put-for-sale")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("plot-menu-put-for-sale")).color(GRAY);
                             else if (!isOwner)
-                                return of("plot-menu-sell-not-owner").component(locale);
+                                return translatable("plot-menu-sell-not-owner");
                             else return Component.empty();
                         })
                         .action(isOwner && player.hasPermission(townBlock != null && townBlock.hasPlotObjectGroup() ? PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_NOTFORSALE.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_NOTFORSALE.getNode())
@@ -111,21 +111,21 @@ public class PlotMenu {
                                 : ClickAction.NONE)
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
-                        .name(of("plot-menu-trusted-players").component(locale))
-                        .lore(of("msg-click-to").append(of("plot-menu-trusted-players-subtitle")).component(locale).color(GRAY))
+                        .name(translatable("plot-menu-trusted-players"))
+                        .lore(translatable("msg-click-to").append(translatable("plot-menu-trusted-players-subtitle")).color(GRAY))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
                         .action(ClickAction.openInventory(() -> formatPlotTrustMenu(player, worldCoord)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
-                        .name(of("plot-menu-claim-plot-title").component(locale))
+                        .name(translatable("plot-menu-claim-plot-title"))
                         .lore(() -> {
                             if (townBlock == null)
-                                return of("plot-menu-only-claim-town-plots").component(locale);
+                                return translatable("plot-menu-only-claim-town-plots");
                             else if (!townBlock.isForSale())
-                                return of("plot-menu-only-claim-for-sale-plots").component(locale);
+                                return translatable("plot-menu-only-claim-for-sale-plots");
                             else
-                                return Arrays.asList(of("msg-click-to").append(of("plot-menu-claim-plot")).component(locale), !TownyEconomyHandler.isActive() ? Component.empty() :
-                                        of("plot-menu-claim-plot-will-cost").append(TownyEconomyHandler.getFormattedBalance(townBlock.getPlotPrice())).append(".").component(locale).color(GRAY));
+                                return Arrays.asList(translatable("msg-click-to").append(translatable("plot-menu-claim-plot")), !TownyEconomyHandler.isActive() ? Component.empty() :
+                                        translatable("plot-menu-claim-plot-will-cost").append(text(TownyEconomyHandler.getFormattedBalance(townBlock.getPlotPrice()))).append(text(".")).color(GRAY));
                         })
                         .action(ClickAction.run(() -> {
                             plotCommand().ifPresent(plotCommand -> {
@@ -142,15 +142,15 @@ public class PlotMenu {
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(5)))
                         .build())
                 .addItem(MenuItem.builder(Material.LEVER)
-                        .name(of("plot-menu-plot-toggle-title").component(locale))
-                        .lore(of("msg-click-to").append(of("plot-menu-plot-toggle-subtitle")).component(locale).color(GRAY))
+                        .name(translatable("plot-menu-plot-toggle-title"))
+                        .lore(translatable("msg-click-to").append(translatable("plot-menu-plot-toggle-subtitle")).color(GRAY))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(5)))
                         .action(ClickAction.openInventory(() -> formatPlotToggle(player, worldCoord)))
                         .build())
                 .addItem(MenuItem.builder(Material.GRAY_WOOL)
-                        .name(of("plot-menu-plot-permission-overrides-title").component(locale))
+                        .name(translatable("plot-menu-plot-permission-overrides-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(1)))
-                        .lore(of("msg-click-to").append(of("plot-menu-plot-permission-overrides-subtitle")).component(locale).color(GRAY))
+                        .lore(translatable("msg-click-to").append(translatable("plot-menu-plot-permission-overrides-subtitle")).color(GRAY))
                         .action(ClickAction.openInventory(() -> formatPlotPermissionOverrideMenu(player, worldCoord)))
                         .build())
                 .build();
@@ -161,17 +161,17 @@ public class PlotMenu {
 
         return MenuInventory.builder()
                 .rows(4)
-                .title(of("plot-menu-plot-set-title").component(locale))
+                .title(translatable("plot-menu-plot-set-title"))
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.NAME_TAG)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
-                        .name(of("plot-menu-plot-set-name-title").component(locale))
-                        .lore(of("plot-menu-plot-set-name-subtitle").component(locale))
+                        .name(translatable("plot-menu-plot-set-name-title"))
+                        .lore(translatable("plot-menu-plot-set-name-subtitle"))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
-                                return of("msg-no-permission-to").append(of("plot-menu-plot-set-name")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("plot-menu-plot-set-name")).color(GRAY);
                             else if (!isOwner)
-                                return of("plot-menu-only-owner-can-set-name").component(locale);
+                                return translatable("plot-menu-only-owner-can-set-name");
                             else return Component.empty();
                         })
                         .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput("Input new plot name", completion -> {
@@ -185,7 +185,7 @@ public class PlotMenu {
                             String newName = completion.getText().replaceAll(" ", "_");
 
                             if (NameValidation.isBlacklistName(newName)) {
-                                TownyMessaging.sendErrorMsg(player, of("msg_invalid_name"));
+                                TownyMessaging.sendErrorMsg(player, Translatable.of("msg_invalid_name"));
                                 MenuHistory.last(player);
                                 return AnvilResponse.close();
                             }
@@ -193,20 +193,20 @@ public class PlotMenu {
                             townBlock.setName(newName);
                             townBlock.save();
 
-                            TownyMessaging.sendMsg(player, of("msg_plot_name_set_to", townBlock.getName()));
+                            TownyMessaging.sendMsg(player, Translatable.of("msg_plot_name_set_to", townBlock.getName()));
                             MenuHistory.last(player);
                             return AnvilResponse.close();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
-                        .name(of("plot-menu-clear-plot-name-title").component(locale))
+                        .name(translatable("plot-menu-clear-plot-name-title"))
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(3)))
-                        .lore(of("plot-menu-clear-plot-name-subtitle").component(locale))
+                        .lore(translatable("plot-menu-clear-plot-name-subtitle"))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()))
-                                return of("msg-no-permission-to").append(of("plot-menu-clear-plot-name")).component(locale).color(GRAY);
+                                return translatable("msg-no-permission-to").append(translatable("plot-menu-clear-plot-name")).color(GRAY);
                             else if (!isOwner)
-                                return of("plot-menu-only-owner-clear-plot-name").component(locale);
+                                return translatable("plot-menu-only-owner-clear-plot-name");
                             else return Component.empty();
                         })
                         .action(!isOwner || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.confirmation(() -> text("Click to confirm removing the plot's name.", GRAY), ClickAction.run(() -> {
@@ -219,14 +219,14 @@ public class PlotMenu {
 
                             townBlock.setName("");
                             townBlock.save();
-                            TownyMessaging.sendMsg(player, of("msg_plot_name_removed"));
+                            TownyMessaging.sendMsg(player, Translatable.of("msg_plot_name_removed"));
                             MenuHistory.reOpen(player, () -> createPlotSetMenu(player, worldCoord, true));
                         })))
                         .build())
                 .addItem(MenuItem.builder(Material.GRASS_BLOCK)
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(2), HorizontalAnchor.fromLeft(1)))
-                        .name(of("plot-menu-set-plot-type-title").component(locale))
-                        .lore(of("plot-menu-set-plot-type-subtitle").component(locale))
+                        .name(translatable("plot-menu-set-plot-type-title"))
+                        .lore(translatable("plot-menu-set-plot-type-subtitle"))
                         .lore(!isOwner ? text("plot-menu-only-owner-can-set-plot-type") : Component.empty())
                         .action(!isOwner ? ClickAction.NONE : ClickAction.openInventory(() -> formatPlotSetType(player, worldCoord)))
                         .build())
@@ -252,7 +252,7 @@ public class PlotMenu {
             Runnable onClick = () -> {
                 // Check if the player still has permissions to change the plot type.
                 if (!testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET.getNode(type.getName().toLowerCase(Locale.ROOT)))) {
-                    TownyMessaging.sendErrorMsg(player, of("msg-no-permission-to").append(of("plot-menu-change-plot-type")));
+                    TownyMessaging.sendErrorMsg(player, Translatable.of("msg-no-permission-to").append(Translatable.of("plot-menu-change-plot-type")));
                     MenuHistory.back(player);
                     return;
                 }
@@ -268,7 +268,7 @@ public class PlotMenu {
 
                 if (cost > 0 && TownyEconomyHandler.isActive()) {
                     if (!resident.getAccount().canPayFromHoldings(cost)) {
-                        TownyMessaging.sendErrorMsg(player, of("msg_err_cannot_afford_plot_set_type_cost", type.getFormattedName(), TownyEconomyHandler.getFormattedBalance(cost)));
+                        TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_cannot_afford_plot_set_type_cost", type.getFormattedName(), TownyEconomyHandler.getFormattedBalance(cost)));
                         MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                         return;
                     }
@@ -278,7 +278,7 @@ public class PlotMenu {
                     if (TownBlockType.ARENA.equals(type) && TownySettings.getOutsidersPreventPVPToggle()) {
                         for (Player target : Bukkit.getOnlinePlayers()) {
                             if (!townBlock1.getTownOrNull().hasResident(target) && !player.getName().equals(target.getName()) && worldCoord.equals(WorldCoord.parseWorldCoord(target))) {
-                                TownyMessaging.sendErrorMsg(player, of("msg_cant_toggle_pvp_outsider_in_plot"));
+                                TownyMessaging.sendErrorMsg(player, Translatable.of("msg_cant_toggle_pvp_outsider_in_plot"));
                                 MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                                 return;
                             }
@@ -306,7 +306,7 @@ public class PlotMenu {
                         if (TownBlockType.ARENA.equals(type) && TownySettings.getOutsidersPreventPVPToggle()) {
                             for (Player target : Bukkit.getOnlinePlayers()) {
                                 if (!townBlock1.getTownOrNull().hasResident(target) && !player.getName().equals(target.getName()) && groupBlock.getWorldCoord().equals(WorldCoord.parseWorldCoord(target))) {
-                                    TownyMessaging.sendErrorMsg(player, of("msg_cant_toggle_pvp_outsider_in_plot"));
+                                    TownyMessaging.sendErrorMsg(player, Translatable.of("msg_cant_toggle_pvp_outsider_in_plot"));
                                     MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
                                     return;
                                 }
@@ -348,27 +348,27 @@ public class PlotMenu {
                     // We've already checked whether the player can pay above, so this should never fail.
                     // If we withdrew at the top of the method we'd need to refund the cost back if the type couldn't be set.
                     resident.getAccount().withdraw(cost, String.format("Plot set to %s", type.getFormattedName()));
-                    TownyMessaging.sendMsg(player, of("msg_plot_set_cost", cost, type.getFormattedName()));
+                    TownyMessaging.sendMsg(player, Translatable.of("msg_plot_set_cost", cost, type.getFormattedName()));
                 }
 
-                TownyMessaging.sendMsg(player, of(plotGroup == null ? "msg_plot_set_type" : "msg_set_group_type_to_x", type.getFormattedName()));
+                TownyMessaging.sendMsg(player, Translatable.of(plotGroup == null ? "msg_plot_set_type" : "msg_set_group_type_to_x", type.getFormattedName()));
 
                 MenuHistory.reOpen(player, () -> formatPlotSetType(player, worldCoord));
             };
 
             plotTypeItems.add(MenuItem.builder(Material.GRASS_BLOCK)
                     .name(text(type.getFormattedName(), GREEN))
-                    .lore(alreadySelected ? of("plot-menu-plot-currently-selected").component(locale) : of("msg-click-to").append(of("plot-menu-change-plot-type-to")).append(type.getFormattedName() + ".").component(locale).color(GRAY))
-                    .lore(!alreadySelected && changeCost > 0 && TownyEconomyHandler.isActive() ? of("plot-menu-setting-type-cost").append(TownyEconomyHandler.getFormattedBalance(changeCost) + ".").component(locale).color(GRAY) : Component.empty())
-                    .lore(!alreadySelected && TownyEconomyHandler.isActive() && townBlock.getTownOrNull() != null && type.getTax(townBlock.getTownOrNull()) > 0 ? of("plot-menu-plot-type-tax", TownyEconomyHandler.getFormattedBalance(type.getTax(townBlock.getTownOrNull()))).component(locale) : Component.empty())
+                    .lore(alreadySelected ? translatable("plot-menu-plot-currently-selected") : translatable("msg-click-to").append(translatable("plot-menu-change-plot-type-to")).append(text(type.getFormattedName() + ".", GRAY)))
+                    .lore(!alreadySelected && changeCost > 0 && TownyEconomyHandler.isActive() ? translatable("plot-menu-setting-type-cost").append(text(TownyEconomyHandler.getFormattedBalance(changeCost) + ".", GRAY)) : Component.empty())
+                    .lore(!alreadySelected && TownyEconomyHandler.isActive() && townBlock.getTownOrNull() != null && type.getTax(townBlock.getTownOrNull()) > 0 ? translatable("plot-menu-plot-type-tax", TownyEconomyHandler.getFormattedBalance(type.getTax(townBlock.getTownOrNull()))) : Component.empty())
                     .withGlint(alreadySelected)
                     .action(alreadySelected ? ClickAction.NONE : changeCost > 0 && TownyEconomyHandler.isActive() // Add confirmation if cost > 0 and economy is active
-                            ? ClickAction.confirmation(() -> of("plot-menu-change-type-cost").append(TownyEconomyHandler.getFormattedBalance(changeCost)).append("plot-menu-change-type-confirm").component(locale).color(RED), ClickAction.run(onClick))
+                            ? ClickAction.confirmation(() -> translatable("plot-menu-change-type-cost", RED).append(text(TownyEconomyHandler.getFormattedBalance(changeCost))).append(translatable("plot-menu-change-type-confirm")), ClickAction.run(onClick))
                             : ClickAction.run(onClick))
                     .build());
         }
 
-        return MenuInventory.paginator().addItems(plotTypeItems).title(of("plot-menu-select-plot-type").component(locale)).build();
+        return MenuInventory.paginator().addItems(plotTypeItems).title(translatable("plot-menu-select-plot-type")).build();
     }
 
     private static ClickAction putForSaleOrOpenForSaleMenu(Player player, WorldCoord worldCoord) {
@@ -399,12 +399,12 @@ public class PlotMenu {
         else
             return ClickAction.openInventory(() -> MenuInventory.builder()
                     .rows(3)
-                    .title(of("plot-menu-plot-sell-price-title").component(locale))
+                    .title(translatable("plot-menu-plot-sell-price-title"))
                     .addItem(MenuItem.builder(Material.PAPER)
-                            .name(of("plot-menu-plot-sell-custom-amount").component(locale))
+                            .name(translatable("plot-menu-plot-sell-custom-amount"))
                             .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(2)))
-                            .lore(of("msg-click-to").append(of("plot-menu-plot-sell-enter-new-amount")).component(locale))
-                            .action(ClickAction.userInput(of("plot-menu-plot-sell-enter-plot-price").translate(locale), completion -> {
+                            .lore(translatable("msg-click-to").append(translatable("plot-menu-plot-sell-enter-new-amount")))
+                            .action(ClickAction.userInput(Translatable.of("plot-menu-plot-sell-enter-plot-price").translate(locale), completion -> {
                                 TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                                 if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, townBlock)) {
@@ -416,11 +416,11 @@ public class PlotMenu {
                                 try {
                                     plotPrice = Double.parseDouble(completion.getText());
                                 } catch (NumberFormatException e) {
-                                    return AnvilResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
+                                    return AnvilResponse.text(completion.getText() + Translatable.of("plot-menu-plot-sell-invalid-price").translate(locale));
                                 }
 
                                 if (plotPrice < 0)
-                                    return AnvilResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
+                                    return AnvilResponse.text(completion.getText() + Translatable.of("plot-menu-plot-sell-invalid-price").translate(locale));
 
                                 putTownBlockForSale(player, townBlock, plotPrice);
 
@@ -429,9 +429,9 @@ public class PlotMenu {
                             }))
                             .build())
                     .addItem(MenuItem.builder(Material.EMERALD)
-                            .name(of("plot-menu-plot-sell-free").component(locale))
+                            .name(translatable("plot-menu-plot-sell-free"))
                             .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromRight(2)))
-                            .lore(of("msg-click-to").append(of("plot-menu-plot-sell-for-free")).component(locale))
+                            .lore(translatable("msg-click-to").append(translatable("plot-menu-plot-sell-for-free")))
                             .action(putForSale)
                             .build())
                     .addItem(MenuHelper.backButton().build())
@@ -446,15 +446,15 @@ public class PlotMenu {
             townBlock.setPlotPrice(Math.min(price, TownySettings.getMaxPlotPrice()));
             townBlock.save();
 
-            TownyMessaging.sendPrefixedTownMessage(townBlock.getTownOrNull(), of("msg_plot_for_sale", player.getName(), townBlock.getWorldCoord().toString()));
+            TownyMessaging.sendPrefixedTownMessage(townBlock.getTownOrNull(), Translatable.of("msg_plot_for_sale", player.getName(), townBlock.getWorldCoord().toString()));
 
             if (resident == null || !resident.hasTown() || townBlock.getTownOrNull() != resident.getTownOrNull())
-                TownyMessaging.sendMsg(player, of("msg_plot_for_sale", player.getName(), townBlock.getWorldCoord().toString()));
+                TownyMessaging.sendMsg(player, Translatable.of("msg_plot_for_sale", player.getName(), townBlock.getWorldCoord().toString()));
         } else {
             group.setPrice(Math.min(price, TownySettings.getMaxPlotPrice()));
             group.save();
 
-            Translatable message = of("msg_player_put_group_up_for_sale", player.getName(), group.getName(), TownyEconomyHandler.getFormattedBalance(group.getPrice()));
+            Translatable message = Translatable.of("msg_player_put_group_up_for_sale", player.getName(), group.getName(), TownyEconomyHandler.getFormattedBalance(group.getPrice()));
             TownyMessaging.sendPrefixedTownMessage(townBlock.getTownOrNull(), message);
 
             if (resident == null || !resident.hasTown() || resident.getTownOrNull() != townBlock.getTownOrNull())
@@ -479,7 +479,7 @@ public class PlotMenu {
             townBlock.setPlotPrice(-1);
             townBlock.save();
 
-            TownyMessaging.sendMsg(player, of("msg_plot_set_to_nfs"));
+            TownyMessaging.sendMsg(player, Translatable.of("msg_plot_set_to_nfs"));
         } else {
             if (group.getPrice() == -1)
                 return;
@@ -491,14 +491,14 @@ public class PlotMenu {
 
             Resident resident = TownyAPI.getInstance().getResident(player);
             if (resident == null || !resident.hasTown() || resident.getTownOrNull() != townBlock.getTownOrNull())
-                TownyMessaging.sendMsg(player, of("msg_player_made_group_not_for_sale", player.getName(), group.getName()));
+                TownyMessaging.sendMsg(player, Translatable.of("msg_player_made_group_not_for_sale", player.getName(), group.getName()));
         }
     }
 
     private static MenuInventory formatPlotTrustMenu(Player player, WorldCoord worldCoord) {
         final Locale locale = Localization.localeOrDefault(player);
 
-        MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(of("plot-menu-trust-menu-title").component(locale));
+        MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(translatable("plot-menu-trust-menu-title"));
         final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
         if (townBlock == null)
@@ -511,8 +511,8 @@ public class PlotMenu {
             MenuItem.Builder itemBuilder = ResidentMenu.formatResidentInfo(trustedResident, player);
 
             if (canAddRemove)
-                itemBuilder.lore(of("msg-right-click-to").append(of("plot-menu-trust-menu-remove")).component(locale))
-                        .action(ClickAction.rightClick(ClickAction.confirmation(() -> of("Are you sure you want to remove ", trustedResident.getName(), " as trusted?").component(locale), ClickAction.run(() -> {
+                itemBuilder.lore(translatable("msg-right-click-to").append(translatable("plot-menu-trust-menu-remove")))
+                        .action(ClickAction.rightClick(ClickAction.confirmation(() -> translatable("plot-menu-trust-menu-remove-confirm", text(trustedResident.getName())), ClickAction.run(() -> {
                             TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
                             if (townBlock1 == null)
                                 return;
@@ -520,7 +520,7 @@ public class PlotMenu {
                             PlotGroup group = townBlock1.getPlotObjectGroup();
 
                             if (!player.hasPermission(group == null ? PermissionNodes.TOWNY_COMMAND_PLOT_TRUST.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_TRUST.getNode()) || !testPlotOwner(player, townBlock1)) {
-                                TownyMessaging.sendErrorMsg(player, of("msg_err_command_disable"));
+                                TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_command_disable"));
                                 MenuHistory.back(player);
                                 return;
                             }
@@ -568,13 +568,13 @@ public class PlotMenu {
 
         if (canAddRemove)
             builder.addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                    .name(of("plot-menu-trust-add").component(locale))
-                    .lore(of("msg-click-to").append(of("plot-menu-trust-add-subtitle")).component(locale).color(GRAY))
+                    .name(translatable("plot-menu-trust-add"))
+                    .lore(translatable("msg-click-to").append(translatable("plot-menu-trust-add-subtitle")).color(GRAY))
                     .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                    .action(ClickAction.userInput(of("plot-menu-trust-enter-player").translate(locale), completion -> {
+                    .action(ClickAction.userInput(Translatable.of("plot-menu-trust-enter-player").translate(locale), completion -> {
                         Resident resident = TownyAPI.getInstance().getResident(completion.getText());
                         if (resident == null)
-                            return AnvilResponse.text(of("plot-menu-trust-invalid-resident").translate(locale));
+                            return AnvilResponse.text(Translatable.of("plot-menu-trust-invalid-resident").translate(locale));
 
                         TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
                         if (townBlock1 == null)
@@ -588,7 +588,7 @@ public class PlotMenu {
 
                         if (group == null) {
                             if (townBlock1.hasTrustedResident(resident))
-                                return AnvilResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
+                                return AnvilResponse.text(resident.getName() + Translatable.of("plot-menu-trust-already").translate(locale));
 
                             PlotTrustAddEvent event = new PlotTrustAddEvent(townBlock, resident, player);
                             Bukkit.getPluginManager().callEvent(event);
@@ -601,12 +601,12 @@ public class PlotMenu {
                             townBlock.addTrustedResident(resident);
                             Towny.getPlugin().deleteCache(resident);
 
-                            TownyMessaging.sendMsg(player, of("msg_trusted_added", resident.getName(), of("townblock")));
+                            TownyMessaging.sendMsg(player, Translatable.of("msg_trusted_added", resident.getName(), Translatable.of("townblock")));
                             if (resident.isOnline() && !resident.getName().equals(player.getName()))
-                                TownyMessaging.sendMsg(resident, of("msg_trusted_added_2", player.getName(), of("townblock"), townBlock.getWorldCoord().getCoord().toString()));
+                                TownyMessaging.sendMsg(resident, Translatable.of("msg_trusted_added_2", player.getName(), Translatable.of("townblock"), townBlock.getWorldCoord().getCoord().toString()));
                         } else {
                             if (group.hasTrustedResident(resident))
-                                return AnvilResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
+                                return AnvilResponse.text(resident.getName() + Translatable.of("plot-menu-trust-already").translate(locale));
 
                             PlotTrustAddEvent event = new PlotTrustAddEvent(new ArrayList<>(group.getTownBlocks()), resident, player);
                             Bukkit.getPluginManager().callEvent(event);
@@ -635,7 +635,7 @@ public class PlotMenu {
 
     private static MenuInventory formatPlotPermissionOverrideMenu(final Player player, final WorldCoord worldCoord) {
         final Locale locale = Localization.localeOrDefault(player);
-        final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(of("plot-menu-permission-override-title").component(locale));
+        final MenuInventory.PaginatorBuilder builder = MenuInventory.paginator().title(translatable("plot-menu-permission-override-title"));
         final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
         if (townBlock == null)
@@ -650,13 +650,13 @@ public class PlotMenu {
 
             if (canEdit) {
                 if (entry.getValue().getLastChangedAt() > 0 && !entry.getValue().getLastChangedBy().isEmpty())
-                    itemBuilder.lore(of("msg_last_edited", TownyFormatter.lastOnlineFormat.format(entry.getValue().getLastChangedAt()), entry.getValue().getLastChangedBy()).component(locale));
+                    itemBuilder.lore(translatable("msg_last_edited", text(TownyFormatter.lastOnlineFormat.format(entry.getValue().getLastChangedAt())), text(entry.getValue().getLastChangedBy())));
 
                 itemBuilder
-                        .lore(of("msg_click_to_edit").component(locale))
-                        .lore(of("msg-right-click-to").append(of("plot-menu-remove-override")).component(locale).color(GOLD))
+                        .lore(translatable("msg_click_to_edit"))
+                        .lore(translatable("msg-right-click-to").append(translatable("plot-menu-remove-override")).color(GOLD))
                         .action(ClickAction.leftClick(ClickAction.openInventory(() -> openPermissionOverrideEditor(player, worldCoord, entry.getKey(), entry.getValue()))))
-                        .action(ClickAction.rightClick(ClickAction.confirmation(of("plot-menu-remove-override-confirm").component(locale).color(GRAY), ClickAction.run(() -> {
+                        .action(ClickAction.rightClick(ClickAction.confirmation(translatable("plot-menu-remove-override-confirm").color(GRAY), ClickAction.run(() -> {
                             final TownBlock tb = TownyAPI.getInstance().getTownBlock(worldCoord);
                             if (tb == null || !testPlotOwner(player, tb) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_PERM_REMOVE.getNode())) {
                                 MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
@@ -682,10 +682,10 @@ public class PlotMenu {
 
         if (canEdit) {
             builder.addExtraItem(MenuItem.builder(Material.WRITABLE_BOOK)
-                    .name(of("plot-menu-permission-add-player").component(locale))
+                    .name(translatable("plot-menu-permission-add-player"))
                     .slot(SlotAnchor.anchor(VerticalAnchor.fromBottom(0), HorizontalAnchor.fromLeft(1)))
-                    .lore(of("msg-click-to").append(of("plot-menu-permission-add-player-subtitle")).component(locale).color(GRAY))
-                    .action(ClickAction.userInput(of("plot-menu-permission-enter-player-name").translate(locale), completion -> {
+                    .lore(translatable("msg-click-to").append(translatable("plot-menu-permission-add-player-subtitle")).color(GRAY))
+                    .action(ClickAction.userInput(Translatable.of("plot-menu-permission-enter-player-name").translate(locale), completion -> {
                         final TownBlock tb = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                         if (tb == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_PERM_ADD.getNode()) || !testPlotOwner(player, tb)) {
@@ -726,8 +726,8 @@ public class PlotMenu {
         final Locale locale = Localization.localeOrDefault(player);
 
         return Arrays.asList(
-                of("plot-menu-permission-build").component(locale).color(colorFromType(types[ActionType.BUILD.getIndex()])).append(text("   | ", DARK_GRAY)).append(of("plot-menu-permission-destroy").component(locale).color(colorFromType(types[ActionType.DESTROY.getIndex()]))),
-                of("plot-menu-permission-switch").component(locale).color(colorFromType(types[ActionType.SWITCH.getIndex()])).append(text("   | ", DARK_GRAY)).append(of("plot-menu-permission-item").component(locale).color(colorFromType(types[ActionType.ITEM_USE.getIndex()])))
+                translatable("plot-menu-permission-build").color(colorFromType(types[ActionType.BUILD.getIndex()])).append(text("   | ", DARK_GRAY)).append(translatable("plot-menu-permission-destroy").color(colorFromType(types[ActionType.DESTROY.getIndex()]))),
+                translatable("plot-menu-permission-switch").color(colorFromType(types[ActionType.SWITCH.getIndex()])).append(text("   | ", DARK_GRAY)).append(translatable("plot-menu-permission-item").color(colorFromType(types[ActionType.ITEM_USE.getIndex()])))
         );
     }
 
@@ -741,7 +741,7 @@ public class PlotMenu {
 
     private static MenuInventory openPermissionOverrideEditor(final Player player, final WorldCoord worldCoord, final Resident resident, final PermissionData data) {
         final MenuInventory.Builder builder = MenuInventory.builder()
-                .title(of("permission_gui_header").locale(resident).component())
+                .title(translatable("permission_gui_header"))
                 .rows(5)
                 .addItem(MenuHelper.backButton().build())
                 .addItem(MenuItem.builder(Material.PLAYER_HEAD)
@@ -802,7 +802,7 @@ public class PlotMenu {
         final boolean pvpEnabled = townBlock != null && townBlock.getPermissions().pvp;
 
         return MenuInventory.builder()
-                .title(of("plot-menu-plot-toggle-title").component(Localization.localeOrDefault(player)))
+                .title(translatable("plot-menu-plot-toggle-title"))
                 .rows(4)
                 .addItem(MenuHelper.backButton().build())
                 // Explosion
@@ -844,14 +844,14 @@ public class PlotMenu {
         final Locale locale = Localization.localeOrDefault(player);
 
         return MenuItem.builder(material)
-                .name(of("plot-menu-toggle-title").append(text(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1))).component(locale).color(propertyEnabled ? GREEN : RED))
+                .name(translatable("plot-menu-toggle-title").append(text(property.substring(0, 1).toUpperCase(Locale.ROOT) + property.substring(1))).color(propertyEnabled ? GREEN : RED))
                 .lore(() -> {
                     if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) || !testPlotOwner(player, worldCoord))
-                        return of("msg-no-permission-to").append(of("plot-menu-toggle")).append(property + ".").component(locale).color(GRAY);
+                        return translatable("msg-no-permission-to").append(translatable("plot-menu-toggle")).append(text(property + ".")).color(GRAY);
                     else
-                        return of("msg-click-to").append(propertyEnabled ? of("plot-menu-toggle-disable") : of("plot-menu-toggle-enable")).append(" " + property + ".").component(locale);
+                        return translatable("msg-click-to").append(propertyEnabled ? translatable("plot-menu-toggle-disable") : translatable("plot-menu-toggle-enable")).append(text(" " + property + "."));
                 })
-                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(Component.text("Are you sure you want to toggle " + property + " in this plot?", GRAY), ClickAction.run(() -> {
+                .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE.getNode(property)) ? ClickAction.NONE : ClickAction.confirmation(text("Are you sure you want to toggle " + property + " in this plot?", GRAY), ClickAction.run(() -> {
                     TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
                     if (townBlock == null)
                         return;

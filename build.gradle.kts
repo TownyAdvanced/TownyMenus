@@ -7,19 +7,16 @@ plugins {
 repositories {
     mavenCentral()
 
-    // Spigot API
     maven {
-        name = "spigot-repo"
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        name = "paper-repo"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
 
-    // Towny
     maven {
         name = "glare-repo"
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
 
-    // AnvilGUI
     maven {
         name = "codemc"
         url = uri("https://repo.codemc.io/repository/maven-snapshots/")
@@ -27,11 +24,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.spigot)
+    compileOnly(libs.paper)
     compileOnly(libs.towny)
-    compileOnly(libs.jetbrains.annotations)
     implementation(libs.anvilgui)
-    annotationProcessor(libs.jabel)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -75,17 +70,4 @@ tasks {
             url("https://download.luckperms.net/1517/bukkit/loader/LuckPerms-Bukkit-5.4.104.jar")
         }
     }
-}
-
-tasks.withType<JavaCompile> {
-    options.encoding = Charsets.UTF_8.name()
-
-    // Configure source & release versions
-    // https://github.com/bsideup/jabel
-    sourceCompatibility = "17"
-    options.release.set(8)
-
-    javaCompiler.set(javaToolchains.compilerFor {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    })
 }
