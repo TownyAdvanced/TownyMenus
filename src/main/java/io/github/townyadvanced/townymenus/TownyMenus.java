@@ -4,6 +4,7 @@ import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
+import com.palmergames.bukkit.towny.event.TranslationLoadEvent;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
 import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
@@ -20,12 +21,13 @@ import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Logger;
 
-public class TownyMenus extends JavaPlugin {
+public class TownyMenus extends JavaPlugin implements Listener {
 
 	private static final Version requiredTownyVersion = Version.fromString("0.99.0.8");
 	private static TownyMenus plugin;
@@ -42,7 +44,7 @@ public class TownyMenus extends JavaPlugin {
 		if (!townyVersionCheck()) {
 			getLogger().severe("Towny version does not meet required minimum version: " + requiredTownyVersion);
 			getLogger().severe("Download the latest version here: https://github.com/TownyAdvanced/Towny/releases");
-			Bukkit.getPluginManager().disablePlugin(this);
+			getServer().getPluginManager().disablePlugin(this);
 			return;
 		} else {
 			getLogger().info("Towny version " + Towny.getPlugin().getVersion() + " found.");
@@ -52,9 +54,10 @@ public class TownyMenus extends JavaPlugin {
 		MenuSettings.loadConfig();
 		*/
 
-		Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
-		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-		Bukkit.getPluginManager().registerEvents(new AwaitingConfirmation(), this);
+		getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		getServer().getPluginManager().registerEvents(new AwaitingConfirmation(), this);
+		getServer().getPluginManager().registerEvents(this, this);
 
 		TownyMenuCommand townyMenuCommand = new TownyMenuCommand(this);
 
@@ -67,15 +70,13 @@ public class TownyMenus extends JavaPlugin {
 		TownyCommandAddonAPI.addSubCommand(CommandType.TOWN, "menu", new MenuExtensionCommand(TownMenu::createTownMenu));
 
 		logger().info("Loading translations...");
-		TranslationLoader loader = new TranslationLoader(getDataFolder().toPath().resolve("lang"), this, TownyMenus.class);
-		loader.load();
-		TownyAPI.getInstance().addTranslations(this, loader.getTranslations());
+		TownyAPI.getInstance().addTranslations(this, loadTranslations().getTranslations());
 	}
 
 	@Override
 	public void onDisable() {
 		// Close any open menu inventories
-		for (Player player : Bukkit.getOnlinePlayers())
+		for (Player player : getServer().getOnlinePlayers())
 			if (player.getOpenInventory().getTopInventory().getHolder() instanceof MenuInventory)
 				player.closeInventory();
 
@@ -112,5 +113,17 @@ public class TownyMenus extends JavaPlugin {
 		} catch (ClassNotFoundException e) {
 			return false;
 		}
+	}
+
+	private TranslationLoader loadTranslations() {
+		TranslationLoader loader = new TranslationLoader(getDataFolder().toPath().resolve("lang"), this, TownyMenus.class);
+		loader.load();
+
+		return loader;
+	}
+
+	@EventHandler
+	public void onTranslationLoad(final TranslationLoadEvent event) {
+		event.getAddedTranslations().putAll(loadTranslations().getTranslations());
 	}
 }

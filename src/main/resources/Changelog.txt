@@ -42,3 +42,4 @@
   - Fixed some more localization issues.
   - Prevented snapshotting of the clicked inventory holder, however useful that may be.
   - Updated AnvilGUI to version 1.9.0-SNAPSHOT for 1.20.2 support.
+  - Fixed translations not being re-added when Towny reloads them.
