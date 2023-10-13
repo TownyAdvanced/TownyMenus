@@ -1,7 +1,7 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
-    id("xyz.jpenilla.run-paper") version "2.0.1"
+    id("xyz.jpenilla.run-paper") version "2.2.0"
 }
 
 repositories {
@@ -63,7 +63,17 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.20.2")
+
+        downloadPlugins {
+            github("TownyAdvanced", "Towny", "0.99.6.1", "towny-0.99.6.1.jar")
+
+            // Non required plugins
+            github("MilkBowl", "Vault", "1.7.3", "Vault.jar")
+            github("iconomy5legacy", "iConomy", "5.21", "iConomy-5.21.jar")
+
+            url("https://download.luckperms.net/1517/bukkit/loader/LuckPerms-Bukkit-5.4.104.jar")
+        }
     }
 }
 
