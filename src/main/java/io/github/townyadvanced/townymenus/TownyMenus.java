@@ -34,13 +34,12 @@ public class TownyMenus extends JavaPlugin implements Listener {
 	private final Object scheduler;
 
 	public TownyMenus() {
+		plugin = this;
 		this.scheduler = townyVersionCheck() ? isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this) : null;
 	}
 
 	@Override
 	public void onEnable() {
-		plugin = this;
-
 		if (!townyVersionCheck()) {
 			getLogger().severe("Towny version does not meet required minimum version: " + requiredTownyVersion);
 			getLogger().severe("Download the latest version here: https://github.com/TownyAdvanced/Towny/releases");
