@@ -63,10 +63,10 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.20.2")
+        minecraftVersion("1.20.4")
 
         downloadPlugins {
-            github("TownyAdvanced", "Towny", "0.99.6.1", "towny-0.99.6.1.jar")
+            github("TownyAdvanced", "Towny", "0.100.0.18", "towny-0.100.0.18.jar")
 
             // Non required plugins
             github("MilkBowl", "Vault", "1.7.3", "Vault.jar")

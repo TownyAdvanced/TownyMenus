@@ -1,6 +1,6 @@
 [libraries]
 spigot = { group = "org.spigotmc", name = "spigot-api", version = "1.19.4-R0.1-SNAPSHOT" }
-towny = { group = "com.palmergames.bukkit.towny", name = "towny", version = "0.99.6.1" }
+towny = { group = "com.palmergames.bukkit.towny", name = "towny", version = "0.100.0.18" }
 jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version = "24.0.1" }
-anvilgui = { group = "net.wesjd", name = "anvilgui", version = "1.9.0-SNAPSHOT" }
+anvilgui = { group = "net.wesjd", name = "anvilgui", version = "1.9.2-SNAPSHOT" }
 jabel = { group = "com.github.bsideup.jabel", name = "jabel-javac-plugin", version = "1.0.0" }
