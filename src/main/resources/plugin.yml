@@ -9,6 +9,7 @@ depend: [Towny]
 
 commands:
   townymenu:
+    description: Open Towny Menu
     aliases:
       - tmenu
       - townygui
