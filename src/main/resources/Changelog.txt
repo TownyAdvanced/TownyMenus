@@ -43,6 +43,4 @@
   - Prevented snapshotting of the clicked inventory holder, however useful that may be.
   - Updated AnvilGUI to version 1.9.0-SNAPSHOT for 1.20.2 support.
   - Fixed translations not being re-added when Towny reloads them.
-0.0.8:
   - Updated AnvilGUI to version 1.9.2-SNAPSHOT for 1.20.4 support.
-  - Add missing description to /townymenu command
