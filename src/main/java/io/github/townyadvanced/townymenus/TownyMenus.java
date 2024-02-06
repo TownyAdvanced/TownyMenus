@@ -10,13 +10,12 @@ import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
 import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
 import com.palmergames.bukkit.util.Version;
-import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.commands.MenuExtensionCommand;
+import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.listeners.PlayerListener;
-import io.github.townyadvanced.townymenus.settings.MenuSettings;
 import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
@@ -25,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin implements Listener {

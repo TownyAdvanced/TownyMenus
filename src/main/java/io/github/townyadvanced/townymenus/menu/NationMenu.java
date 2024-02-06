@@ -36,9 +36,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static com.palmergames.bukkit.towny.object.Translatable.*;
 import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static com.palmergames.adventure.text.format.NamedTextColor.GRAY;
+import static com.palmergames.adventure.text.format.NamedTextColor.GREEN;
+import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class NationMenu {
     public static MenuInventory createNationMenu(@NotNull Player player) {

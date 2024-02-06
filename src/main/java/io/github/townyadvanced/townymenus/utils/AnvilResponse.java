@@ -3,6 +3,7 @@ package io.github.townyadvanced.townymenus.utils;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import net.wesjd.anvilgui.AnvilGUI.ResponseAction;
+
 import java.util.function.Supplier;
 
 /**

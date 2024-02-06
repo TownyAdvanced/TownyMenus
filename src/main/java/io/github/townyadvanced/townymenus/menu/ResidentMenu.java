@@ -27,15 +27,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
-import static com.palmergames.bukkit.towny.object.Translatable.*;
 import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static com.palmergames.adventure.text.format.NamedTextColor.DARK_GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.GREEN;
+import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class ResidentMenu {
     public static MenuInventory createResidentMenu(@NotNull Player player) {

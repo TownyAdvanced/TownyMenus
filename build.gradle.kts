@@ -66,7 +66,7 @@ tasks {
         minecraftVersion("1.20.4")
 
         downloadPlugins {
-            github("TownyAdvanced", "Towny", "0.100.0.18", "towny-0.100.0.18.jar")
+            github("TownyAdvanced", "Towny", "0.100.1.10", "towny-0.100.1.10.jar")
 
             // Non required plugins
             github("MilkBowl", "Vault", "1.7.3", "Vault.jar")
