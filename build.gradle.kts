@@ -66,13 +66,11 @@ tasks {
         minecraftVersion("1.20.4")
 
         downloadPlugins {
-            github("TownyAdvanced", "Towny", "0.100.0.18", "towny-0.100.0.18.jar")
+            libs.towny.get().version?.let { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }
 
             // Non required plugins
             github("MilkBowl", "Vault", "1.7.3", "Vault.jar")
             github("iconomy5legacy", "iConomy", "5.21", "iConomy-5.21.jar")
-
-            url("https://download.luckperms.net/1517/bukkit/loader/LuckPerms-Bukkit-5.4.104.jar")
         }
     }
 }
