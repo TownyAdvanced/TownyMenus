@@ -31,7 +31,9 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static com.palmergames.adventure.text.format.NamedTextColor.GRAY;
+import static com.palmergames.adventure.text.format.NamedTextColor.GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.RED;
 import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class GovernmentMenus {

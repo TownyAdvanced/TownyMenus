@@ -27,7 +27,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 import static com.palmergames.adventure.text.Component.text;
 import static com.palmergames.adventure.text.format.NamedTextColor.DARK_GREEN;

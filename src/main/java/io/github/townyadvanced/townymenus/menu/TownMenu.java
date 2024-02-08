@@ -1,14 +1,26 @@
 package io.github.townyadvanced.townymenus.menu;
 
 import com.palmergames.adventure.text.Component;
-import com.palmergames.bukkit.towny.*;
+import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyEconomyHandler;
+import com.palmergames.bukkit.towny.TownyMessaging;
+import com.palmergames.bukkit.towny.TownySettings;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.command.BaseCommand;
 import com.palmergames.bukkit.towny.command.TownCommand;
 import com.palmergames.bukkit.towny.event.TownAddResidentRankEvent;
 import com.palmergames.bukkit.towny.event.TownRemoveResidentRankEvent;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
-import com.palmergames.bukkit.towny.object.*;
+import com.palmergames.bukkit.towny.object.Government;
+import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.object.TownBlockType;
+import com.palmergames.bukkit.towny.object.TownBlockTypeCache;
 import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
+import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
+import com.palmergames.bukkit.towny.object.TransactionType;
+import com.palmergames.bukkit.towny.object.Translation;
 import com.palmergames.bukkit.towny.object.economy.Account;
 import com.palmergames.bukkit.towny.object.economy.BankTransaction;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
@@ -31,10 +43,17 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static com.palmergames.adventure.text.format.NamedTextColor.DARK_GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.GRAY;
+import static com.palmergames.adventure.text.format.NamedTextColor.GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.RED;
 import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class TownMenu {
