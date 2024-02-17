@@ -13,6 +13,7 @@ import com.palmergames.bukkit.towny.command.PlotCommand;
 import com.palmergames.bukkit.towny.event.PlotPreChangeTypeEvent;
 import com.palmergames.bukkit.towny.event.plot.PlotTrustAddEvent;
 import com.palmergames.bukkit.towny.event.plot.PlotTrustRemoveEvent;
+import com.palmergames.bukkit.towny.exceptions.InvalidNameException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.PermissionData;
 import com.palmergames.bukkit.towny.object.PlotGroup;
@@ -188,10 +189,12 @@ public class PlotMenu {
 
                             String newName = completion.getText().replaceAll(" ", "_");
 
-                            if (NameValidation.isBlacklistName(newName)) {
-                                TownyMessaging.sendErrorMsg(player, of("msg_invalid_name"));
-                                MenuHistory.last(player);
-                                return AnvilResponse.close();
+							try {
+								NameValidation.checkAndFilterPlotNameOrThrow(newName);
+							} catch (InvalidNameException e) {
+								TownyMessaging.sendErrorMsg(player, of("msg_invalid_name"));
+								MenuHistory.last(player);
+								return AnvilResponse.close();
                             }
 
                             townBlock.setName(newName);
