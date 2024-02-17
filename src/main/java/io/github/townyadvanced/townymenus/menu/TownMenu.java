@@ -49,9 +49,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static com.palmergames.bukkit.towny.object.Translatable.of;
 import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static com.palmergames.adventure.text.format.NamedTextColor.DARK_GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.GRAY;
+import static com.palmergames.adventure.text.format.NamedTextColor.GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.RED;
+import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class TownMenu {
     public static MenuInventory createTownMenu(@NotNull Player player) {
@@ -277,7 +280,12 @@ public class TownMenu {
                             if (town == null || !TownyUniverse.getInstance().hasTown(town.getUUID()) || !town.hasResident(resident))
                                 return;
 
-                            TownCommand.townKickResidents(player, TownyAPI.getInstance().getResident(player), town, Collections.singletonList(resident));
+                            try {
+                                TownCommand.townKick(player, new String[]{resident.getName()});
+                            }
+                            catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
                         })))
                         .build())
                 .addItem(ResidentMenu.formatResidentInfo(resident, player)
@@ -302,7 +310,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-management-resident-enter-new-title").toString(), completion -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
-                                TownCommand.townSetTitle(player, resident, completion.getText(), false);
+                                TownCommand.townSetTitle(player, (resident.getName()+" "+completion.getText()).split(" "), false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));
@@ -314,7 +322,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
-                                TownCommand.townSetTitle(player, resident, "", false);
+								TownCommand.townSetTitle(player, (resident.getName()+" ").split(" "), false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
@@ -333,7 +341,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-management-resident-enter-new-surname").toString(), completion -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
-                                TownCommand.townSetSurname(player, resident, completion.getText(), false);
+								TownCommand.townSetSurname(player, (resident.getName()+" "+completion.getText()).split(" "), false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));
@@ -345,7 +353,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
-                                TownCommand.townSetSurname(player, resident, "", false);
+								TownCommand.townSetSurname(player, (resident.getName()+" ").split(" "), false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }

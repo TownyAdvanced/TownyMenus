@@ -1,11 +1,11 @@
 package io.github.townyadvanced.townymenus.settings;
 
+import com.palmergames.bukkit.config.CommentedConfiguration;
+import io.github.townyadvanced.townymenus.TownyMenus;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.palmergames.bukkit.config.CommentedConfiguration;
-import io.github.townyadvanced.townymenus.TownyMenus;
 
 public class MenuSettings {
 	private static CommentedConfiguration config, newConfig;

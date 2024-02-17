@@ -13,6 +13,7 @@ import com.palmergames.bukkit.towny.command.PlotCommand;
 import com.palmergames.bukkit.towny.event.PlotPreChangeTypeEvent;
 import com.palmergames.bukkit.towny.event.plot.PlotTrustAddEvent;
 import com.palmergames.bukkit.towny.event.plot.PlotTrustRemoveEvent;
+import com.palmergames.bukkit.towny.exceptions.InvalidNameException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.PermissionData;
 import com.palmergames.bukkit.towny.object.PlotGroup;
@@ -52,9 +53,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.palmergames.bukkit.towny.object.Translatable.*;
 import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static com.palmergames.adventure.text.format.NamedTextColor.DARK_GRAY;
+import static com.palmergames.adventure.text.format.NamedTextColor.GOLD;
+import static com.palmergames.adventure.text.format.NamedTextColor.GRAY;
+import static com.palmergames.adventure.text.format.NamedTextColor.GREEN;
+import static com.palmergames.adventure.text.format.NamedTextColor.RED;
+import static com.palmergames.bukkit.towny.object.Translatable.of;
 
 public class PlotMenu {
     public static MenuInventory createPlotMenu(@NotNull Player player) {
@@ -184,10 +189,12 @@ public class PlotMenu {
 
                             String newName = completion.getText().replaceAll(" ", "_");
 
-                            if (NameValidation.isBlacklistName(newName)) {
-                                TownyMessaging.sendErrorMsg(player, of("msg_invalid_name"));
-                                MenuHistory.last(player);
-                                return AnvilResponse.close();
+							try {
+								NameValidation.checkAndFilterPlotNameOrThrow(newName);
+							} catch (InvalidNameException e) {
+								TownyMessaging.sendErrorMsg(player, of("msg_invalid_name"));
+								MenuHistory.last(player);
+								return AnvilResponse.close();
                             }
 
                             townBlock.setName(newName);
