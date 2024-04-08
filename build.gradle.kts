@@ -1,7 +1,10 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply true
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("xyz.jpenilla.run-paper") version "2.2.3"
+	id("com.modrinth.minotaur") version "2.8.7"
+	id("me.modmuss50.mod-publish-plugin") version "0.5.1"
+	id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 repositories {
@@ -86,4 +89,103 @@ tasks.withType<JavaCompile> {
     javaCompiler.set(javaToolchains.compilerFor {
         languageVersion.set(JavaLanguageVersion.of(17))
     })
+}
+
+modrinth {
+	token.set(System.getenv("MODRINTH_TOKEN"))
+	projectId.set("townymenus")
+	versionNumber.set(project.version.toString().substringBefore("-"))
+	versionType.set("release")
+	versionName.set("${project.name} ${versionNumber.get()}")
+	uploadFile.set(tasks.jar.get().archiveFile)
+	gameVersions.addAll((property("modrinthVersions") as String).split(",").map { it.trim() })
+	loaders.addAll("bukkit", "paper", "folia")
+	changelog.set(readChangelog())
+
+	syncBodyFrom.set(rootProject.file("README.md").readText())
+}
+
+publishMods {
+	file.set(tasks.jar.get().archiveFile)
+	type.set(me.modmuss50.mpp.ReleaseType.STABLE)
+	modLoaders.addAll("bukkit", "paper", "folia")
+
+	changelog.set(readChangelog())
+
+	github {
+		accessToken.set(System.getenv("TOWNYMENUS_GITHUB_PAT"))
+		repository.set("TownyAdvanced/TownyMenus")
+		commitish.set("main")
+		tagName.set(project.version.toString().substringBefore("-"))
+		displayName.set("Version " + tagName.get())
+	}
+
+	/*discord {
+		webhookUrl.set(System.getenv("TOWNYMENUS_DISCORD_WEBHOOK"))
+	}*/
+}
+
+hangarPublish {
+	publications.register("plugin") {
+		version.set(project.version.toString().substringBefore("-"))
+		channel.set("Release")
+		id.set("TownyMenus")
+		apiKey.set(System.getenv("HANGAR_API_TOKEN"))
+
+		changelog.set(readChangelog())
+
+		platforms {
+			register(io.papermc.hangarpublishplugin.model.Platforms.PAPER) {
+				jar.set(tasks.jar.get().archiveFile)
+
+				val versions: List<String> = (property("paperVersions") as String)
+					.split(",")
+					.map { it.trim() }
+				platformVersions.set(versions)
+
+				dependencies {
+					hangar("Towny") {
+						required.set(true)
+					}
+				}
+			}
+		}
+	}
+}
+
+tasks.register("publish") {
+	tasks.getByName("publishPluginPublicationToHangar").dependsOn(tasks.shadowJar)
+
+	dependsOn(tasks.publishMods)
+	dependsOn(tasks.publishAllPublicationsToHangar)
+	dependsOn(tasks.modrinth)
+
+	//dependsOn(tasks.syncAllPagesToHangar)
+	dependsOn(tasks.modrinthSyncBody)
+}
+
+tasks.register("readChangelog") {
+	doLast {
+		println(readChangelog())
+	}
+}
+
+fun readChangelog(): String {
+	val lines = mutableListOf<String>()
+	val version = project.version.toString().substringBefore("-") // remove -SNAPSHOT if present
+
+	var versionFound = false
+	rootProject.file("src/main/resources/Changelog.txt").readLines().forEach {
+		val line = it.trim()
+
+		if (line.startsWith(version))
+			versionFound = true
+		else if (versionFound && !line.startsWith("-"))
+			return@forEach
+
+		if (versionFound && line.startsWith("-"))
+			lines.add(line)
+	}
+
+	return lines.joinToString("\n")
 }

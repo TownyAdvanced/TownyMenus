@@ -1,3 +1,5 @@
+[Github](https://github.com/TownyAdvanced/TownyMenus) | [Discord](https://discord.gg/gnpVs5m)
+
 # TownyMenus
 An easy-to-use and accessible way for players to use Towny commands.
 
@@ -10,6 +12,7 @@ Players can open the main menu using /townymenu or one of its aliases. The menu 
 
 The plugin is currently still in beta, so any feedback is welcome! Feel free to stop by our Discord if you have any ideas for the plugin, or if you just want to chat.
 
+<!-- modrinth_exclude.start -->
 ## Downloading
 The plugin can be downloaded from [Hangar](https://hangar.papermc.io/Warrior/TownyMenus), [Modrinth](https://modrinth.com/plugin/townymenus) or from the [latest release](https://github.com/TownyAdvanced/TownyMenus/releases).
 
@@ -17,3 +20,4 @@ Development builds can be downloaded by going to the [Actions](https://github.co
 
 ## Compiling from source
 Build with `gradlew build` (Windows) or `./gradlew build` (Linux), requires Java 17.
+<!-- modrinth_exclude.end -->
