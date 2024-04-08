@@ -26,7 +26,6 @@ import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.utils.PermissionGUIUtil;
 import com.palmergames.bukkit.towny.utils.PermissionGUIUtil.SetPermissionType;
-import com.palmergames.bukkit.util.NameValidation;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuHistory;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
@@ -182,18 +181,16 @@ public class PlotMenu {
                                 return AnvilResponse.close();
                             }
 
-                            String newName = completion.getText().replaceAll(" ", "_");
+							String newName = completion.getText().replaceAll(" ", "_");
 
-                            if (NameValidation.isBlacklistName(newName)) {
-                                TownyMessaging.sendErrorMsg(player, of("msg_invalid_name"));
-                                MenuHistory.last(player);
-                                return AnvilResponse.close();
-                            }
+							plotCommand().ifPresent(command -> {
+                                try {
+                                    command.parsePlotSetName(player, new String[]{ newName }, townBlock);
+                                } catch (TownyException e) {
+                                    TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                                }
+                            });
 
-                            townBlock.setName(newName);
-                            townBlock.save();
-
-                            TownyMessaging.sendMsg(player, of("msg_plot_name_set_to", townBlock.getName()));
                             MenuHistory.last(player);
                             return AnvilResponse.close();
                         }))

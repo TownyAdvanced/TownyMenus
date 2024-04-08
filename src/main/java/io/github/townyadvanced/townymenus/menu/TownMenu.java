@@ -277,7 +277,11 @@ public class TownMenu {
                             if (town == null || !TownyUniverse.getInstance().hasTown(town.getUUID()) || !town.hasResident(resident))
                                 return;
 
-                            TownCommand.townKickResidents(player, TownyAPI.getInstance().getResident(player), town, Collections.singletonList(resident));
+                            try {
+                                TownCommand.townKick(player, new String[]{ resident.getName() });
+                            } catch (TownyException e) {
+                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+                            }
                         })))
                         .build())
                 .addItem(ResidentMenu.formatResidentInfo(resident, player)
@@ -302,7 +306,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-management-resident-enter-new-title").toString(), completion -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
-                                TownCommand.townSetTitle(player, resident, completion.getText(), false);
+                                TownCommand.townSetTitle(player, new String[]{ resident.getName(), completion.getText() }, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));
@@ -314,7 +318,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
-                                TownCommand.townSetTitle(player, resident, "", false);
+                                TownCommand.townSetTitle(player, new String[]{ resident.getName(), "" }, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }
@@ -333,7 +337,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-management-resident-enter-new-surname").toString(), completion -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
-                                TownCommand.townSetSurname(player, resident, completion.getText(), false);
+                                TownCommand.townSetSurname(player, new String[]{ resident.getName(), completion.getText() }, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));
@@ -345,7 +349,7 @@ public class TownMenu {
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
-                                TownCommand.townSetSurname(player, resident, "", false);
+                                TownCommand.townSetSurname(player, new String[]{ resident.getName(), "" }, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                             }

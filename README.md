@@ -1,7 +1,7 @@
 # TownyMenus
 An easy-to-use and accessible way for players to use Towny commands.
 
-Requires [Towny](https://github.com/TownyAdvanced/Towny) version 0.99.0.6 or above.
+Requires [Towny](https://github.com/TownyAdvanced/Towny) version 0.100.2.0 or above.
 
 ## About
 TownyMenus is a plugin that adds lots of inventory menus that trivializes interfacing with Towny. Instead of having to scour through documentation, commands are just a mouseclick away.
