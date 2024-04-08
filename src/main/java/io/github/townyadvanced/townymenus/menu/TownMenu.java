@@ -711,8 +711,14 @@ public class TownMenu {
         lore.add(of("town-menu-town-info-founded").append(Time.ago(town.getRegistered()).translate()).component(locale).color(GREEN));
         lore.add(text(town.getNumResidents(), DARK_GREEN).append(of("town-menu-town-info-resident").append(town.getNumResidents() == 1 ? "" : "s").component(locale).color(GREEN)));
 
-        if (TownySettings.isEconomyAsync() && TownyEconomyHandler.isActive())
-            lore.add(of("town-menu-town-info-balance").component(locale).append(text(TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance()), GREEN)));
+		if (TownyEconomyHandler.isActive()) {
+			// Only add bank balance when it's safe to do so
+			if (TownySettings.isEconomyAsync())
+				lore.add(of("town-menu-town-info-balance").component(locale).append(text(TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance()), GREEN)));
+
+			if (town.hasUpkeep())
+				lore.add(of("status_bank_town2").component(locale).color(DARK_GREEN).appendSpace().append(text(TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)), GREEN)));
+		}
 
         if (town.getMayor() != null)
             lore.add(of("town-menu-town-info-owned-by").component(locale).append(text(town.getMayor().getName(), GREEN)));
