@@ -160,6 +160,7 @@ tasks.register("publish") {
 		throw GradleException("Snapshot versions should not be deployed")
 
 	tasks.getByName("publishPluginPublicationToHangar").dependsOn(tasks.shadowJar)
+	tasks.getByName("publishGithub").dependsOn(tasks.shadowJar)
 
 	dependsOn(tasks.publishMods)
 	dependsOn(tasks.publishAllPublicationsToHangar)
