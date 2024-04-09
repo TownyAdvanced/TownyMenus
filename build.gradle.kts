@@ -94,7 +94,7 @@ tasks.withType<JavaCompile> {
 modrinth {
 	token.set(System.getenv("MODRINTH_TOKEN"))
 	projectId.set("townymenus")
-	versionNumber.set(project.version.toString().substringBefore("-"))
+	versionNumber.set(project.version as String)
 	versionType.set("release")
 	versionName.set("${project.name} ${versionNumber.get()}")
 	uploadFile.set(tasks.jar.get().archiveFile)
@@ -116,7 +116,7 @@ publishMods {
 		accessToken.set(System.getenv("TOWNYMENUS_GITHUB_PAT"))
 		repository.set("TownyAdvanced/TownyMenus")
 		commitish.set("main")
-		tagName.set(project.version.toString().substringBefore("-"))
+		tagName.set(project.version as String)
 		displayName.set("Version " + tagName.get())
 	}
 
@@ -127,7 +127,7 @@ publishMods {
 
 hangarPublish {
 	publications.register("plugin") {
-		version.set(project.version.toString().substringBefore("-"))
+		version.set(project.version as String)
 		channel.set("Release")
 		id.set("TownyMenus")
 		apiKey.set(System.getenv("HANGAR_API_TOKEN"))
@@ -154,6 +154,9 @@ hangarPublish {
 }
 
 tasks.register("publish") {
+	if ((project.version as String).endsWith("-SNAPSHOT"))
+		throw GradleException("Snapshot versions should not be deployed")
+
 	tasks.getByName("publishPluginPublicationToHangar").dependsOn(tasks.shadowJar)
 
 	dependsOn(tasks.publishMods)
@@ -165,9 +168,7 @@ tasks.register("publish") {
 }
 
 tasks.register("readChangelog") {
-	doLast {
-		println(readChangelog())
-	}
+	println(readChangelog())
 }
 
 fun readChangelog(): String {
