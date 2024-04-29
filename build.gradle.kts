@@ -1,7 +1,7 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("xyz.jpenilla.run-paper") version "2.2.3"
+    id("xyz.jpenilla.run-paper") version "2.2.4"
 	id("com.modrinth.minotaur") version "2.8.7"
 	id("me.modmuss50.mod-publish-plugin") version "0.5.1"
 	id("io.papermc.hangar-publish-plugin") version "0.1.2"
