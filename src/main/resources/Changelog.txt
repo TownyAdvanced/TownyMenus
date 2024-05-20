@@ -48,3 +48,4 @@
   - Fix compatability with Towny versions 0.100.2.0 and up
 0.0.9:
   - Add translations for Brazilian Portuguese, courtesy of josegoust
+  - Updated AnvilGUI to version 1.9.3-SNAPSHOT for 1.20.5/6 support.
