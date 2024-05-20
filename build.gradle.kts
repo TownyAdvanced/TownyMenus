@@ -123,7 +123,7 @@ publishMods {
 	discord {
 		webhookUrl.set(System.getenv("TOWNYMENUS_DISCORD_WEBHOOK"))
 		username.set("${project.name} Releases")
-		content.set("Version ${project.version} has been released \n${changelog}")
+		content.set("Version ${project.version} has been released \n${readChangelog()}")
 	}
 }
 
