@@ -559,7 +559,7 @@ public class TownMenu {
                             AwaitingConfirmation.await(player);
 
                             try {
-                                TownCommand.townSetName(player, new String[]{"", completion.getText().replaceAll(" ", "_")}, town);
+                                TownCommand.townSetName(player, new String[]{completion.getText().replaceAll(" ", "_")}, town);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
                                 return AnvilResponse.text(e.getMessage(player));

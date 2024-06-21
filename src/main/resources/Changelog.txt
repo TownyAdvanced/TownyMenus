@@ -51,3 +51,4 @@
   - Updated AnvilGUI to version 1.9.3-SNAPSHOT for 1.20.5/6 support.
 0.0.10:
   - Update AnvilGUI again for proper 1.20.6 support.
+  - Fix rogue underscore in front of town name when changing name.
