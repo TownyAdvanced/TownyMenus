@@ -68,6 +68,6 @@ public class InventoryListener implements Listener {
         if (!(PaperLib.getHolder(event.getInventory(), false).getHolder() instanceof MenuInventory menu))
             return;
 
-        event.setCancelled(false);
+        event.setCancelled(true);
     }
 }
