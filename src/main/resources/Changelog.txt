@@ -52,3 +52,6 @@
 0.0.10:
   - Update AnvilGUI again for proper 1.20.6 support.
   - Fix rogue underscore in front of town name when changing name.
+0.0.11:
+  - Add support for new Towny versions, now requires version 0.100.4.0 or up.
+  - Add support up to 1.21.1.

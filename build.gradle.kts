@@ -66,7 +66,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.21.1")
 
         downloadPlugins {
             libs.towny.get().version?.let { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }
