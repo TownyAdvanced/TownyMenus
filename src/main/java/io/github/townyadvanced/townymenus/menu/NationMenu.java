@@ -188,7 +188,7 @@ public class NationMenu {
                             if (nation == null)
                                 return of("msg-must-be-in-nation-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
                             else if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_NAME.getNode()))
-                                return of("msg-bo-permission-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
+                                return of("msg-no-permission-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
                             else
                                 return of("msg-click-to").append(of("nation-menu-set-change-name")).component(locale).color(GRAY);
                         })

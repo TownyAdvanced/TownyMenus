@@ -22,7 +22,7 @@ public class Time {
         final long diff = TimeUnit.MILLISECONDS.toSeconds(now - time);
 
         if (diff < MINUTE_SECONDS)
-            return Translatable.of("just now");
+            return Translatable.of("time-just-now");
         else if (diff < 2 * MINUTE_SECONDS)
             return Translatable.of("time-a-minute-ago");
         else if (diff < 60 * MINUTE_SECONDS)
