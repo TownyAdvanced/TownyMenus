@@ -267,7 +267,7 @@ public class TownMenu {
                         .slot(SlotAnchor.anchor(VerticalAnchor.fromTop(1), HorizontalAnchor.fromLeft(1)))
                         .lore(() -> {
                             if (!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_KICK.getNode()))
-                                return of("msg-no-permission-to" + "town-menu-management-resident-kick").component(locale);
+                                return of("msg-no-permission-to").append(of("town-menu-management-resident-kick")).component(locale);
                             else if (player.getUniqueId().equals(resident.getUUID()))
                                 return of("town-menu-management-resident-cannot-kick-self").component(locale);
                             else
