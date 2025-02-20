@@ -1,6 +1,5 @@
 package io.github.townyadvanced.townymenus.listeners;
 
-import com.palmergames.paperlib.PaperLib;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.MenuItem;
@@ -27,7 +26,7 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(final InventoryClickEvent event) {
-        if (!(PaperLib.getHolder(event.getInventory(), false).getHolder() instanceof MenuInventory menu))
+        if (!(event.getInventory().getHolder(false) instanceof MenuInventory menu))
             return;
 
         event.setCancelled(true);
@@ -39,7 +38,7 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(final InventoryCloseEvent event) {
-        if (!(event.getView().getTopInventory().getHolder() instanceof MenuInventory))
+        if (!(event.getView().getTopInventory().getHolder(false) instanceof MenuInventory))
             return;
 
         for (ItemStack item : event.getView().getBottomInventory()) {
@@ -65,7 +64,7 @@ public class InventoryListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onInventoryDrag(final InventoryDragEvent event) {
-        if (!(PaperLib.getHolder(event.getInventory(), false).getHolder() instanceof MenuInventory menu))
+        if (!(event.getInventory().getHolder(false) instanceof MenuInventory menu))
             return;
 
         event.setCancelled(true);

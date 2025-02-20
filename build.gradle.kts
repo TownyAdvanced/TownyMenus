@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.6"
     id("xyz.jpenilla.run-paper") version "2.2.3"
 	id("com.modrinth.minotaur") version "2.8.7"
 	id("me.modmuss50.mod-publish-plugin") version "0.5.1"
@@ -10,11 +10,7 @@ plugins {
 repositories {
     mavenCentral()
 
-    // Spigot API
-    maven {
-        name = "spigot-repo"
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
+    maven("https://repo.papermc.io/repository/maven-public/")
 
     // Towny
     maven {
@@ -30,14 +26,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.spigot)
+    compileOnly(libs.paper)
     compileOnly(libs.towny)
-    compileOnly(libs.jetbrains.annotations)
     implementation(libs.anvilgui)
-    annotationProcessor(libs.jabel)
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 tasks {
     assemble {
@@ -56,7 +50,7 @@ tasks {
 
     compileJava {
         options.encoding = Charsets.UTF_8.name()
-        options.release.set(17)
+        options.release.set(21)
     }
 
     processResources {
@@ -66,7 +60,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.1")
+        minecraftVersion("1.21.4")
 
         downloadPlugins {
             libs.towny.get().version?.let { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }
@@ -78,19 +72,6 @@ tasks {
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = Charsets.UTF_8.name()
-
-    // Configure source & release versions
-    // https://github.com/bsideup/jabel
-    sourceCompatibility = "17"
-    options.release.set(8)
-
-    javaCompiler.set(javaToolchains.compilerFor {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    })
-}
-
 modrinth {
 	token.set(System.getenv("MODRINTH_TOKEN"))
 	projectId.set("townymenus")
@@ -99,7 +80,7 @@ modrinth {
 	versionName.set("${project.name} ${versionNumber.get()}")
 	uploadFile.set(tasks.jar.get().archiveFile)
 	gameVersions.addAll((property("modrinthVersions") as String).split(",").map { it.trim() })
-	loaders.addAll("bukkit", "paper", "folia")
+	loaders.addAll("paper", "folia")
 	changelog.set(readChangelog())
 
 	syncBodyFrom.set(rootProject.file("README.md").readText())
@@ -140,7 +121,7 @@ hangarPublish {
 			register(io.papermc.hangarpublishplugin.model.Platforms.PAPER) {
 				jar.set(tasks.jar.get().archiveFile)
 
-				val versions: List<String> = (property("paperVersions") as String)
+				val versions: List<String> = (property("hangarVersions") as String)
 					.split(",")
 					.map { it.trim() }
 				platformVersions.set(versions)

@@ -245,7 +245,7 @@ public class TownMenu {
 
         for (Resident resident : town.getResidents()) {
             builder.addItem(ResidentMenu.formatResidentInfo(resident, player)
-                    .lore(of("town-menu-overview-joined-town").append(Time.registeredOrAgo(res.getJoinedTownAt(), Translation.getLocale(player))).component(locale))
+                    .lore(of("town-menu-overview-joined-town", Time.registeredOrAgo(res.getJoinedTownAt(), Translation.getLocale(player))).component(locale))
                     .lore(Component.space())
                     .lore(of("msg-right-click-additional-options").component(locale))
                     .action(ClickAction.rightClick(ClickAction.openInventory(() -> createResidentManagementScreen(player, town, resident))))

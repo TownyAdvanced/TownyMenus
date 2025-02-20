@@ -190,7 +190,7 @@ public class MenuInventory implements InventoryHolder, Iterable<ItemStack>, Supp
             this.items.addAll(items);
             return this;
         }
-        
+
         public PaginatorBuilder addExtraItem(MenuItem extraItem) {
             this.extraItems.add(extraItem);
             return this;

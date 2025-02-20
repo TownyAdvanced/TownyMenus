@@ -7,8 +7,8 @@ import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.event.TranslationLoadEvent;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
 import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
-import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
 import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
+import com.palmergames.bukkit.towny.scheduling.impl.PaperTaskScheduler;
 import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.commands.MenuExtensionCommand;
@@ -16,7 +16,6 @@ import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.listeners.PlayerListener;
-import io.github.townyadvanced.townymenus.settings.MenuSettings;
 import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.PlotMenu;
 import io.github.townyadvanced.townymenus.menu.ResidentMenu;
@@ -31,11 +30,11 @@ public class TownyMenus extends JavaPlugin implements Listener {
 
 	private static final Version requiredTownyVersion = Version.fromString("0.100.4.0");
 	private static TownyMenus plugin;
-	private final Object scheduler;
+	private final TaskScheduler scheduler;
 
 	public TownyMenus() {
 		plugin = this;
-		this.scheduler = townyVersionCheck() ? isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this) : null;
+		this.scheduler = isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new PaperTaskScheduler(this);
 	}
 
 	@Override
@@ -76,7 +75,7 @@ public class TownyMenus extends JavaPlugin implements Listener {
 	public void onDisable() {
 		// Close any open menu inventories
 		for (Player player : getServer().getOnlinePlayers())
-			if (player.getOpenInventory().getTopInventory().getHolder() instanceof MenuInventory)
+			if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof MenuInventory)
 				player.closeInventory();
 
 		TownyCommandAddonAPI.removeSubCommand(CommandType.NATION, "menu");
@@ -102,7 +101,7 @@ public class TownyMenus extends JavaPlugin implements Listener {
 	}
 
 	public TaskScheduler getScheduler() {
-		return (TaskScheduler) this.scheduler;
+		return this.scheduler;
 	}
 
 	private static boolean isFoliaClassPresent() {

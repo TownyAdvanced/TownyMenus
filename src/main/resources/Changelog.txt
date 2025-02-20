@@ -55,3 +55,5 @@
 0.0.11:
   - Add support for new Towny versions, now requires version 0.100.4.0 or up.
   - Add support up to 1.21.1.
+0.0.12:
+  - Added support for 1.21.4, dropped support for pre-1.19
