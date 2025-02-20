@@ -1,5 +1,7 @@
 [Github](https://github.com/TownyAdvanced/TownyMenus) | [Discord](https://discord.gg/gnpVs5m)
 
+[![Build Status](https://ci.warriorrr.dev/job/TownyMenus/badge/icon)](https://ci.warriorrr.dev/job/TownyMenus/)
+
 # TownyMenus
 An easy-to-use and accessible way for players to use Towny commands.
 
