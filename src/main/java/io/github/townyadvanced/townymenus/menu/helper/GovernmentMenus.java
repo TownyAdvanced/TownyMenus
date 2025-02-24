@@ -22,7 +22,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.menu.NationMenu;
 import io.github.townyadvanced.townymenus.menu.TownMenu;
-import io.github.townyadvanced.townymenus.utils.AnvilResponse;
+import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import io.github.townyadvanced.townymenus.utils.Localization;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -120,12 +120,12 @@ public class GovernmentMenus {
             try {
                 MathUtil.getIntOrThrow(completion.getText());
             } catch (TownyException e) {
-                return AnvilResponse.text(e.getMessage(player));
+                return InputResponse.text(e.getMessage(player));
             }
 
             boolean town = government instanceof Town;
             if (!player.hasPermission(town ? PermissionNodes.TOWNY_COMMAND_TOWN_DEPOSIT.getNode() : PermissionNodes.TOWNY_COMMAND_NATION_DEPOSIT.getNode()))
-                return AnvilResponse.close();
+                return InputResponse.finish();
 
             Class<?> clazz = town ? TownCommand.class : NationCommand.class;
 
@@ -135,9 +135,9 @@ public class GovernmentMenus {
                 method.invoke(null, player, new String[]{completion.getText()}, withdraw);
 
                 MenuHistory.last(player);
-                return AnvilResponse.nil();
+                return InputResponse.doNothing();
             } catch (ReflectiveOperationException e) {
-                return AnvilResponse.close();
+                return InputResponse.finish();
             }
         });
     }

@@ -1,6 +1,7 @@
 #language: portuguese-brazil
 #author: josegoust
 main-menu-title: "Towny Menu"
+townymenus:plugin-prefix: "<gold>[TownyMenus] "
 
 main-menu-town: "<green>Town Menu"
 main-menu-town-subtitle: "<gray>Click para ver o town menu!"
@@ -293,3 +294,7 @@ government-menus-input: "Digite "
 government-menus-input-withdraw: "sacar"
 government-menus-input-deposit: "depositar"
 government-menus-input-amount: " quantidade"
+
+chat-input-header: "<green>Enter in chat, the value for the following:"
+chat-input-timeout-warning: "<green>This prompt will time out after %s seconds."
+chat-input-timed-out: "<red>Prompt timed out."

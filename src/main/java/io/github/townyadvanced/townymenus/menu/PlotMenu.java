@@ -35,7 +35,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.HorizontalAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
-import io.github.townyadvanced.townymenus.utils.AnvilResponse;
+import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import io.github.townyadvanced.townymenus.utils.Localization;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -178,7 +178,7 @@ public class PlotMenu {
 
                             if (townBlock == null || !testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode())) {
                                 MenuHistory.last(player);
-                                return AnvilResponse.close();
+                                return InputResponse.finish();
                             }
 
 							String newName = completion.getText().replaceAll(" ", "_");
@@ -192,7 +192,7 @@ public class PlotMenu {
                             });
 
                             MenuHistory.last(player);
-                            return AnvilResponse.close();
+                            return InputResponse.finish();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
@@ -406,23 +406,23 @@ public class PlotMenu {
 
                                 if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, townBlock)) {
                                     MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
-                                    return AnvilResponse.close();
+                                    return InputResponse.finish();
                                 }
 
                                 double plotPrice;
                                 try {
                                     plotPrice = Double.parseDouble(completion.getText());
                                 } catch (NumberFormatException e) {
-                                    return AnvilResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
+                                    return InputResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
                                 }
 
                                 if (plotPrice < 0)
-                                    return AnvilResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
+                                    return InputResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
 
                                 putTownBlockForSale(player, townBlock, plotPrice);
 
                                 MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
-                                return AnvilResponse.close();
+                                return InputResponse.finish();
                             }))
                             .build())
                     .addItem(MenuItem.builder(Material.EMERALD)
@@ -571,28 +571,28 @@ public class PlotMenu {
                     .action(ClickAction.userInput(of("plot-menu-trust-enter-player").translate(locale), completion -> {
                         Resident resident = TownyAPI.getInstance().getResident(completion.getText());
                         if (resident == null)
-                            return AnvilResponse.text(of("plot-menu-trust-invalid-resident").translate(locale));
+                            return InputResponse.text(of("plot-menu-trust-invalid-resident").translate(locale));
 
                         TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
                         if (townBlock1 == null)
-                            return AnvilResponse.close();
+                            return InputResponse.finish();
 
                         PlotGroup group = townBlock1.getPlotObjectGroup();
 
                         // Check if the player can still add players as trusted
                         if (!player.hasPermission(group == null ? PermissionNodes.TOWNY_COMMAND_PLOT_TRUST.getNode() : PermissionNodes.TOWNY_COMMAND_PLOT_GROUP_TRUST.getNode()) || !testPlotOwner(player, townBlock1))
-                            return AnvilResponse.close();
+                            return InputResponse.finish();
 
                         if (group == null) {
                             if (townBlock1.hasTrustedResident(resident))
-                                return AnvilResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
+                                return InputResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
 
                             PlotTrustAddEvent event = new PlotTrustAddEvent(townBlock, resident, player);
                             Bukkit.getPluginManager().callEvent(event);
 
                             if (event.isCancelled()) {
                                 TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
-                                return AnvilResponse.close();
+                                return InputResponse.finish();
                             }
 
                             townBlock.addTrustedResident(resident);
@@ -603,14 +603,14 @@ public class PlotMenu {
                                 TownyMessaging.sendMsg(resident, of("msg_trusted_added_2", player.getName(), of("townblock"), townBlock.getWorldCoord().getCoord().toString()));
                         } else {
                             if (group.hasTrustedResident(resident))
-                                return AnvilResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
+                                return InputResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
 
                             PlotTrustAddEvent event = new PlotTrustAddEvent(new ArrayList<>(group.getTownBlocks()), resident, player);
                             Bukkit.getPluginManager().callEvent(event);
 
                             if (event.isCancelled()) {
                                 TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
-                                return AnvilResponse.close();
+                                return InputResponse.finish();
                             }
 
                             group.addTrustedResident(resident);
@@ -623,7 +623,7 @@ public class PlotMenu {
                         }
 
                         MenuHistory.reOpen(player, () -> formatPlotTrustMenu(player, worldCoord));
-                        return AnvilResponse.close();
+                        return InputResponse.finish();
                     }))
                     .build());
 
@@ -687,16 +687,16 @@ public class PlotMenu {
 
                         if (tb == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_PERM_ADD.getNode()) || !testPlotOwner(player, tb)) {
                             MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
-                            return AnvilResponse.nil();
+                            return InputResponse.doNothing();
                         }
 
                         final Resident toAdd = TownyAPI.getInstance().getResident(completion.getText());
                         if (toAdd == null)
-                            return AnvilResponse.text(Translatable.of("msg_err_not_registered_1").stripColors(true).forLocale(player));
+                            return InputResponse.text(Translatable.of("msg_err_not_registered_1").stripColors(true).forLocale(player));
 
                         if (tb.getPermissionOverrides().containsKey(toAdd)) {
                             TownyMessaging.sendErrorMsg(player, Translatable.of("msg_overrides_already_set", toAdd.getName(), Translatable.of("townblock")));
-                            return AnvilResponse.nil();
+                            return InputResponse.doNothing();
                         }
 
                         PlotGroup group = tb.getPlotObjectGroup();
@@ -711,7 +711,7 @@ public class PlotMenu {
 
                         TownyMessaging.sendMsg(player, Translatable.of("msg_overrides_added", toAdd.getName()));
                         MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
-                        return AnvilResponse.nil();
+                        return InputResponse.doNothing();
                     }))
                     .build());
         }

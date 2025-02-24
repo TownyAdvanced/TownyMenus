@@ -1,4 +1,5 @@
 main-menu-title: "Towny Menu"
+townymenus:plugin-prefix: "<gold>[TownyMenus] "
 
 main-menu-town: "<green>Town Menu"
 main-menu-town-subtitle: "<gray>Click to view the town menu!"
@@ -291,3 +292,8 @@ government-menus-input: "Enter "
 government-menus-input-withdraw: "withdraw"
 government-menus-input-deposit: "deposit"
 government-menus-input-amount: " amount"
+
+chat-input-header: "<green>Enter in chat, the value for the following:"
+chat-input-timeout-warning: "<green>This prompt will time out after %s seconds."
+chat-input-timed-out: "<red>Prompt timed out."
+chat-input-cancelled: "<red>Chat prompt cancelled."

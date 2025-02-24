@@ -35,7 +35,7 @@ import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.VerticalAnchor;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.menu.helper.GovernmentMenus;
-import io.github.townyadvanced.townymenus.utils.AnvilResponse;
+import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import io.github.townyadvanced.townymenus.utils.Localization;
 import io.github.townyadvanced.townymenus.utils.Time;
 import org.bukkit.Bukkit;
@@ -309,11 +309,11 @@ public class TownMenu {
                                 TownCommand.townSetTitle(player, new String[]{ resident.getName(), completion.getText() }, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilResponse.text(e.getMessage(player));
+                                return InputResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
-                            return AnvilResponse.close();
+                            return InputResponse.finish();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
@@ -340,11 +340,11 @@ public class TownMenu {
                                 TownCommand.townSetSurname(player, new String[]{ resident.getName(), completion.getText() }, false);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilResponse.text(e.getMessage(player));
+                                return InputResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
-                            return AnvilResponse.nil();
+                            return InputResponse.doNothing();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
@@ -554,7 +554,7 @@ public class TownMenu {
                         .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput(of("town-menu-town-set-enter-town-name").toString(), completion -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
-                                return AnvilResponse.close();
+                                return InputResponse.finish();
 
                             AwaitingConfirmation.await(player);
 
@@ -562,11 +562,11 @@ public class TownMenu {
                                 TownCommand.townSetName(player, new String[]{completion.getText().replaceAll(" ", "_")}, town);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilResponse.text(e.getMessage(player));
+                                return InputResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
-                            return AnvilResponse.nil();
+                            return InputResponse.doNothing();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
@@ -584,17 +584,17 @@ public class TownMenu {
                         .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.leftClick(ClickAction.userInput(of("town-menu-town-set-enter-town-board").toString(), completion -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()))
-                                return AnvilResponse.close();
+                                return InputResponse.finish();
 
                             try {
                                 TownCommand.townSetBoard(player, completion.getText(), playerTown);
                             } catch (TownyException e) {
                                 TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return AnvilResponse.text(e.getMessage(player));
+                                return InputResponse.text(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
-                            return AnvilResponse.nil();
+                            return InputResponse.doNothing();
                         })))
                         .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);

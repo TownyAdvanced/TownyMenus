@@ -49,7 +49,7 @@ public class MenuItem {
     }
 
     public ItemStack itemStack() {
-        return this.itemStack;
+        return this.itemStack.clone();
     }
 
     @NotNull

@@ -13,6 +13,7 @@ import com.palmergames.bukkit.util.Version;
 import io.github.townyadvanced.townymenus.commands.TownyMenuCommand;
 import io.github.townyadvanced.townymenus.commands.MenuExtensionCommand;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
+import io.github.townyadvanced.townymenus.gui.input.UserInputBackend;
 import io.github.townyadvanced.townymenus.listeners.AwaitingConfirmation;
 import io.github.townyadvanced.townymenus.listeners.InventoryListener;
 import io.github.townyadvanced.townymenus.listeners.PlayerListener;
@@ -31,6 +32,7 @@ public class TownyMenus extends JavaPlugin implements Listener {
 	private static final Version requiredTownyVersion = Version.fromString("0.100.4.0");
 	private static TownyMenus plugin;
 	private final TaskScheduler scheduler;
+	private UserInputBackend userInputBackend;
 
 	public TownyMenus() {
 		plugin = this;
@@ -46,10 +48,16 @@ public class TownyMenus extends JavaPlugin implements Listener {
 			return;
 		}
 
+		this.userInputBackend = UserInputBackend.selectBackend(this);
+
 		getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 		getServer().getPluginManager().registerEvents(new AwaitingConfirmation(), this);
 		getServer().getPluginManager().registerEvents(this, this);
+
+		if (this.userInputBackend instanceof Listener listener) {
+			getServer().getPluginManager().registerEvents(listener, this);
+		}
 
 		TownyMenuCommand townyMenuCommand = new TownyMenuCommand(this);
 
@@ -95,6 +103,10 @@ public class TownyMenus extends JavaPlugin implements Listener {
 
 	public TaskScheduler getScheduler() {
 		return this.scheduler;
+	}
+
+	public UserInputBackend getUserInputBackend() {
+		return this.userInputBackend;
 	}
 
 	private static boolean isFoliaClassPresent() {
