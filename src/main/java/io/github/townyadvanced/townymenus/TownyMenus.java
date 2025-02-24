@@ -44,13 +44,7 @@ public class TownyMenus extends JavaPlugin implements Listener {
 			getLogger().severe("Download the latest version here: https://github.com/TownyAdvanced/Towny/releases");
 			getServer().getPluginManager().disablePlugin(this);
 			return;
-		} else {
-			getLogger().info("Towny version " + Towny.getPlugin().getVersion() + " found.");
 		}
-
-		/*
-		MenuSettings.loadConfig();
-		*/
 
 		getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -67,7 +61,6 @@ public class TownyMenus extends JavaPlugin implements Listener {
 		TownyCommandAddonAPI.addSubCommand(CommandType.RESIDENT, "menu", new MenuExtensionCommand(ResidentMenu::createResidentMenu));
 		TownyCommandAddonAPI.addSubCommand(CommandType.TOWN, "menu", new MenuExtensionCommand(TownMenu::createTownMenu));
 
-		logger().info("Loading translations...");
 		TownyAPI.getInstance().addTranslations(this, loadTranslations().getTranslations());
 	}
 

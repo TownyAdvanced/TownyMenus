@@ -11,5 +11,6 @@
       "matchUpdateTypes": "minor",
       "enabled": false
     }
-  ]
+  ],
+  "ignoreDeps": ["com.palmergames.bukkit.towny:towny"]
 }
