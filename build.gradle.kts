@@ -70,6 +70,16 @@ tasks {
             github("iconomy5legacy", "iConomy", "5.21", "iConomy-5.21.jar")
         }
     }
+
+	javadoc {
+		val options = options as StandardJavadocDocletOptions
+
+		options.use()
+		options.links(
+			"https://jd.papermc.io/paper/${libs.paper.get().version!!.substringBefore("-")}/",
+			"https://townyadvanced.github.io/Towny/javadoc/release/"
+		)
+	}
 }
 
 modrinth {
