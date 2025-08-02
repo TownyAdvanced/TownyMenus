@@ -1,4 +1,4 @@
 [libraries]
-paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.5-R0.1-SNAPSHOT" }
+paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.8-R0.1-SNAPSHOT" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version = "0.101.1.1" }
-anvilgui = { group = "net.wesjd", name = "anvilgui", version = "1.10.6-SNAPSHOT" }
+anvilgui = { group = "net.wesjd", name = "anvilgui", version = "1.10.8-SNAPSHOT" }

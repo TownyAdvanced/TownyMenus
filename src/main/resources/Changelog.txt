@@ -58,3 +58,5 @@
 0.0.12:
   - Added support for 1.21.5, dropped support for pre-1.19.
   - Added a minecraft version check to AnvilGUI, in order to gracefully fall back to chat as input if it does not support the current version.
+0.0.13:
+  - Add support for 1.21.6-8
