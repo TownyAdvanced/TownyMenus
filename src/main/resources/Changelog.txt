@@ -66,3 +66,4 @@
     - Minecraft version support is unchanged, because 0.101.2.5 still supports all the versions we do (1.20.1 - 1.20.9).
     - Using anvils for user input will not work on 1.21.9 until spigot mappings are added back, since AnvilGUI unfortunately still depends on those.
   - Item names and lore now have full support for the full color spectrum through MiniMessage in the language files, rather than being downsampled.
+  - Chat-based input prompts now properly automatically cancel in more cases after receiving a successful input.
