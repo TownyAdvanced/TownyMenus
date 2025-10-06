@@ -160,15 +160,13 @@ fun readChangelog(): String {
 	val version = project.version.toString().substringBefore("-") // remove -SNAPSHOT if present
 
 	var versionFound = false
-	rootProject.file("src/main/resources/Changelog.txt").readLines().forEach {
-		val line = it.trim()
-
+	rootProject.file("src/main/resources/Changelog.txt").readLines().forEach { line ->
 		if (line.startsWith(version))
 			versionFound = true
-		else if (versionFound && !line.startsWith("-"))
+		else if (versionFound && !line.trim().startsWith("-"))
 			return@forEach
 
-		if (versionFound && line.startsWith("-"))
+		if (versionFound && line.trim().startsWith("-"))
 			lines.add(line)
 	}
 
