@@ -93,7 +93,10 @@ public class TextInputBackend implements UserInputBackend, Listener {
 					cancelSession(player.getUniqueId());
 				}
 				case ErrorMessage errorMessage -> player.sendMessage(errorMessage.error());
-				case OpenPreviousMenu ignored -> MenuHistory.last(player);
+				case OpenPreviousMenu ignored -> {
+					cancelSession(player.getUniqueId());
+					MenuHistory.last(player);
+				}
 				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass());
 			}
 		}
