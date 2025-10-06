@@ -202,8 +202,7 @@ public class NationMenu {
                             try {
                                 NationCommand.nationSet(player, ("name " + snapshot.getText()).split(" "), false, playerNation);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatNationSetMenu(player));
@@ -229,8 +228,7 @@ public class NationMenu {
                             try {
                                 NationCommand.nationSet(player, ("board " + board.getText()).split(" "), false, playerNation);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatNationSetMenu(player));
@@ -312,8 +310,7 @@ public class NationMenu {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode());
                                 NationCommand.nationSet(player, new String[]{"title", resident.getName(), completion.getText()}, false, nation);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
@@ -347,8 +344,7 @@ public class NationMenu {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode());
                                 NationCommand.nationSet(player, new String[]{"surname", resident.getName(), completion.getText()}, false, nation);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);

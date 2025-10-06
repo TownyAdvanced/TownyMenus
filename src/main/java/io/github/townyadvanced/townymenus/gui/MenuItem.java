@@ -3,7 +3,6 @@ package io.github.townyadvanced.townymenus.gui;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.slot.Slot;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;

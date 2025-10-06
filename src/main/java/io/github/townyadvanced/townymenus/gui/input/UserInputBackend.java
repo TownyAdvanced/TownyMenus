@@ -6,6 +6,7 @@ import io.github.townyadvanced.townymenus.gui.input.impl.anvil.AnvilInputBackend
 import io.github.townyadvanced.townymenus.gui.input.impl.text.TextInputBackend;
 import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import net.kyori.adventure.text.Component;
+import net.wesjd.anvilgui.AnvilGUI;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
@@ -18,13 +19,24 @@ public interface UserInputBackend {
 
 	static UserInputBackend selectBackend(TownyMenus plugin) {
 		try {
+
 			// Use reflection to access the versions map in anvilgui to check if it contains the current mc version
 			final Field versionMapField = VersionMatcher.class.getDeclaredField("VERSION_TO_REVISION");
 			versionMapField.setAccessible(true);
 			final Map<?, ?> versionMap = (Map<?, ?>) versionMapField.get(null);
 
 			if (versionMap.containsKey(plugin.getServer().getMinecraftVersion())) {
-				return new AnvilInputBackend(plugin);
+				boolean stillNotCompatible = false;
+
+				try {
+					new AnvilGUI.Builder(); // this throws if spigot mappings are not available
+				} catch (Throwable throwable) {
+					stillNotCompatible = true;
+				}
+
+				if (!stillNotCompatible) {
+					return new AnvilInputBackend(plugin);
+				}
 			}
 		} catch (Throwable throwable) {
 			plugin.getSLF4JLogger().warn("Failed to check AnvilGUI minecraft version compatability", throwable);

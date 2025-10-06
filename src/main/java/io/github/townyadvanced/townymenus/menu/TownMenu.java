@@ -308,8 +308,7 @@ public class TownMenu {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode());
                                 TownCommand.townSetTitle(player, new String[]{ resident.getName(), completion.getText() }, false);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
@@ -339,8 +338,7 @@ public class TownMenu {
                                 BaseCommand.checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode());
                                 TownCommand.townSetSurname(player, new String[]{ resident.getName(), completion.getText() }, false);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.last(player);
@@ -561,8 +559,7 @@ public class TownMenu {
                             try {
                                 TownCommand.townSetName(player, new String[]{completion.getText().replaceAll(" ", "_")}, town);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
@@ -589,8 +586,7 @@ public class TownMenu {
                             try {
                                 TownCommand.townSetBoard(player, completion.getText(), playerTown);
                             } catch (TownyException e) {
-                                TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                return InputResponse.text(e.getMessage(player));
+                                return InputResponse.errorMessage(e.getMessage(player));
                             }
 
                             MenuHistory.reOpen(player, () -> formatTownSetMenu(player));

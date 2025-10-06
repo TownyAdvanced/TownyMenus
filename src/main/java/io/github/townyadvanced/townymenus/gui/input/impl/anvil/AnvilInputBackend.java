@@ -10,9 +10,10 @@ import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import io.github.townyadvanced.townymenus.gui.input.PlayerInput;
 import io.github.townyadvanced.townymenus.gui.input.response.Nothing;
 import io.github.townyadvanced.townymenus.gui.input.response.ReOpen;
-import io.github.townyadvanced.townymenus.gui.input.response.ReplaceText;
+import io.github.townyadvanced.townymenus.gui.input.response.ErrorMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -50,11 +51,11 @@ public class AnvilInputBackend implements UserInputBackend {
 
 		for (final InputResponse response : responses) {
 			switch (response) {
-				case Finish close -> anvilResponses.add(AnvilGUI.ResponseAction.close());
+				case Finish ignored -> anvilResponses.add(AnvilGUI.ResponseAction.close());
 				case Nothing nothing -> {}
 				case ReOpen reOpen -> anvilResponses.add((anvilGUI, player) -> MenuHistory.reOpen(player, reOpen.supplier()));
-				case ReplaceText replaceText -> anvilResponses.add(AnvilGUI.ResponseAction.replaceInputText(replaceText.newText()));
-				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass().toString());
+				case ErrorMessage errorMessage -> anvilResponses.add(((anvilGUI, player) -> player.sendMessage(errorMessage.error())));
+				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass());
 			}
 		}
 

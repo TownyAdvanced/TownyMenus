@@ -10,7 +10,7 @@ import io.github.townyadvanced.townymenus.gui.input.PlayerInput;
 import io.github.townyadvanced.townymenus.gui.input.UserInputBackend;
 import io.github.townyadvanced.townymenus.gui.input.response.Nothing;
 import io.github.townyadvanced.townymenus.gui.input.response.ReOpen;
-import io.github.townyadvanced.townymenus.gui.input.response.ReplaceText;
+import io.github.townyadvanced.townymenus.gui.input.response.ErrorMessage;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -91,8 +91,8 @@ public class TextInputBackend implements UserInputBackend, Listener {
 					MenuHistory.reOpen(player, reOpen.supplier());
 					cancelSession(player.getUniqueId());
 				}
-				case ReplaceText replaceText -> {} // Doesn't work with chat
-				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass().toString());
+				case ErrorMessage errorMessage -> player.sendMessage(errorMessage.error());
+				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass());
 			}
 		}
 	}

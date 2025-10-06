@@ -120,7 +120,7 @@ public class GovernmentMenus {
             try {
                 MathUtil.getIntOrThrow(completion.getText());
             } catch (TownyException e) {
-                return InputResponse.text(e.getMessage(player));
+                return InputResponse.errorMessage(e.getMessage(player));
             }
 
             boolean town = government instanceof Town;

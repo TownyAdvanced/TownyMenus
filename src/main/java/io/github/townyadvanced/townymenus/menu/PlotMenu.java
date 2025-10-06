@@ -413,11 +413,11 @@ public class PlotMenu {
                                 try {
                                     plotPrice = Double.parseDouble(completion.getText());
                                 } catch (NumberFormatException e) {
-                                    return InputResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
+                                    return InputResponse.errorMessage(of("plot-menu-plot-sell-invalid-price", completion.getText()).component(locale));
                                 }
 
                                 if (plotPrice < 0)
-                                    return InputResponse.text(completion.getText() + of("plot-menu-plot-sell-invalid-price").translate(locale));
+                                    return InputResponse.errorMessage(of("plot-menu-plot-sell-invalid-price", completion.getText()).component(locale));
 
                                 putTownBlockForSale(player, townBlock, plotPrice);
 
@@ -571,7 +571,7 @@ public class PlotMenu {
                     .action(ClickAction.userInput(of("plot-menu-trust-enter-player").translate(locale), completion -> {
                         Resident resident = TownyAPI.getInstance().getResident(completion.getText());
                         if (resident == null)
-                            return InputResponse.text(of("plot-menu-trust-invalid-resident").translate(locale));
+                            return InputResponse.errorMessage(of("plot-menu-trust-invalid-resident").component(locale));
 
                         TownBlock townBlock1 = TownyAPI.getInstance().getTownBlock(worldCoord);
                         if (townBlock1 == null)
@@ -585,7 +585,7 @@ public class PlotMenu {
 
                         if (group == null) {
                             if (townBlock1.hasTrustedResident(resident))
-                                return InputResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
+                                return InputResponse.errorMessage(of("plot-menu-trust-already", resident.getName()).component(locale));
 
                             PlotTrustAddEvent event = new PlotTrustAddEvent(townBlock, resident, player);
                             Bukkit.getPluginManager().callEvent(event);
@@ -603,7 +603,7 @@ public class PlotMenu {
                                 TownyMessaging.sendMsg(resident, of("msg_trusted_added_2", player.getName(), of("townblock"), townBlock.getWorldCoord().getCoord().toString()));
                         } else {
                             if (group.hasTrustedResident(resident))
-                                return InputResponse.text(resident.getName() + of("plot-menu-trust-already").translate(locale));
+                                return InputResponse.errorMessage(of("plot-menu-trust-already", resident.getName()).component(locale));
 
                             PlotTrustAddEvent event = new PlotTrustAddEvent(new ArrayList<>(group.getTownBlocks()), resident, player);
                             Bukkit.getPluginManager().callEvent(event);
@@ -692,11 +692,10 @@ public class PlotMenu {
 
                         final Resident toAdd = TownyAPI.getInstance().getResident(completion.getText());
                         if (toAdd == null)
-                            return InputResponse.text(Translatable.of("msg_err_not_registered_1").stripColors(true).forLocale(player));
+                            return InputResponse.errorMessage(of("msg_err_not_registered_1", completion.getText()).component(locale));
 
                         if (tb.getPermissionOverrides().containsKey(toAdd)) {
-                            TownyMessaging.sendErrorMsg(player, Translatable.of("msg_overrides_already_set", toAdd.getName(), Translatable.of("townblock")));
-                            return InputResponse.doNothing();
+                            return InputResponse.errorMessage(of("msg_overrides_already_set", toAdd.getName(), Translatable.of("townblock")).component(locale));
                         }
 
                         PlotGroup group = tb.getPlotObjectGroup();

@@ -179,14 +179,14 @@ public class ResidentMenu {
 
                         Resident resident = TownyAPI.getInstance().getResident(player);
                         if (resident == null)
-                            return InputResponse.text(of("msg_err_not_registered").translate(locale));
+                            return InputResponse.errorMessage(of("msg_err_not_registered").component(locale));
 
                         Resident friend = TownyAPI.getInstance().getResident(completion.getText());
                         if (friend == null || friend.isNPC() || friend.getUUID().equals(resident.getUUID()))
-                            return InputResponse.text(of("resident-menu-add-friend-invalid", completion.getText()).translate(locale));
+                            return InputResponse.errorMessage(of("resident-menu-add-friend-invalid", completion.getText()).component(locale));
 
                         if (resident.hasFriend(friend))
-                            return InputResponse.text(of("resident-menu-add-friend-already-friend", friend.getName()).translate(locale));
+                            return InputResponse.errorMessage(of("resident-menu-add-friend-already-friend", friend.getName()).component(locale));
 
                         List<Resident> friends = new ArrayList<>();
                         friends.add(friend);
