@@ -11,18 +11,8 @@ repositories {
     mavenCentral()
 
     maven("https://repo.papermc.io/repository/maven-public/")
-
-    // Towny
-    maven {
-        name = "glare-repo"
-        url = uri("https://repo.glaremasters.me/repository/towny/")
-    }
-
-    // AnvilGUI
-    maven {
-        name = "codemc"
-        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
-    }
+	maven("https://repo.glaremasters.me/repository/towny/")
+	maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
 dependencies {
@@ -60,7 +50,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.5")
+        minecraftVersion("1.21.9")
 
         downloadPlugins {
             libs.towny.get().version?.let { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }

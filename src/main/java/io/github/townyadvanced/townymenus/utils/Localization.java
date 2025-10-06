@@ -1,6 +1,6 @@
 package io.github.townyadvanced.townymenus.utils;
 
-import com.palmergames.adventure.translation.Translator;
+import net.kyori.adventure.translation.Translator;
 import com.palmergames.bukkit.towny.object.Translation;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

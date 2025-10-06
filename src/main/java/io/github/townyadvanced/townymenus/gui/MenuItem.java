@@ -1,8 +1,9 @@
 package io.github.townyadvanced.townymenus.gui;
 
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.TextDecoration;
-import com.palmergames.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;
 import io.github.townyadvanced.townymenus.gui.slot.Slot;
 import io.github.townyadvanced.townymenus.gui.slot.anchor.SlotAnchor;
@@ -22,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class MenuItem {
     public static final NamespacedKey PDC_KEY = Objects.requireNonNull(NamespacedKey.fromString("townymenus:menuitem")); // Hide the might be null message
@@ -78,14 +78,19 @@ public class MenuItem {
         if (meta != null) {
             builder.withGlint(meta.hasEnchants());
 
-            if (meta.hasDisplayName())
-                builder.name(LegacyComponentSerializer.legacySection().deserialize(meta.getDisplayName()));
+			final Component displayName = meta.displayName();
+            if (displayName != null) {
+				builder.name(displayName);
+			}
 
-            if (meta.hasLore())
-                meta.getLore().forEach(lore -> builder.lore(LegacyComponentSerializer.legacySection().deserialize(lore)));
+			final List<Component> lore = meta.lore();
+            if (lore != null) {
+				builder.lore(lore);
+			}
 
-            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.hasOwner() && skullMeta.getOwnerProfile().isComplete())
-                builder.skullOwner(skullMeta.getOwnerProfile().getUniqueId());
+            if (itemStack.getType() == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta && skullMeta.getPlayerProfile() instanceof PlayerProfile profile && profile.getId() != null) {
+				builder.skullOwner(profile.getId());
+			}
         }
 
         for (ClickAction clickAction : this.actions)
@@ -183,17 +188,9 @@ public class MenuItem {
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
                 meta.getPersistentDataContainer().set(PDC_KEY, PersistentDataType.BYTE, (byte) 1);
-                String displayName = LegacyComponentSerializer.legacySection().serialize(name);
 
-                // Set to string with just a legacy color if empty, since spigot just sets the display name to null if it's empty.
-                // Why not just a space? Because a space is wider for players who don't have advanced tooltips enabled...
-                if (displayName.isEmpty())
-                    displayName = "§0";
-
-                meta.setDisplayName(displayName);
-
-                if (!lore.isEmpty())
-                    meta.setLore(lore.stream().map(component -> LegacyComponentSerializer.legacySection().serialize(component)).collect(Collectors.toList()));
+				meta.displayName(this.name);
+				meta.lore(lore);
 
                 if (meta instanceof SkullMeta skullMeta && this.ownerUUID != null)
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(this.ownerUUID));

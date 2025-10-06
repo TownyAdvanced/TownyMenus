@@ -1,11 +1,11 @@
 package io.github.townyadvanced.townymenus.gui;
 
-import com.palmergames.adventure.key.Key;
-import com.palmergames.adventure.sound.Sound;
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
-import com.palmergames.adventure.text.format.TextDecoration;
-import com.palmergames.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import io.github.townyadvanced.townymenus.TownyMenus;
 import io.github.townyadvanced.townymenus.gui.action.ClickAction;

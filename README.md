@@ -8,7 +8,7 @@
 An easy-to-use and accessible way for players to use Towny commands.
 
 ## Requirements
-- [Towny](https://github.com/TownyAdvanced/Towny) version 0.100.2.0 or newer.
+- [Towny](https://github.com/TownyAdvanced/Towny) version 0.101.2.5 or newer.
 - Paper 1.20.1 or newer.
 
 ## About

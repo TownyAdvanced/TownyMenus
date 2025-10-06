@@ -1,6 +1,6 @@
 package io.github.townyadvanced.townymenus.listeners;
 
-import com.palmergames.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import com.palmergames.bukkit.towny.confirmations.ConfirmationHandler;
 import com.palmergames.bukkit.towny.confirmations.event.ConfirmationSendEvent;
 import com.palmergames.bukkit.towny.scheduling.ScheduledTask;

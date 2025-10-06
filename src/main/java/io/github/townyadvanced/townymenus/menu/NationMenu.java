@@ -1,6 +1,6 @@
 package io.github.townyadvanced.townymenus.menu;
 
-import com.palmergames.adventure.text.Component;
+import net.kyori.adventure.text.Component;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.palmergames.bukkit.towny.object.Translatable.*;
-import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class NationMenu {
     public static MenuInventory createNationMenu(@NotNull Player player) {

@@ -1,6 +1,6 @@
 package io.github.townyadvanced.townymenus.gui.action;
 
-import com.palmergames.adventure.text.Component;
+import net.kyori.adventure.text.Component;
 import io.github.townyadvanced.townymenus.gui.MenuHelper;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import org.bukkit.event.inventory.InventoryClickEvent;

@@ -1,7 +1,7 @@
 package io.github.townyadvanced.townymenus.gui.action;
 
-import com.palmergames.adventure.sound.Sound;
-import com.palmergames.adventure.text.Component;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import io.github.townyadvanced.townymenus.gui.MenuInventory;
 import io.github.townyadvanced.townymenus.gui.input.PlayerInput;
 import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;

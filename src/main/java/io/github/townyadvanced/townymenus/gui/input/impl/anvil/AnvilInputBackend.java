@@ -39,7 +39,7 @@ public class AnvilInputBackend implements UserInputBackend {
 
 				return toAnvil(inputFunction.apply(new PlayerInput(snapshot.getText())));
 			})
-			.itemLeft(MenuItem.builder(Material.PAPER).name(com.palmergames.adventure.text.Component.empty()).build().itemStack())
+			.itemLeft(MenuItem.builder(Material.PAPER).name(Component.empty()).build().itemStack())
 			.plugin(plugin)
 			.mainThreadExecutor(run -> player.getScheduler().run(plugin, task -> run.run(), null))
 			.open(player);

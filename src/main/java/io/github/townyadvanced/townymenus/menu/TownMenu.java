@@ -1,6 +1,6 @@
 package io.github.townyadvanced.townymenus.menu;
 
-import com.palmergames.adventure.text.Component;
+import net.kyori.adventure.text.Component;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -50,8 +50,8 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.palmergames.bukkit.towny.object.Translatable.of;
-import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class TownMenu {
     public static MenuInventory createTownMenu(@NotNull Player player) {
@@ -551,7 +551,7 @@ public class TownMenu {
                             else
                                 return of("msg-click-to").append(of("town-menu-town-set-change-name-subtitle")).component(locale);
                         })
-                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput(of("town-menu-town-set-enter-town-name").toString(), completion -> {
+                        .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()) ? ClickAction.NONE : ClickAction.userInput(of("town-menu-town-set-enter-town-name").forLocale(player), completion -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);
                             if (playerTown == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_NAME.getNode()))
                                 return InputResponse.finish();

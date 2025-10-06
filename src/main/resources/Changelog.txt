@@ -60,3 +60,9 @@
   - Added a minecraft version check to AnvilGUI, in order to gracefully fall back to chat as input if it does not support the current version.
 0.0.13:
   - Add support for 1.21.6-8
+0.0.14:
+  - Added support for 1.21.9 and Towny versions 0.101.2.5 and up.
+    - Because of breaking changes made by Towny while switching to Paper, 0.101.2.5 is now also immediately the minimum required version.
+    - Minecraft version support is unchanged, because 0.101.2.5 still supports all the versions we do (1.20.1 - 1.20.9).
+    - Using anvils for user input will not work on 1.21.9 until spigot mappings are added back, since AnvilGUI unfortunately still depends on those.
+  - Item names and lore now have full support for the full color spectrum through MiniMessage in the language files, rather than being downsampled.

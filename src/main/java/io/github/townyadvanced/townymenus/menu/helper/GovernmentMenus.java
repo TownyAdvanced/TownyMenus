@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static com.palmergames.bukkit.towny.object.Translatable.*;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class GovernmentMenus {
     public static MenuItem.Builder createTogglePropertyItem(Player player, Government government, Material material, boolean propertyEnabled, String property) {

@@ -1,8 +1,8 @@
 package io.github.townyadvanced.townymenus.menu;
 
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.format.NamedTextColor;
-import com.palmergames.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
@@ -52,8 +52,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.palmergames.bukkit.towny.object.Translatable.*;
-import static com.palmergames.adventure.text.Component.text;
-import static com.palmergames.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class PlotMenu {
     public static MenuInventory createPlotMenu(@NotNull Player player) {

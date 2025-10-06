@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 public class TownyMenus extends JavaPlugin implements Listener {
 
-	private static final Version requiredTownyVersion = Version.fromString("0.100.4.0");
+	private static final Version requiredTownyVersion = Version.fromString("0.101.2.5");
 	private static TownyMenus plugin;
 	private final TaskScheduler scheduler;
 	private UserInputBackend userInputBackend;
