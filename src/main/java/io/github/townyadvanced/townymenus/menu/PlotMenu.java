@@ -177,22 +177,19 @@ public class PlotMenu {
                             TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                             if (townBlock == null || !testPlotOwner(player, worldCoord) || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_SET_NAME.getNode())) {
-                                MenuHistory.last(player);
-                                return InputResponse.finish();
+                                return InputResponse.openPreviousMenu();
                             }
 
 							String newName = completion.getText().replaceAll(" ", "_");
 
-							plotCommand().ifPresent(command -> {
-                                try {
-                                    command.parsePlotSetName(player, new String[]{ newName }, townBlock);
-                                } catch (TownyException e) {
-                                    TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-                                }
-                            });
-
-                            MenuHistory.last(player);
-                            return InputResponse.finish();
+							return plotCommand().map(command -> {
+								try {
+									command.parsePlotSetName(player, new String[]{ newName }, townBlock);
+									return InputResponse.openPreviousMenu();
+								} catch (TownyException e) {
+									return InputResponse.errorMessage(e.getMessage(player));
+								}
+							}).orElse(InputResponse.openPreviousMenu());
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.REDSTONE_BLOCK)
@@ -405,8 +402,7 @@ public class PlotMenu {
                                 TownBlock townBlock = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                                 if (townBlock == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_FORSALE.getNode()) || !testPlotOwner(player, townBlock)) {
-                                    MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
-                                    return InputResponse.finish();
+                                    return InputResponse.reOpen(() -> createPlotMenu(player, worldCoord));
                                 }
 
                                 double plotPrice;
@@ -420,9 +416,7 @@ public class PlotMenu {
                                     return InputResponse.errorMessage(of("plot-menu-plot-sell-invalid-price", completion.getText()).component(locale));
 
                                 putTownBlockForSale(player, townBlock, plotPrice);
-
-                                MenuHistory.reOpen(player, () -> createPlotMenu(player, worldCoord));
-                                return InputResponse.finish();
+                                return InputResponse.reOpen(() -> createPlotMenu(player, worldCoord));
                             }))
                             .build())
                     .addItem(MenuItem.builder(Material.EMERALD)
@@ -591,8 +585,7 @@ public class PlotMenu {
                             Bukkit.getPluginManager().callEvent(event);
 
                             if (event.isCancelled()) {
-                                TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
-                                return InputResponse.finish();
+                                return InputResponse.errorMessage(event.getCancelMessage());
                             }
 
                             townBlock.addTrustedResident(resident);
@@ -609,8 +602,7 @@ public class PlotMenu {
                             Bukkit.getPluginManager().callEvent(event);
 
                             if (event.isCancelled()) {
-                                TownyMessaging.sendErrorMsg(player, event.getCancelMessage());
-                                return InputResponse.finish();
+                                return InputResponse.errorMessage(event.getCancelMessage());
                             }
 
                             group.addTrustedResident(resident);
@@ -622,8 +614,7 @@ public class PlotMenu {
                                 TownyMessaging.sendMsg(resident, Translatable.of("msg_trusted_added_2", player.getName(), Translatable.of("plotgroup_sing"), group.getName()));
                         }
 
-                        MenuHistory.reOpen(player, () -> formatPlotTrustMenu(player, worldCoord));
-                        return InputResponse.finish();
+                        return InputResponse.reOpen(() -> formatPlotTrustMenu(player, worldCoord));
                     }))
                     .build());
 
@@ -686,8 +677,7 @@ public class PlotMenu {
                         final TownBlock tb = TownyAPI.getInstance().getTownBlock(worldCoord);
 
                         if (tb == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_PERM_ADD.getNode()) || !testPlotOwner(player, tb)) {
-                            MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
-                            return InputResponse.doNothing();
+                            return InputResponse.reOpen(() -> formatPlotPermissionOverrideMenu(player, worldCoord));
                         }
 
                         final Resident toAdd = TownyAPI.getInstance().getResident(completion.getText());
@@ -709,8 +699,7 @@ public class PlotMenu {
                         }
 
                         TownyMessaging.sendMsg(player, Translatable.of("msg_overrides_added", toAdd.getName()));
-                        MenuHistory.reOpen(player, () -> formatPlotPermissionOverrideMenu(player, worldCoord));
-                        return InputResponse.doNothing();
+                        return InputResponse.reOpen(() -> formatPlotPermissionOverrideMenu(player, worldCoord));
                     }))
                     .build());
         }

@@ -134,8 +134,7 @@ public class GovernmentMenus {
                 method.setAccessible(true);
                 method.invoke(null, player, new String[]{completion.getText()}, withdraw);
 
-                MenuHistory.last(player);
-                return InputResponse.doNothing();
+                return InputResponse.openPreviousMenu();
             } catch (ReflectiveOperationException e) {
                 return InputResponse.finish();
             }

@@ -9,6 +9,7 @@ import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import io.github.townyadvanced.townymenus.gui.input.PlayerInput;
 import io.github.townyadvanced.townymenus.gui.input.UserInputBackend;
 import io.github.townyadvanced.townymenus.gui.input.response.Nothing;
+import io.github.townyadvanced.townymenus.gui.input.response.OpenPreviousMenu;
 import io.github.townyadvanced.townymenus.gui.input.response.ReOpen;
 import io.github.townyadvanced.townymenus.gui.input.response.ErrorMessage;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -92,6 +93,7 @@ public class TextInputBackend implements UserInputBackend, Listener {
 					cancelSession(player.getUniqueId());
 				}
 				case ErrorMessage errorMessage -> player.sendMessage(errorMessage.error());
+				case OpenPreviousMenu ignored -> MenuHistory.last(player);
 				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass());
 			}
 		}

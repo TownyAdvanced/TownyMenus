@@ -41,4 +41,8 @@ public interface InputResponse {
     static InputResponse finish() {
         return Finish.INSTANCE;
     }
+
+	static InputResponse openPreviousMenu() {
+		return OpenPreviousMenu.INSTANCE;
+	}
 }

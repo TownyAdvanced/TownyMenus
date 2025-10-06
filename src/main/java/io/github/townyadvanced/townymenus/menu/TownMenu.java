@@ -311,8 +311,7 @@ public class TownMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.last(player);
-                            return InputResponse.finish();
+                            return InputResponse.openPreviousMenu();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
@@ -341,8 +340,7 @@ public class TownMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.last(player);
-                            return InputResponse.doNothing();
+                            return InputResponse.openPreviousMenu();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
@@ -562,8 +560,7 @@ public class TownMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
-                            return InputResponse.doNothing();
+                            return InputResponse.openPreviousMenu();
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
@@ -589,8 +586,7 @@ public class TownMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.reOpen(player, () -> formatTownSetMenu(player));
-                            return InputResponse.doNothing();
+                            return InputResponse.reOpen(() -> formatTownSetMenu(player));
                         })))
                         .action(town == null || !player.hasPermission(PermissionNodes.TOWNY_COMMAND_TOWN_SET_BOARD.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             final Town playerTown = TownyAPI.getInstance().getTown(player);

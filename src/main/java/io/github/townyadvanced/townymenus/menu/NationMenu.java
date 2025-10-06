@@ -205,8 +205,7 @@ public class NationMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.reOpen(player, () -> formatNationSetMenu(player));
-                            return InputResponse.doNothing();
+                            return InputResponse.reOpen(() -> formatNationSetMenu(player));
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.OAK_SIGN)
@@ -231,8 +230,7 @@ public class NationMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.reOpen(player, () -> formatNationSetMenu(player));
-                            return InputResponse.doNothing();
+                            return InputResponse.reOpen(() -> formatNationSetMenu(player));
                         }))
                         .build())
                 .addItem(MenuItem.builder(Material.RED_BED)
@@ -313,8 +311,7 @@ public class NationMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.last(player);
-                            return InputResponse.doNothing();
+                            return InputResponse.openPreviousMenu();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_TITLE.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {
@@ -347,8 +344,7 @@ public class NationMenu {
                                 return InputResponse.errorMessage(e.getMessage(player));
                             }
 
-                            MenuHistory.last(player);
-                            return InputResponse.doNothing();
+                            return InputResponse.openPreviousMenu();
                         })))
                         .action(!player.hasPermission(PermissionNodes.TOWNY_COMMAND_NATION_SET_SURNAME.getNode()) ? ClickAction.NONE : ClickAction.rightClick(ClickAction.run(() -> {
                             try {

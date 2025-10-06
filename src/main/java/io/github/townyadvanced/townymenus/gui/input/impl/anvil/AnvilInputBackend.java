@@ -9,6 +9,7 @@ import io.github.townyadvanced.townymenus.gui.input.response.Finish;
 import io.github.townyadvanced.townymenus.gui.input.response.InputResponse;
 import io.github.townyadvanced.townymenus.gui.input.PlayerInput;
 import io.github.townyadvanced.townymenus.gui.input.response.Nothing;
+import io.github.townyadvanced.townymenus.gui.input.response.OpenPreviousMenu;
 import io.github.townyadvanced.townymenus.gui.input.response.ReOpen;
 import io.github.townyadvanced.townymenus.gui.input.response.ErrorMessage;
 import net.kyori.adventure.text.Component;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class AnvilInputBackend implements UserInputBackend {
@@ -50,12 +52,17 @@ public class AnvilInputBackend implements UserInputBackend {
 		final List<AnvilGUI.ResponseAction> anvilResponses = new ArrayList<>();
 
 		for (final InputResponse response : responses) {
-			switch (response) {
-				case Finish ignored -> anvilResponses.add(AnvilGUI.ResponseAction.close());
-				case Nothing nothing -> {}
-				case ReOpen reOpen -> anvilResponses.add((anvilGUI, player) -> MenuHistory.reOpen(player, reOpen.supplier()));
-				case ErrorMessage errorMessage -> anvilResponses.add(((anvilGUI, player) -> player.sendMessage(errorMessage.error())));
+			final AnvilGUI.ResponseAction action = switch (response) {
+				case Finish ignored -> AnvilGUI.ResponseAction.close();
+				case Nothing ignored -> null;
+				case ReOpen reOpen -> (anvilGUI, player) -> MenuHistory.reOpen(player, reOpen.supplier());
+				case ErrorMessage errorMessage -> (anvilGUI, player) -> player.sendMessage(errorMessage.error());
+				case OpenPreviousMenu ignored -> (anvilGUI, player) -> MenuHistory.last(player);
 				default -> throw new IllegalArgumentException("Unimplemented input response type " + response.getClass());
+			};
+
+			if (action != null) {
+				anvilResponses.add(action);
 			}
 		}
 
