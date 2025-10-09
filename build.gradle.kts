@@ -3,7 +3,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.8"
     id("xyz.jpenilla.run-paper") version "2.2.3"
 	id("com.modrinth.minotaur") version "2.8.7"
-	id("me.modmuss50.mod-publish-plugin") version "0.5.1"
+	id("me.modmuss50.mod-publish-plugin") version "1.0.0"
 	id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
