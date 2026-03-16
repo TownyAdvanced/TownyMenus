@@ -1,4 +1,23 @@
+[versions]
+paper = "1.21.11-R0.1-SNAPSHOT"
+towny = "0.102.0.0"
+anvilgui = "1.10.11-SNAPSHOT"
+
+# plugins
+shadow = "9.4.0"
+run-paper = "3.0.2"
+minotaur = "2.9.0"
+mod-publish = "1.1.0"
+hangar-publish = "0.1.4"
+
 [libraries]
-paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.8-R0.1-SNAPSHOT" }
-towny = { group = "com.palmergames.bukkit.towny", name = "towny", version = "0.101.2.5" }
-anvilgui = { group = "net.wesjd", name = "anvilgui", version = "1.10.9-SNAPSHOT" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
+anvilgui = { group = "net.wesjd", name = "anvilgui", version.ref = "anvilgui" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+mod-publish = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish" }
+hangar-publish = { id = "io.papermc.hangar-publish-plugin", version.ref = "hangar-publish" }

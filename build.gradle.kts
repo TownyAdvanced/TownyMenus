@@ -1,18 +1,23 @@
 plugins {
     java
-    id("com.gradleup.shadow") version "8.3.8"
-    id("xyz.jpenilla.run-paper") version "2.2.3"
-	id("com.modrinth.minotaur") version "2.8.7"
-	id("me.modmuss50.mod-publish-plugin") version "0.5.1"
-	id("io.papermc.hangar-publish-plugin") version "0.1.3"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.run.paper)
+	alias(libs.plugins.minotaur)
+	alias(libs.plugins.mod.publish)
+	alias(libs.plugins.hangar.publish)
 }
 
 repositories {
     mavenCentral()
-
     maven("https://repo.papermc.io/repository/maven-public/")
-	maven("https://repo.glaremasters.me/repository/towny/")
-	maven("https://repo.codemc.io/repository/maven-snapshots/")
+
+	maven("https://repo.glaremasters.me/repository/towny/") {
+		mavenContent { includeGroup("com.palmergames.bukkit.towny") }
+	}
+
+	maven("https://mvn.wesjd.net/") {
+		mavenContent { includeGroup("net.wesjd") }
+	}
 }
 
 dependencies {
@@ -50,10 +55,10 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.9")
+        minecraftVersion("1.21.11")
 
         downloadPlugins {
-            libs.towny.get().version?.let { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }
+			libs.versions.towny.map { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }
 
             // Non required plugins
             github("MilkBowl", "Vault", "1.7.3", "Vault.jar")
@@ -66,7 +71,7 @@ tasks {
 
 		options.use()
 		options.links(
-			"https://jd.papermc.io/paper/${libs.paper.get().version!!.substringBefore("-")}/",
+			"https://jd.papermc.io/paper/${libs.versions.paper.get().substringBefore("-")}/",
 			"https://townyadvanced.github.io/Towny/javadoc/release/"
 		)
 	}
