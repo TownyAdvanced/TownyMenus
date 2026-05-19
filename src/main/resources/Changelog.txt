@@ -70,3 +70,4 @@
 0.0.15:
   - Added support for up to 26.1.x, this is hopefully the final version that specifically needs to add support for new versions due to obfuscation being removed.
   - Fixed the joined town date in the town resident overview always being your own instead of the resident's.
+  - Fixed an issue where English translations registered by other plugins were being overwritten when the Towny config is reloaded.
