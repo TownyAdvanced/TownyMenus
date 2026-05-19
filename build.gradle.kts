@@ -55,7 +55,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.11")
+        minecraftVersion("26.1.2")
 
         downloadPlugins {
 			libs.versions.towny.map { github("TownyAdvanced", "Towny", it, "towny-${it}.jar") }
@@ -179,4 +179,13 @@ fun readChangelog(): String {
 	}
 
 	return lines.joinToString("\n")
+}
+
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
+	javaLauncher = javaToolchains.launcherFor {
+		@Suppress("UnstableApiUsage")
+		vendor = JvmVendorSpec.JETBRAINS
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+	jvmArgs("-XX:+AllowEnhancedClassRedefinition")
 }
