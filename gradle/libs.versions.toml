@@ -1,7 +1,7 @@
 [versions]
 paper = "1.21.11-R0.1-SNAPSHOT"
 towny = "0.102.0.0"
-anvilgui = "1.10.12-SNAPSHOT"
+anvilgui = "1.10.13-SNAPSHOT"
 
 # plugins
 shadow = "9.4.0"
